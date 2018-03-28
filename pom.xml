@@ -13,6 +13,8 @@
         <module>mybatis-boost-core</module>
         <module>mybatis-boost-mapper</module>
         <module>mybatis-boost-limiter</module>
+        <module>mybatis-boost-all</module>
+        <module>mybatis-boost-test</module>
     </modules>
 
     <properties>
@@ -27,6 +29,17 @@
                 <version>${version}</version>
             </dependency>
             <dependency>
+                <groupId>me.rfprojects</groupId>
+                <artifactId>mybatis-boost-mapper</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.rfprojects</groupId>
+                <artifactId>mybatis-boost-limiter</artifactId>
+                <version>${version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>persistence-api</artifactId>
                 <version>1.0.2</version>
@@ -35,6 +48,11 @@
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>3.4.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
