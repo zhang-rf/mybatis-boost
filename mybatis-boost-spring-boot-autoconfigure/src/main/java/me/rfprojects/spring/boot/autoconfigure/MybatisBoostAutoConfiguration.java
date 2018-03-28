@@ -4,6 +4,7 @@ import me.rfprojects.limiter.LimiterInterceptor;
 import me.rfprojects.mapper.MapperInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Configuration
-@ConditionalOnBean({SqlSessionFactory.class})
-@EnableConfigurationProperties({MybatisBoostProperties.class})
-@AutoConfigureAfter({MybatisAutoConfiguration.class})
+@EnableConfigurationProperties(MybatisBoostProperties.class)
+@ConditionalOnBean({SqlSessionFactory.class, MapperScannerConfigurer.class})
+@AutoConfigureAfter(MybatisAutoConfiguration.class)
 public class MybatisBoostAutoConfiguration {
 
     private final MybatisBoostProperties properties;
