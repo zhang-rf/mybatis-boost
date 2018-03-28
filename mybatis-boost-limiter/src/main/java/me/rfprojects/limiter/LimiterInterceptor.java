@@ -38,7 +38,7 @@ public class LimiterInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         SqlProvider provider = this.provider;
-        if (provider == null || !configuration.isSingleDatasource()) {
+        if (provider == null || configuration.isMultipleDatasource()) {
             Connection connection = (Connection) invocation.getArgs()[0];
             String databaseName = connection.getMetaData().getDatabaseProductName();
             this.provider = provider = providerMap.get(databaseName);

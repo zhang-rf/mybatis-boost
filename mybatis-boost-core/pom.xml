@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>mybatis-boost</artifactId>
         <groupId>me.rfprojects</groupId>
+        <artifactId>mybatis-boost</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 

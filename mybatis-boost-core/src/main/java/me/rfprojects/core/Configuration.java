@@ -6,7 +6,7 @@ import me.rfprojects.core.adaptor.NoopNameAdaptor;
 public class Configuration {
 
     private NameAdaptor nameAdaptor = new NoopNameAdaptor();
-    private boolean singleDatasource = true;
+    private boolean multipleDatasource;
 
     public static Builder builder() {
         return new Builder();
@@ -16,26 +16,26 @@ public class Configuration {
         return nameAdaptor;
     }
 
-    public boolean isSingleDatasource() {
-        return singleDatasource;
+    public boolean isMultipleDatasource() {
+        return multipleDatasource;
     }
 
     public static class Builder {
 
         private Configuration configuration = new Configuration();
 
+        public Configuration build() {
+            return configuration;
+        }
+
         public Builder setNameAdaptor(NameAdaptor nameAdaptor) {
             configuration.nameAdaptor = nameAdaptor;
             return this;
         }
 
-        public Builder setSingleDatasource(boolean singleDatasource) {
-            configuration.singleDatasource = singleDatasource;
+        public Builder setMultipleDatasource(boolean multipleDatasource) {
+            configuration.multipleDatasource = multipleDatasource;
             return this;
-        }
-
-        public Configuration build() {
-            return configuration;
         }
     }
 }

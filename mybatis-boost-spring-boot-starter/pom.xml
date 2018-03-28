@@ -10,17 +10,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mybatis-boost-limiter</artifactId>
+    <artifactId>mybatis-boost-spring-boot-starter</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>me.rfprojects</groupId>
-            <artifactId>mybatis-boost-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <scope>provided</scope>
+            <artifactId>mybatis-boost-spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
 </project>
