@@ -31,7 +31,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>tech.rfprojects</groupId>
+            <groupId>tech.rfprojects.mybatisboost</groupId>
             <artifactId>mybatis-boost-all</artifactId>
         </dependency>
         <dependency>

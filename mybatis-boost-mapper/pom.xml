@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>tech.rfprojects</groupId>
+            <groupId>tech.rfprojects.mybatisboost</groupId>
             <artifactId>mybatis-boost-core</artifactId>
         </dependency>
         <dependency>

@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>tech.rfprojects</groupId>
+            <groupId>tech.rfprojects.mybatisboost</groupId>
             <artifactId>mybatis-boost-spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>

@@ -26,32 +26,32 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-all</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-core</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-limiter</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-mapper</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-spring-boot-autoconfigure</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
-                <groupId>tech.rfprojects</groupId>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-spring-boot-starter</artifactId>
                 <version>${version}</version>
             </dependency>

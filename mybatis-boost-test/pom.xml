@@ -26,7 +26,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>tech.rfprojects</groupId>
+            <groupId>tech.rfprojects.mybatisboost</groupId>
             <artifactId>mybatis-boost-spring-boot-starter</artifactId>
             <scope>test</scope>
         </dependency>
