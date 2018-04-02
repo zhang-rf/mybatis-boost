@@ -48,7 +48,7 @@ public abstract class EntityUtils {
     public static List<Integer> getIdIndexes(Class<?> type, List<String> properties) {
         return idIndexesCache.computeIfAbsent(type, k ->
                 Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields())
-                        .filter(f -> f.isAnnotationPresent(Id.class))
+                        .filter(f -> Objects.equals(f.getName(), "id") || f.isAnnotationPresent(Id.class))
                         .map(f -> properties.indexOf(f.getName()))
                         .collect(Collectors.toList())));
     }
