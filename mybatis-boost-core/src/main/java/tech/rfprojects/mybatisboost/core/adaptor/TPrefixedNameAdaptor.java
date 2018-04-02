@@ -1,6 +1,6 @@
 package tech.rfprojects.mybatisboost.core.adaptor;
 
-public class T_PrefixedNameAdaptor implements NameAdaptor {
+public class TPrefixedNameAdaptor implements NameAdaptor {
 
     @Override
     public String adapt(String name) {

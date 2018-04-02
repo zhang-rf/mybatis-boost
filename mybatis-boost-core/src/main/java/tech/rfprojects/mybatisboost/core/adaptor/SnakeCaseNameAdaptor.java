@@ -5,12 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class LowercaseUnderscoreNameAdaptor implements NameAdaptor {
+public class SnakeCaseNameAdaptor implements NameAdaptor {
 
     @Override
     public String adapt(String name) {
         return Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(name))
-                .map(String::toLowerCase)
-                .collect(Collectors.joining("_"));
+                .collect(Collectors.joining("_")).toLowerCase();
     }
 }
