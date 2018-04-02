@@ -19,6 +19,6 @@ public class PostgreSQL implements SqlProvider {
 
     @Override
     public String toString() {
-        return "MySQL";
+        return "PostgreSQL";
     }
 }
