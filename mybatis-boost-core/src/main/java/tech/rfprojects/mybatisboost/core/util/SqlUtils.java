@@ -19,4 +19,11 @@ public abstract class SqlUtils {
         }
         return sql;
     }
+
+    public static String appendLimitOffset(String sql, RowBounds rowBounds) {
+        if (rowBounds.getOffset() != RowBounds.NO_ROW_OFFSET || rowBounds.getLimit() != RowBounds.NO_ROW_LIMIT) {
+            sql += " LIMIT " + rowBounds.getLimit() + " OFFSET " + rowBounds.getOffset();
+        }
+        return sql;
+    }
 }
