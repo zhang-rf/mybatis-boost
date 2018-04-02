@@ -30,8 +30,9 @@ public class MybatisBoostAutoConfiguration {
     @ConditionalOnMissingBean
     public tech.rfprojects.mybatisboost.core.Configuration configuration()
             throws IllegalAccessException, InstantiationException {
-        tech.rfprojects.mybatisboost.core.Configuration.Builder builder = tech.rfprojects.mybatisboost.core.Configuration.builder()
-                .setMultipleDatasource(properties.isMultipleDatasource());
+        tech.rfprojects.mybatisboost.core.Configuration.Builder builder =
+                tech.rfprojects.mybatisboost.core.Configuration.builder()
+                        .setMultipleDatasource(properties.isMultipleDatasource());
         if (properties.getNameAdaptor() != null) {
             builder.setNameAdaptor(properties.getNameAdaptor().newInstance());
         } else {
