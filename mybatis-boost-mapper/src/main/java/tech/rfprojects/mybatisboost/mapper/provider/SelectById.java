@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FindById implements SqlProvider, ConfigurationAware {
+public class SelectById implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 

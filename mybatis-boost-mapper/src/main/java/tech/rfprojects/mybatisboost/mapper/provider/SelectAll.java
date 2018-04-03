@@ -8,7 +8,7 @@ import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
 import tech.rfprojects.mybatisboost.core.util.EntityUtils;
 
-public class FindAll implements SqlProvider, ConfigurationAware {
+public class SelectAll implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 

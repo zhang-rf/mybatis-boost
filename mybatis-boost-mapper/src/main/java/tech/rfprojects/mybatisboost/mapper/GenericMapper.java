@@ -11,23 +11,23 @@ import java.util.List;
 
 public interface GenericMapper<T> {
 
-    @SelectProvider(type = Find.class, method = "reserved")
-    T findOne(T entity);
+    @SelectProvider(type = Select.class, method = "reserved")
+    T selectOne(T entity);
 
-    @SelectProvider(type = FindById.class, method = "reserved")
-    T findById(Object... id);
+    @SelectProvider(type = SelectById.class, method = "reserved")
+    T selectById(Object... id);
 
-    @SelectProvider(type = Find.class, method = "reserved")
-    List<T> find(T entity);
+    @SelectProvider(type = Select.class, method = "reserved")
+    List<T> select(T entity);
 
-    @SelectProvider(type = Find.class, method = "reserved")
-    List<T> findWithRowBounds(T entity, RowBounds rowBounds);
+    @SelectProvider(type = Select.class, method = "reserved")
+    List<T> selectWithRowBounds(T entity, RowBounds rowBounds);
 
-    @SelectProvider(type = FindAll.class, method = "reserved")
-    List<T> findAll();
+    @SelectProvider(type = SelectAll.class, method = "reserved")
+    List<T> selectAll();
 
-    @SelectProvider(type = FindAll.class, method = "reserved")
-    List<T> findAllWithRowBounds(RowBounds rowBounds);
+    @SelectProvider(type = SelectAll.class, method = "reserved")
+    List<T> selectAllWithRowBounds(RowBounds rowBounds);
 
     @InsertProvider(type = Insert.class, method = "reserved")
     int insert(T entity);

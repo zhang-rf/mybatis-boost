@@ -13,7 +13,7 @@ import tech.rfprojects.mybatisboost.core.util.SqlUtils;
 
 import java.util.List;
 
-public class Find implements SqlProvider, ConfigurationAware {
+public class Select implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 

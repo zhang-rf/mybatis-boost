@@ -18,6 +18,6 @@ public class MybatisBoostTest {
 
     @Test
     public void myTest() {
-        System.out.println(mapper.findAllWithRowBounds(new RowBounds(1, 1)));
+        System.out.println(mapper.selectAllWithRowBounds(new RowBounds(1, 1)));
     }
 }
