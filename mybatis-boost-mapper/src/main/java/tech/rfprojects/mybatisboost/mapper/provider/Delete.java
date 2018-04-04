@@ -26,7 +26,8 @@ public class Delete implements SqlProvider, ConfigurationAware {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("DELETE FROM ").append(tableName);
 
-        List<String> properties = EntityUtils.getProperties(parameterObject, true);
+        List<String> properties = EntityUtils.getProperties(parameterObject,
+                true, false, false);
         if (!properties.isEmpty()) {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");

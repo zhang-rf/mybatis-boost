@@ -1,6 +1,8 @@
 package tech.rfprojects.mybatisboost.core.util;
 
 import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.ref.WeakReference;
@@ -23,5 +25,13 @@ public abstract class MyBatisUtils {
                     .map(p -> new ParameterMapping.Builder(configuration, p, Object.class).build())
                     .collect(Collectors.toList())));
         }).get();
+    }
+
+    public static MetaObject getRealMetaObject(Object target) {
+        MetaObject metaObject;
+        while ((metaObject = SystemMetaObject.forObject(target)).hasGetter("h")) {
+            target = metaObject.getValue("h.target");
+        }
+        return metaObject;
     }
 }

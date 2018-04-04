@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class EntityUtils {
 
@@ -61,18 +62,26 @@ public abstract class EntityUtils {
                         .collect(Collectors.toList()))));
     }
 
-    public static List<String> getProperties(Object entity, boolean selective) {
+    public static List<String> getProperties(Object entity, boolean selective, boolean insertable, boolean updatable) {
         Class<?> type = entity.getClass();
-        List<String> properties = getProperties(type);
-        if (selective) {
-            properties = properties.stream()
-                    .map(UncheckedFunction.of(type::getDeclaredField))
-                    .peek(f -> f.setAccessible(true))
-                    .filter(UncheckedPredicate.of(f -> f.get(entity) != null))
-                    .map(UncheckedFunction.of(Field::getName))
-                    .collect(Collectors.toList());
+        if (selective || insertable || updatable) {
+            Stream<Field> stream = getProperties(type).stream()
+                    .map(UncheckedFunction.of(type::getDeclaredField)).peek(f -> f.setAccessible(true));
+            if (selective) {
+                stream = stream.filter(UncheckedPredicate.of(f -> f.get(entity) != null));
+            }
+            if (insertable) {
+                stream = stream.filter(f -> !f.isAnnotationPresent(Column.class) ||
+                        f.getAnnotation(Column.class).insertable());
+            }
+            if (updatable) {
+                stream = stream.filter(f -> !f.isAnnotationPresent(Column.class) ||
+                        f.getAnnotation(Column.class).updatable());
+            }
+            return stream.map(Field::getName).collect(Collectors.toList());
+        } else {
+            return getProperties(type);
         }
-        return properties;
     }
 
     public static List<String> getColumns(Class<?> type, List<String> properties, boolean mapUnderscoreToCamelCase) {

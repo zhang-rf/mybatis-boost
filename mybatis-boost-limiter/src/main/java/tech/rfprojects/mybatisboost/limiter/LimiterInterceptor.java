@@ -7,7 +7,7 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
-import tech.rfprojects.mybatisboost.core.util.MetaObjectUtils;
+import tech.rfprojects.mybatisboost.core.util.MyBatisUtils;
 import tech.rfprojects.mybatisboost.limiter.provider.MySQL;
 
 import java.sql.Connection;
@@ -45,7 +45,7 @@ public class LimiterInterceptor implements Interceptor {
         }
 
         if (provider != null) {
-            MetaObject metaObject = MetaObjectUtils.getRealMetaObject(invocation.getTarget());
+            MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
             MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
             BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
             provider.replace(metaObject, mappedStatement, boundSql);

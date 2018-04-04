@@ -27,7 +27,7 @@ public class Update implements SqlProvider, ConfigurationAware {
         sqlBuilder.append("UPDATE ").append(tableName);
 
         boolean selective = mappedStatement.getId().endsWith("Selective");
-        List<String> properties = EntityUtils.getProperties(parameterObject, selective);
+        List<String> properties = EntityUtils.getProperties(parameterObject, selective, false, true);
         if (!properties.isEmpty()) {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");

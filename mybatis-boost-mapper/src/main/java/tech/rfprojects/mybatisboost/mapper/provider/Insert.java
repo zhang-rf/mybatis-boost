@@ -24,7 +24,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
         String table = EntityUtils.getTableName(parameterType, configuration.getNameAdaptor()), column = "", value = "";
 
         boolean selective = mappedStatement.getId().endsWith("Selective");
-        List<String> properties = EntityUtils.getProperties(parameterObject, selective);
+        List<String> properties = EntityUtils.getProperties(parameterObject, selective, true, false);
         if (!properties.isEmpty()) {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");

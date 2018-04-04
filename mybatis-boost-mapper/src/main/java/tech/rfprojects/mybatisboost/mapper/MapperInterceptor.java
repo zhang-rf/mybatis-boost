@@ -9,7 +9,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
-import tech.rfprojects.mybatisboost.core.util.MetaObjectUtils;
+import tech.rfprojects.mybatisboost.core.util.MyBatisUtils;
 import tech.rfprojects.mybatisboost.core.util.function.UncheckedFunction;
 
 import java.sql.Connection;
@@ -34,7 +34,7 @@ public class MapperInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        MetaObject metaObject = MetaObjectUtils.getRealMetaObject(invocation.getTarget());
+        MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
         if (Objects.equals(boundSql.getSql(), SqlProvider.MYBATIS_BOOST)) {
             MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
