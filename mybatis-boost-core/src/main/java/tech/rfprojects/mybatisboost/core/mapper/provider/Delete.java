@@ -1,4 +1,4 @@
-package tech.rfprojects.mybatisboost.mapper.provider;
+package tech.rfprojects.mybatisboost.core.mapper.provider;
 
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -26,8 +26,7 @@ public class Delete implements SqlProvider, ConfigurationAware {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("DELETE FROM ").append(tableName);
 
-        List<String> properties = EntityUtils.getProperties(parameterObject,
-                true, false, false);
+        List<String> properties = EntityUtils.getProperties(parameterObject, true);
         if (!properties.isEmpty()) {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");

@@ -11,7 +11,6 @@
 
     <modules>
         <module>mybatis-boost-core</module>
-        <module>mybatis-boost-mapper</module>
         <module>mybatis-boost-limiter</module>
         <module>mybatis-boost-all</module>
         <module>mybatis-boost-test</module>
@@ -38,11 +37,6 @@
             <dependency>
                 <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-limiter</artifactId>
-                <version>${version}</version>
-            </dependency>
-            <dependency>
-                <groupId>tech.rfprojects.mybatisboost</groupId>
-                <artifactId>mybatis-boost-mapper</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>

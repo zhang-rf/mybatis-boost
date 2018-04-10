@@ -1,4 +1,4 @@
-package tech.rfprojects.mybatisboost.mapper.provider;
+package tech.rfprojects.mybatisboost.core.mapper.provider;
 
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -7,33 +7,33 @@ import org.apache.ibatis.reflection.MetaObject;
 import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
+import tech.rfprojects.mybatisboost.core.mapper.GenericMapper;
 import tech.rfprojects.mybatisboost.core.util.EntityUtils;
+import tech.rfprojects.mybatisboost.core.util.MapperUtils;
 import tech.rfprojects.mybatisboost.core.util.MyBatisUtils;
 import tech.rfprojects.mybatisboost.core.util.SqlUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class SelectById implements SqlProvider, ConfigurationAware {
+public class DeleteById implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        Class<?> type = mappedStatement.getResultMaps().get(0).getType();
+        Class<?> type = MapperUtils.getEntityTypeFromMapper(GenericMapper.class,
+                mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
 
         String tableName = EntityUtils.getTableName(type, configuration.getNameAdaptor());
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT * FROM ").append(tableName);
+        sqlBuilder.append("DELETE FROM ").append(tableName);
 
         List<String> properties = EntityUtils.getProperties(type);
         boolean mapUnderscoreToCamelCase = (boolean)
                 metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
         List<String> columns = EntityUtils.getColumns(type, properties, mapUnderscoreToCamelCase);
 
-        List<Integer> idIndexes = EntityUtils.getIdIndexes(type, properties);
+        List<Integer> idIndexes = Collections.singletonList(EntityUtils.getIdIndex(type, properties));
         List<String> ids = new ArrayList<>();
         idIndexes.forEach(i -> ids.add(columns.get(i)));
 

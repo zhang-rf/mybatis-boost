@@ -1,4 +1,4 @@
-package tech.rfprojects.mybatisboost.mapper.provider;
+package tech.rfprojects.mybatisboost.core.mapper.provider;
 
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;

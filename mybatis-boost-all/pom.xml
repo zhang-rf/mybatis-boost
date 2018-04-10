@@ -19,10 +19,6 @@
         </dependency>
         <dependency>
             <groupId>tech.rfprojects.mybatisboost</groupId>
-            <artifactId>mybatis-boost-mapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>tech.rfprojects.mybatisboost</groupId>
             <artifactId>mybatis-boost-limiter</artifactId>
         </dependency>
     </dependencies>

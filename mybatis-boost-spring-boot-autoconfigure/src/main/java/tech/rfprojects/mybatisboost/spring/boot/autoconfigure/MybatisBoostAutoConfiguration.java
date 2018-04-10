@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import tech.rfprojects.mybatisboost.core.adaptor.NoopNameAdaptor;
+import tech.rfprojects.mybatisboost.core.mapper.MapperInterceptor;
 import tech.rfprojects.mybatisboost.limiter.LimiterInterceptor;
-import tech.rfprojects.mybatisboost.mapper.MapperInterceptor;
 
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
