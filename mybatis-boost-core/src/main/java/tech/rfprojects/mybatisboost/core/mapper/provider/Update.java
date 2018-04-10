@@ -7,7 +7,6 @@ import org.apache.ibatis.reflection.MetaObject;
 import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
-import tech.rfprojects.mybatisboost.core.mapper.GenericMapper;
 import tech.rfprojects.mybatisboost.core.util.*;
 
 import java.util.List;
@@ -19,24 +18,22 @@ public class Update implements SqlProvider, ConfigurationAware {
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        boolean isSelectiveUpdating = mappedStatement.getId().endsWith("Selectively");
+        Class<?> entityType = MapperUtils.getEntityTypeFromMapper
+                (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
+
         Map parameterMap = (Map) boundSql.getParameterObject();
         int parameterLength = parameterMap.size() / 2;
 
-        Class<?> entityType = MapperUtils.getEntityTypeFromMapper(GenericMapper.class,
-                mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
-        String tableName = EntityUtils.getTableName(entityType, configuration.getNameAdaptor());
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE ").append(tableName);
-
+        Object entity = parameterMap.get("arg0");
+        boolean isSelectiveUpdating = mappedStatement.getId().endsWith("Selectively");
         List<String> properties;
         if (parameterLength == 2) {
-            properties = EntityUtils.getProperties(parameterMap.get("arg0"), isSelectiveUpdating);
+            properties = EntityUtils.getProperties(entity, isSelectiveUpdating);
         } else {
-            Object parameterObject = parameterMap.get("arg0");
             String[] candidateProperties = (String[]) parameterMap.get("arg1");
-            properties = PropertyUtils.buildPropertiesWithCandidates
-                    (candidateProperties, parameterObject, isSelectiveUpdating);
+            properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, isSelectiveUpdating);
         }
 
         String[] conditionalProperties = (String[]) parameterMap.get(parameterLength == 2 ? "arg1" : "arg2");
