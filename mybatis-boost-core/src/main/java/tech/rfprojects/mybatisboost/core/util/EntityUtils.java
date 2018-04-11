@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public abstract class EntityUtils {
 
     private static ConcurrentMap<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
-    private static ConcurrentMap<Class<?>, String> idCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Class<?>, String> idPropertyCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, List<String>> propertiesCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<List<String>, List<String>> columnsCache = new ConcurrentHashMap<>();
 
@@ -46,10 +46,14 @@ public abstract class EntityUtils {
     }
 
     public static String getIdProperty(Class<?> type) {
-        return idCache.computeIfAbsent(type,
-                k -> Arrays.stream(type.getDeclaredFields())
-                        .filter(f -> Objects.equals(f.getName(), "id") || f.isAnnotationPresent(Id.class))
-                        .map(Field::getName).findFirst().orElse(""));
+        return idPropertyCache.computeIfAbsent(type, k -> {
+            try {
+                return type.getDeclaredField("id").getName();
+            } catch (NoSuchFieldException e) {
+                return Arrays.stream(type.getDeclaredFields())
+                        .filter(f -> f.isAnnotationPresent(Id.class)).map(Field::getName).findFirst().orElse(null);
+            }
+        });
     }
 
     public static List<String> getProperties(Class<?> type) {
