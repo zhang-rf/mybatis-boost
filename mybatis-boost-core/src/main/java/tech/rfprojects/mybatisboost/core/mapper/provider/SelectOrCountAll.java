@@ -9,7 +9,7 @@ import tech.rfprojects.mybatisboost.core.SqlProvider;
 import tech.rfprojects.mybatisboost.core.util.EntityUtils;
 import tech.rfprojects.mybatisboost.core.util.MapperUtils;
 
-public class SelectAll implements SqlProvider, ConfigurationAware {
+public class SelectOrCountAll implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 
@@ -18,7 +18,8 @@ public class SelectAll implements SqlProvider, ConfigurationAware {
         String tableName = EntityUtils.getTableName(MapperUtils.getEntityTypeFromMapper
                         (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.'))),
                 configuration.getNameAdaptor());
-        metaObject.setValue("delegate.boundSql.sql", "SELECT * FROM " + tableName);
+        metaObject.setValue("delegate.boundSql.sql", (mappedStatement.getId().endsWith("countAll") ?
+                "SELECT COUNT(*) FROM " : "SELECT * FROM ") + tableName);
     }
 
     @Override

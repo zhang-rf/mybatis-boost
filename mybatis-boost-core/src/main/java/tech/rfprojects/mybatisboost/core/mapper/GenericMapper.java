@@ -11,19 +11,25 @@ import java.util.List;
 
 public interface GenericMapper<T, ID> {
 
-    @SelectProvider(type = Select.class, method = "reserved")
-    T selectOne(T entity);
+    @SelectProvider(type = SelectOrCount.class, method = "reserved")
+    int count(T entity, String... conditionProperties);
 
-    @SelectProvider(type = Select.class, method = "reserved")
-    List<T> select(T entity);
+    @SelectProvider(type = SelectOrCount.class, method = "reserved")
+    T selectOne(T entity, String... conditionProperties);
 
-    @SelectProvider(type = Select.class, method = "reserved")
-    List<T> selectWithRowBounds(T entity, RowBounds rowBounds);
+    @SelectProvider(type = SelectOrCount.class, method = "reserved")
+    List<T> select(T entity, String... conditionProperties);
 
-    @SelectProvider(type = SelectAll.class, method = "reserved")
+    @SelectProvider(type = SelectOrCount.class, method = "reserved")
+    List<T> selectWithRowBounds(T entity, RowBounds rowBounds, String... conditionProperties);
+
+    @SelectProvider(type = SelectOrCountAll.class, method = "reserved")
+    int countAll();
+
+    @SelectProvider(type = SelectOrCountAll.class, method = "reserved")
     List<T> selectAll();
 
-    @SelectProvider(type = SelectAll.class, method = "reserved")
+    @SelectProvider(type = SelectOrCountAll.class, method = "reserved")
     List<T> selectAllWithRowBounds(RowBounds rowBounds);
 
     @SelectProvider(type = SelectByIds.class, method = "reserved")
