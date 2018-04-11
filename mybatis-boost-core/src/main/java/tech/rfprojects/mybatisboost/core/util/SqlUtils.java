@@ -8,8 +8,8 @@ public abstract class SqlUtils {
 
     public static StringBuilder appendWhere(StringBuilder sqlBuilder, Stream<String> stream) {
         sqlBuilder.append(" WHERE ");
-        stream.forEach(c -> sqlBuilder.append(c).append(" = ?, "));
-        sqlBuilder.setLength(sqlBuilder.length() - 2);
+        stream.forEach(c -> sqlBuilder.append(c).append(" = ? AND "));
+        sqlBuilder.setLength(sqlBuilder.length() - 5);
         return sqlBuilder;
     }
 

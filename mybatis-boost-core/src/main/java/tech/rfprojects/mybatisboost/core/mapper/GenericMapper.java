@@ -42,25 +42,25 @@ public interface GenericMapper<T, ID> {
     int insert(T entity, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int insert(List<T> entities, String... properties);
+    int batchInsert(List<T> entities, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
     int insertSelectively(T entity, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int insertSelectively(List<T> entities, String... properties);
+    int batchInsertSelectively(List<T> entities, String... properties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
     int update(T entity, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
-    int update(T entity, String[] properties, String... conditionProperties);
+    int updatePartially(T entity, String[] properties, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
     int updateSelectively(T entity, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
-    int updateSelectively(T entity, String[] properties, String... conditionProperties);
+    int updatePartiallySelectively(T entity, String[] properties, String... conditionProperties);
 
     @DeleteProvider(type = Delete.class, method = "reserved")
     int delete(T entity, String... conditionProperties);

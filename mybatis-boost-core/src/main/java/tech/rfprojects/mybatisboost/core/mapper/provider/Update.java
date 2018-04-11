@@ -36,7 +36,12 @@ public class Update implements SqlProvider, ConfigurationAware {
             properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);
         }
 
-        String[] conditionalProperties = (String[]) parameterMap.get(parameterLength == 2 ? "arg1" : "arg2");
+        String[] conditionalProperties;
+        if (parameterLength == 3) {
+            conditionalProperties = (String[]) parameterMap.get("arg2");
+        } else {
+            conditionalProperties = new String[]{EntityUtils.getIdProperty(entityType)};
+        }
         PropertyUtils.rebuildPropertiesWithConditions(properties, entityType, conditionalProperties);
 
         if (!properties.isEmpty()) {

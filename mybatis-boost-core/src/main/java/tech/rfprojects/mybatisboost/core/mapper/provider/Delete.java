@@ -32,8 +32,7 @@ public class Delete implements SqlProvider, ConfigurationAware {
         List<String> properties;
         String[] conditionalProperties = (String[]) parameterMap.get("arg1");
         if (conditionalProperties.length == 0) {
-            boolean selective = mappedStatement.getId().endsWith("Selectively");
-            properties = EntityUtils.getProperties(entity, selective);
+            properties = EntityUtils.getProperties(entity, true);
         } else {
             properties = Arrays.asList(conditionalProperties);
         }

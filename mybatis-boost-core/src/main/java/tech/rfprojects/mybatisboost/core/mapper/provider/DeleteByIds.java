@@ -30,7 +30,7 @@ public class DeleteByIds implements SqlProvider, ConfigurationAware {
         if (parameterArray.length > 0) {
             String idProperty = EntityUtils.getIdProperty(entityType);
             sqlBuilder.append(" WHERE ").append(idProperty).append(" IN (");
-            Arrays.stream(parameterArray).forEach(c -> sqlBuilder.append(c).append("?, "));
+            Arrays.stream(parameterArray).forEach(c -> sqlBuilder.append("?, "));
             sqlBuilder.setLength(sqlBuilder.length() - 2);
             sqlBuilder.append(')');
 

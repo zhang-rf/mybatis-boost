@@ -29,11 +29,10 @@ public class SelectOrCount implements SqlProvider, ConfigurationAware {
                 .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
         Map parameterMap = (Map) boundSql.getParameterObject();
-        int parameterLength = parameterMap.size() / 2;
-
         Object entity = parameterMap.get("arg0");
         List<String> properties;
-        String[] conditionalProperties = (String[]) parameterMap.get(parameterLength == 2 ? "arg1" : "arg2");
+        String[] conditionalProperties = (String[]) (parameterMap.containsKey("arg1") ?
+                parameterMap.get("arg1") : parameterMap.get("arg2"));
         if (conditionalProperties.length == 0) {
             properties = EntityUtils.getProperties(entity, true);
         } else {
