@@ -8,10 +8,13 @@ import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
 import tech.rfprojects.mybatisboost.core.util.EntityUtils;
+import tech.rfprojects.mybatisboost.core.util.MapperUtils;
 import tech.rfprojects.mybatisboost.core.util.MyBatisUtils;
 import tech.rfprojects.mybatisboost.core.util.SqlUtils;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Delete implements SqlProvider, ConfigurationAware {
 
@@ -19,25 +22,35 @@ public class Delete implements SqlProvider, ConfigurationAware {
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        Object parameterObject = boundSql.getParameterObject();
-        Class<?> parameterType = parameterObject.getClass();
-
-        String tableName = EntityUtils.getTableName(parameterType, configuration.getNameAdaptor());
+        Class<?> entityType = MapperUtils.getEntityTypeFromMapper
+                (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("DELETE FROM ").append(tableName);
+        sqlBuilder.append("DELETE FROM ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        List<String> properties = EntityUtils.getProperties(parameterObject, true);
+        Map parameterMap = (Map) boundSql.getParameterObject();
+        Object entity = parameterMap.get("arg0");
+        List<String> properties;
+        String[] conditionalProperties = (String[]) parameterMap.get("arg1");
+        if (conditionalProperties.length == 0) {
+            boolean selective = mappedStatement.getId().endsWith("Selectively");
+            properties = EntityUtils.getProperties(entity, selective);
+        } else {
+            properties = Arrays.asList(conditionalProperties);
+        }
+
         if (!properties.isEmpty()) {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
-            List<String> columns = EntityUtils.getColumns(parameterType, properties, mapUnderscoreToCamelCase);
-
-            SqlUtils.appendWhere(sqlBuilder, columns);
-            List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
-                    ((org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration"), properties);
-            metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
+            List<String> columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
+            SqlUtils.appendWhere(sqlBuilder, columns.stream());
         }
+
+        List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
+                ((org.apache.ibatis.session.Configuration)
+                        metaObject.getValue("delegate.configuration"), properties);
+        metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
+        metaObject.setValue("delegate.boundSql.parameterObject", entity);
+        metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
     }
 

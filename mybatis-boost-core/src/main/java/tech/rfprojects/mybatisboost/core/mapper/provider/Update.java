@@ -27,13 +27,13 @@ public class Update implements SqlProvider, ConfigurationAware {
         int parameterLength = parameterMap.size() / 2;
 
         Object entity = parameterMap.get("arg0");
-        boolean isSelectiveUpdating = mappedStatement.getId().endsWith("Selectively");
+        boolean selective = mappedStatement.getId().endsWith("Selectively");
         List<String> properties;
         if (parameterLength == 2) {
-            properties = EntityUtils.getProperties(entity, isSelectiveUpdating);
+            properties = EntityUtils.getProperties(entity, selective);
         } else {
             String[] candidateProperties = (String[]) parameterMap.get("arg1");
-            properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, isSelectiveUpdating);
+            properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);
         }
 
         String[] conditionalProperties = (String[]) parameterMap.get(parameterLength == 2 ? "arg1" : "arg2");
@@ -43,7 +43,10 @@ public class Update implements SqlProvider, ConfigurationAware {
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
             List<String> columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
-            SqlUtils.appendSet(sqlBuilder, columns.stream().limit(columns.size() - conditionalProperties.length));
+            sqlBuilder.append(" SET ");
+            columns.stream().limit(columns.size() - conditionalProperties.length)
+                    .forEach(c -> sqlBuilder.append(c).append(" = ?, "));
+            sqlBuilder.setLength(sqlBuilder.length() - 2);
             SqlUtils.appendWhere(sqlBuilder, columns.stream().skip(columns.size() - conditionalProperties.length));
         }
 
@@ -51,6 +54,8 @@ public class Update implements SqlProvider, ConfigurationAware {
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
         metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
+        metaObject.setValue("delegate.boundSql.parameterObject", entity);
+        metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
     }
 

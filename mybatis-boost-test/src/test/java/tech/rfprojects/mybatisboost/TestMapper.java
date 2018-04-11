@@ -4,5 +4,5 @@ import org.apache.ibatis.annotations.Mapper;
 import tech.rfprojects.mybatisboost.core.mapper.GenericMapper;
 
 @Mapper
-public interface TestMapper extends GenericMapper<ProxyDog> {
+public interface TestMapper extends GenericMapper<ProxyDog, Integer> {
 }

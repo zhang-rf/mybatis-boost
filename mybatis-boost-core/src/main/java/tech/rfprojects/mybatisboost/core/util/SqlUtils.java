@@ -28,13 +28,6 @@ public abstract class SqlUtils {
         return sql;
     }
 
-    public static StringBuilder appendSet(StringBuilder sqlBuilder, Stream<String> stream) {
-        sqlBuilder.append(" SET ");
-        stream.forEach(c -> sqlBuilder.append(c).append(" = ?, "));
-        sqlBuilder.setLength(sqlBuilder.length() - 2);
-        return sqlBuilder;
-    }
-
     public static StringBuilder appendWhere(StringBuilder sqlBuilder, Stream<String> stream) {
         sqlBuilder.append(" WHERE ");
         stream.forEach(c -> sqlBuilder.append(c).append(" = ?, "));

@@ -7,6 +7,7 @@ import tech.rfprojects.mybatisboost.core.Configuration;
 import tech.rfprojects.mybatisboost.core.ConfigurationAware;
 import tech.rfprojects.mybatisboost.core.SqlProvider;
 import tech.rfprojects.mybatisboost.core.util.EntityUtils;
+import tech.rfprojects.mybatisboost.core.util.MapperUtils;
 
 public class SelectAll implements SqlProvider, ConfigurationAware {
 
@@ -14,8 +15,9 @@ public class SelectAll implements SqlProvider, ConfigurationAware {
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        String tableName = EntityUtils.getTableName
-                (mappedStatement.getResultMaps().get(0).getType(), configuration.getNameAdaptor());
+        String tableName = EntityUtils.getTableName(MapperUtils.getEntityTypeFromMapper
+                        (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.'))),
+                configuration.getNameAdaptor());
         metaObject.setValue("delegate.boundSql.sql", "SELECT * FROM " + tableName);
     }
 
