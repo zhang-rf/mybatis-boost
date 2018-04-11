@@ -11,10 +11,7 @@ import javax.persistence.Table;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -57,11 +54,11 @@ public abstract class EntityUtils {
     }
 
     public static List<String> getProperties(Class<?> type) {
-        return propertiesCache.computeIfAbsent(type, UncheckedFunction.of(k ->
+        return new ArrayList<>(propertiesCache.computeIfAbsent(type, UncheckedFunction.of(k ->
                 Collections.unmodifiableList(Arrays.stream(Introspector.getBeanInfo(type).getPropertyDescriptors())
                         .map(PropertyDescriptor::getName)
                         .filter(p -> !Objects.equals(p, "class"))
-                        .collect(Collectors.toList()))));
+                        .collect(Collectors.toList())))));
     }
 
     public static List<String> getProperties(Object entity, boolean selective) {
