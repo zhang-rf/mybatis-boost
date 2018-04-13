@@ -15,8 +15,7 @@ import java.util.function.BiConsumer;
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class}),
         @Signature(type = StatementHandler.class, method = "update", args = {Statement.class}),
-        @Signature(type = StatementHandler.class, method = "query", args = {Statement.class, ResultHandler.class})
-})
+        @Signature(type = StatementHandler.class, method = "query", args = {Statement.class, ResultHandler.class})})
 public class MetricInterceptor implements Interceptor {
 
     private static Logger logger = LoggerFactory.getLogger(MetricInterceptor.class);
