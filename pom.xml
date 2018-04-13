@@ -10,12 +10,13 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>mybatis-boost-all</module>
         <module>mybatis-boost-core</module>
         <module>mybatis-boost-limiter</module>
-        <module>mybatis-boost-all</module>
-        <module>mybatis-boost-test</module>
+        <module>mybatis-boost-metric</module>
         <module>mybatis-boost-spring-boot-autoconfigure</module>
         <module>mybatis-boost-spring-boot-starter</module>
+        <module>mybatis-boost-test</module>
     </modules>
 
     <properties>
@@ -37,6 +38,11 @@
             <dependency>
                 <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-limiter</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
+                <artifactId>mybatis-boost-metric</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
@@ -65,6 +71,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.7</version>
             </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

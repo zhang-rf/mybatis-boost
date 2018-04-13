@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import tech.rfprojects.mybatisboost.core.adaptor.NoopNameAdaptor;
 import tech.rfprojects.mybatisboost.core.mapper.MapperInterceptor;
 import tech.rfprojects.mybatisboost.limiter.LimiterInterceptor;
+import tech.rfprojects.mybatisboost.metric.MetricInterceptor;
 
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
@@ -32,19 +32,30 @@ public class MybatisBoostAutoConfiguration {
             throws IllegalAccessException, InstantiationException {
         tech.rfprojects.mybatisboost.core.Configuration.Builder builder =
                 tech.rfprojects.mybatisboost.core.Configuration.builder()
-                        .setMultipleDatasource(properties.isMultipleDatasource());
+                        .setMultipleDatasource(properties.isMultipleDatasource())
+                        .setLogSqlAndTime(properties.isLogSqlAndTime())
+                        .setSlowSqlThresholdInMillis(properties.getSlowSqlThresholdInMillis());
         if (properties.getNameAdaptor() != null) {
             builder.setNameAdaptor(properties.getNameAdaptor().newInstance());
         } else {
             builder.setNameAdaptor(new NoopNameAdaptor());
+        }
+        if (properties.getSlowSqlHandler() != null) {
+            builder.setSlowSqlHandler(properties.getSlowSqlHandler().newInstance());
         }
         return builder.build();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "mybatisboost.metric.enabled", havingValue = "true", matchIfMissing = true)
+    public MetricInterceptor metricInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
+        return new MetricInterceptor(configuration);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnProperty(value = "mybatisboost.limiter.enabled", havingValue = "true", matchIfMissing = true)
-    @Order(-1)
     public LimiterInterceptor limiterInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
         return new LimiterInterceptor(configuration);
     }
@@ -52,7 +63,7 @@ public class MybatisBoostAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(value = "mybatisboost.mapper.enabled", havingValue = "true", matchIfMissing = true)
-    public MapperInterceptor mybatisInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
+    public MapperInterceptor mapperInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
         return new MapperInterceptor(configuration);
     }
 }
