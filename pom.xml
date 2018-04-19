@@ -12,6 +12,7 @@
     <modules>
         <module>mybatis-boost-all</module>
         <module>mybatis-boost-core</module>
+        <module>mybatis-boost-lang</module>
         <module>mybatis-boost-limiter</module>
         <module>mybatis-boost-metric</module>
         <module>mybatis-boost-spring-boot-autoconfigure</module>
@@ -33,6 +34,11 @@
             <dependency>
                 <groupId>tech.rfprojects.mybatisboost</groupId>
                 <artifactId>mybatis-boost-core</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.rfprojects.mybatisboost</groupId>
+                <artifactId>mybatis-boost-lang</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>

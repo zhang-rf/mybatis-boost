@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>mybatis-boost-all</artifactId>
+    <artifactId>mybatis-boost-lang</artifactId>
 
     <dependencies>
         <dependency>
@@ -18,16 +18,9 @@
             <artifactId>mybatis-boost-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>tech.rfprojects.mybatisboost</groupId>
-            <artifactId>mybatis-boost-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>tech.rfprojects.mybatisboost</groupId>
-            <artifactId>mybatis-boost-limiter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>tech.rfprojects.mybatisboost</groupId>
-            <artifactId>mybatis-boost-metric</artifactId>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

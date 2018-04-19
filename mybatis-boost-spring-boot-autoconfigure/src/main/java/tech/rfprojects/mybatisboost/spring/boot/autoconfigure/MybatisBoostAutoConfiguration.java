@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tech.rfprojects.mybatisboost.core.adaptor.NoopNameAdaptor;
 import tech.rfprojects.mybatisboost.core.mapper.MapperInterceptor;
+import tech.rfprojects.mybatisboost.lang.LangInterceptor;
 import tech.rfprojects.mybatisboost.limiter.LimiterInterceptor;
 import tech.rfprojects.mybatisboost.metric.MetricInterceptor;
 
@@ -58,6 +59,13 @@ public class MybatisBoostAutoConfiguration {
     @ConditionalOnProperty(value = "mybatisboost.limiter.enabled", havingValue = "true", matchIfMissing = true)
     public LimiterInterceptor limiterInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
         return new LimiterInterceptor(configuration);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "mybatisboost.lang.enabled", havingValue = "true", matchIfMissing = true)
+    public LangInterceptor langInterceptor(tech.rfprojects.mybatisboost.core.Configuration configuration) {
+        return new LangInterceptor(configuration);
     }
 
     @Bean
