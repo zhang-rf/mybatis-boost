@@ -34,7 +34,8 @@ public class MetricInterceptor implements Interceptor {
         StopWatch stopWatch = StopWatch.createStarted();
         Object proceed = invocation.proceed();
 
-        String sql = ((StatementHandler) invocation.getTarget()).getBoundSql().getSql();
+        String sql = ((StatementHandler) invocation.getTarget()).getBoundSql().getSql()
+                .replaceAll("\\s*\\n\\s*", " ");
         long time = stopWatch.getTime();
         long threshold = configuration.getSlowSqlThresholdInMillis();
         if (threshold > 0 && time > threshold) {
