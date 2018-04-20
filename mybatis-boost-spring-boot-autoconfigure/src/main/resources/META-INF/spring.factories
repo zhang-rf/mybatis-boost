@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-tech.rfprojects.mybatisboost.spring.boot.autoconfigure.MybatisBoostAutoConfiguration
+cn.mybatisboost.spring.boot.autoconfigure.MybatisBoostAutoConfiguration
