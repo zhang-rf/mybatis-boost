@@ -43,7 +43,7 @@ public class MetricInterceptor implements Interceptor {
         BoundSql boundSql = ((StatementHandler) invocation.getTarget()).getBoundSql();
 
         List<Object> parameters = new ArrayList<>();
-        if (configuration.isLogSqlParameters()) {
+        if (configuration.isShowQueryWithParameters()) {
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             Object parameterObject = boundSql.getParameterObject();
             MetaObject metaObject = SystemMetaObject.forObject(parameterObject);
@@ -57,17 +57,17 @@ public class MetricInterceptor implements Interceptor {
 
         String sql = boundSql.getSql().replaceAll("\\s*\\n\\s*", " ");
         long time = stopWatch.getTime();
-        if (time > configuration.getSlowSqlThresholdInMillis()) {
+        if (time > configuration.getSlowQueryThresholdInMillis()) {
             if (parameters.isEmpty()) {
                 logger.error(String.format("[SLOW Query took %s ms] %s", time, sql));
             } else {
                 logger.error(String.format("[SLOW Query took %s ms, Parameters: %s] %s ", time, parameters, sql));
             }
-            BiConsumer<String, Long> slowSqlHandler = configuration.getSlowSqlHandler();
+            BiConsumer<String, Long> slowSqlHandler = configuration.getSlowQueryHandler();
             if (slowSqlHandler != null) {
                 slowSqlHandler.accept(sql, time);
             }
-        } else if (configuration.isLogSqlAndTime()) {
+        } else if (configuration.isShowQuery()) {
             if (parameters.isEmpty()) {
                 logger.info(String.format("[Query took %s ms] %s", time, sql));
             } else {

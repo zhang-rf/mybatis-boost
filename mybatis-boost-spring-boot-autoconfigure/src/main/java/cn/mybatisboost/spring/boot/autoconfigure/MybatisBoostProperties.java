@@ -10,10 +10,10 @@ public class MybatisBoostProperties {
 
     private Class<? extends NameAdaptor> nameAdaptor;
     private boolean multipleDatasource;
-    private boolean logSqlAndTime;
-    private boolean logSqlParameters;
-    private long slowSqlThresholdInMillis = Long.MAX_VALUE;
-    private Class<? extends BiConsumer<String, Long>> slowSqlHandler;
+    private boolean showQuery;
+    private boolean showQueryWithParameters;
+    private long slowQueryThresholdInMillis = Long.MAX_VALUE;
+    private Class<? extends BiConsumer<String, Long>> slowQueryHandler;
 
     public Class<? extends NameAdaptor> getNameAdaptor() {
         return nameAdaptor;
@@ -31,39 +31,39 @@ public class MybatisBoostProperties {
         this.multipleDatasource = multipleDatasource;
     }
 
-    public boolean isLogSqlAndTime() {
-        return logSqlAndTime;
+    public boolean isShowQuery() {
+        return showQuery;
     }
 
-    public MybatisBoostProperties setLogSqlAndTime(boolean logSqlAndTime) {
-        this.logSqlAndTime = logSqlAndTime;
+    public MybatisBoostProperties setShowQuery(boolean showQuery) {
+        this.showQuery = showQuery;
         return this;
     }
 
-    public long getSlowSqlThresholdInMillis() {
-        return slowSqlThresholdInMillis;
+    public boolean isShowQueryWithParameters() {
+        return showQueryWithParameters;
     }
 
-    public MybatisBoostProperties setSlowSqlThresholdInMillis(long slowSqlThresholdInMillis) {
-        this.slowSqlThresholdInMillis = slowSqlThresholdInMillis;
+    public MybatisBoostProperties setShowQueryWithParameters(boolean showQueryWithParameters) {
+        this.showQueryWithParameters = showQueryWithParameters;
         return this;
     }
 
-    public Class<? extends BiConsumer<String, Long>> getSlowSqlHandler() {
-        return slowSqlHandler;
+    public long getSlowQueryThresholdInMillis() {
+        return slowQueryThresholdInMillis;
     }
 
-    public MybatisBoostProperties setSlowSqlHandler(Class<? extends BiConsumer<String, Long>> slowSqlHandler) {
-        this.slowSqlHandler = slowSqlHandler;
+    public MybatisBoostProperties setSlowQueryThresholdInMillis(long slowQueryThresholdInMillis) {
+        this.slowQueryThresholdInMillis = slowQueryThresholdInMillis;
         return this;
     }
 
-    public boolean isLogSqlParameters() {
-        return logSqlParameters;
+    public Class<? extends BiConsumer<String, Long>> getSlowQueryHandler() {
+        return slowQueryHandler;
     }
 
-    public MybatisBoostProperties setLogSqlParameters(boolean logSqlParameters) {
-        this.logSqlParameters = logSqlParameters;
+    public MybatisBoostProperties setSlowQueryHandler(Class<? extends BiConsumer<String, Long>> slowQueryHandler) {
+        this.slowQueryHandler = slowQueryHandler;
         return this;
     }
 }

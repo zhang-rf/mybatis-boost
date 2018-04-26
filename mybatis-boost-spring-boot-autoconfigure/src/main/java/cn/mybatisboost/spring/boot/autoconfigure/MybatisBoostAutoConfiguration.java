@@ -34,16 +34,16 @@ public class MybatisBoostAutoConfiguration {
         cn.mybatisboost.core.Configuration.Builder builder =
                 cn.mybatisboost.core.Configuration.builder()
                         .setMultipleDatasource(properties.isMultipleDatasource())
-                        .setLogSqlAndTime(properties.isLogSqlAndTime())
-                        .setLogSqlParameters(properties.isLogSqlParameters())
-                        .setSlowSqlThresholdInMillis(properties.getSlowSqlThresholdInMillis());
+                        .setShowQuery(properties.isShowQuery())
+                        .setShowQueryWithParameters(properties.isShowQueryWithParameters())
+                        .setSlowQueryThresholdInMillis(properties.getSlowQueryThresholdInMillis());
         if (properties.getNameAdaptor() != null) {
             builder.setNameAdaptor(properties.getNameAdaptor().newInstance());
         } else {
             builder.setNameAdaptor(new NoopNameAdaptor());
         }
-        if (properties.getSlowSqlHandler() != null) {
-            builder.setSlowSqlHandler(properties.getSlowSqlHandler().newInstance());
+        if (properties.getSlowQueryHandler() != null) {
+            builder.setSlowQueryHandler(properties.getSlowQueryHandler().newInstance());
         }
         return builder.build();
     }

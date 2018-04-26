@@ -9,10 +9,10 @@ public class Configuration {
 
     private NameAdaptor nameAdaptor = new NoopNameAdaptor();
     private boolean multipleDatasource;
-    private boolean logSqlAndTime;
-    private boolean logSqlParameters;
-    private long slowSqlThresholdInMillis = Long.MAX_VALUE;
-    private BiConsumer<String, Long> slowSqlHandler;
+    private boolean showQuery;
+    private boolean showQueryWithParameters;
+    private long slowQueryThresholdInMillis = Long.MAX_VALUE;
+    private BiConsumer<String, Long> slowQueryHandler;
 
     public static Builder builder() {
         return new Builder();
@@ -26,25 +26,20 @@ public class Configuration {
         return multipleDatasource;
     }
 
-    public boolean isLogSqlAndTime() {
-        return logSqlAndTime;
+    public boolean isShowQuery() {
+        return showQuery;
     }
 
-    public long getSlowSqlThresholdInMillis() {
-        return slowSqlThresholdInMillis;
+    public boolean isShowQueryWithParameters() {
+        return showQueryWithParameters;
     }
 
-    public BiConsumer<String, Long> getSlowSqlHandler() {
-        return slowSqlHandler;
+    public long getSlowQueryThresholdInMillis() {
+        return slowQueryThresholdInMillis;
     }
 
-    public boolean isLogSqlParameters() {
-        return logSqlParameters;
-    }
-
-    public Configuration setLogSqlParameters(boolean logSqlParameters) {
-        this.logSqlParameters = logSqlParameters;
-        return this;
+    public BiConsumer<String, Long> getSlowQueryHandler() {
+        return slowQueryHandler;
     }
 
     public static class Builder {
@@ -65,23 +60,23 @@ public class Configuration {
             return this;
         }
 
-        public Builder setLogSqlAndTime(boolean logSqlAndTime) {
-            configuration.logSqlAndTime = logSqlAndTime;
+        public Builder setShowQuery(boolean showQuery) {
+            configuration.showQuery = showQuery;
             return this;
         }
 
-        public Builder setLogSqlParameters(boolean logSqlParameters) {
-            configuration.logSqlParameters = logSqlParameters;
+        public Builder setShowQueryWithParameters(boolean showQueryWithParameters) {
+            configuration.showQueryWithParameters = showQueryWithParameters;
             return this;
         }
 
-        public Builder setSlowSqlThresholdInMillis(long slowSqlThresholdInMillis) {
-            configuration.slowSqlThresholdInMillis = slowSqlThresholdInMillis;
+        public Builder setSlowQueryThresholdInMillis(long slowQueryThresholdInMillis) {
+            configuration.slowQueryThresholdInMillis = slowQueryThresholdInMillis;
             return this;
         }
 
-        public Builder setSlowSqlHandler(BiConsumer<String, Long> slowSqlHandler) {
-            configuration.slowSqlHandler = slowSqlHandler;
+        public Builder setSlowQueryHandler(BiConsumer<String, Long> slowQueryHandler) {
+            configuration.slowQueryHandler = slowQueryHandler;
             return this;
         }
     }
