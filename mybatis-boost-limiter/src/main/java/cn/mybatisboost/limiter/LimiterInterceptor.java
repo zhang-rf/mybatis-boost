@@ -4,6 +4,7 @@ import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.limiter.provider.MySQL;
+import cn.mybatisboost.limiter.provider.PostgreSQL;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -29,6 +30,7 @@ public class LimiterInterceptor implements Interceptor {
     public LimiterInterceptor(Configuration configuration) {
         this.configuration = configuration;
         addProvider(new MySQL());
+        addProvider(new PostgreSQL());
     }
 
     public synchronized void addProvider(SqlProvider provider) {
