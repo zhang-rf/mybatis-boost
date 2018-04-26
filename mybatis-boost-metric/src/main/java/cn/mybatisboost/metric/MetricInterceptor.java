@@ -57,8 +57,7 @@ public class MetricInterceptor implements Interceptor {
 
         String sql = boundSql.getSql().replaceAll("\\s*\\n\\s*", " ");
         long time = stopWatch.getTime();
-        long threshold = configuration.getSlowSqlThresholdInMillis();
-        if (threshold > 0 && time > threshold) {
+        if (time > configuration.getSlowSqlThresholdInMillis()) {
             if (parameters.isEmpty()) {
                 logger.error(String.format("[SLOW Query took %s ms] %s", time, sql));
             } else {

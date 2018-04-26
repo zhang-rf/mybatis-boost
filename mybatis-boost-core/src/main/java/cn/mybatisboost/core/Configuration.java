@@ -11,7 +11,7 @@ public class Configuration {
     private boolean multipleDatasource;
     private boolean logSqlAndTime;
     private boolean logSqlParameters;
-    private long slowSqlThresholdInMillis;
+    private long slowSqlThresholdInMillis = Long.MAX_VALUE;
     private BiConsumer<String, Long> slowSqlHandler;
 
     public static Builder builder() {

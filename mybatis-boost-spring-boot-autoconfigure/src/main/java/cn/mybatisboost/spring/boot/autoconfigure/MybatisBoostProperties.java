@@ -12,7 +12,7 @@ public class MybatisBoostProperties {
     private boolean multipleDatasource;
     private boolean logSqlAndTime;
     private boolean logSqlParameters;
-    private long slowSqlThresholdInMillis;
+    private long slowSqlThresholdInMillis = Long.MAX_VALUE;
     private Class<? extends BiConsumer<String, Long>> slowSqlHandler;
 
     public Class<? extends NameAdaptor> getNameAdaptor() {
