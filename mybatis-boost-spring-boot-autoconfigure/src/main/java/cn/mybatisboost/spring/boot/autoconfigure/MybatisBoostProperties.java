@@ -10,7 +10,8 @@ public class MybatisBoostProperties {
 
     private Class<? extends NameAdaptor> nameAdaptor;
     private boolean multipleDatasource;
-    private boolean logSqlAndTime = false;
+    private boolean logSqlAndTime;
+    private boolean logSqlParameters;
     private long slowSqlThresholdInMillis;
     private Class<? extends BiConsumer<String, Long>> slowSqlHandler;
 
@@ -54,6 +55,15 @@ public class MybatisBoostProperties {
 
     public MybatisBoostProperties setSlowSqlHandler(Class<? extends BiConsumer<String, Long>> slowSqlHandler) {
         this.slowSqlHandler = slowSqlHandler;
+        return this;
+    }
+
+    public boolean isLogSqlParameters() {
+        return logSqlParameters;
+    }
+
+    public MybatisBoostProperties setLogSqlParameters(boolean logSqlParameters) {
+        this.logSqlParameters = logSqlParameters;
         return this;
     }
 }

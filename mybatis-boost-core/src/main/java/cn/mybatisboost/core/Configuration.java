@@ -9,7 +9,8 @@ public class Configuration {
 
     private NameAdaptor nameAdaptor = new NoopNameAdaptor();
     private boolean multipleDatasource;
-    private boolean logSqlAndTime = false;
+    private boolean logSqlAndTime;
+    private boolean logSqlParameters;
     private long slowSqlThresholdInMillis;
     private BiConsumer<String, Long> slowSqlHandler;
 
@@ -37,6 +38,15 @@ public class Configuration {
         return slowSqlHandler;
     }
 
+    public boolean isLogSqlParameters() {
+        return logSqlParameters;
+    }
+
+    public Configuration setLogSqlParameters(boolean logSqlParameters) {
+        this.logSqlParameters = logSqlParameters;
+        return this;
+    }
+
     public static class Builder {
 
         private Configuration configuration = new Configuration();
@@ -57,6 +67,11 @@ public class Configuration {
 
         public Builder setLogSqlAndTime(boolean logSqlAndTime) {
             configuration.logSqlAndTime = logSqlAndTime;
+            return this;
+        }
+
+        public Builder setLogSqlParameters(boolean logSqlParameters) {
+            configuration.logSqlParameters = logSqlParameters;
             return this;
         }
 

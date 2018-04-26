@@ -1,6 +1,5 @@
 package cn.mybatisboost.test;
 
-import org.apache.ibatis.session.RowBounds;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,6 @@ public class MybatisBoostTest {
 
     @Test
     public void myTest() {
-        System.out.println(mapper.selectAllWithRowBounds(new RowBounds(0, 100)));
+        System.out.println(mapper.selectAll());
     }
 }

@@ -35,6 +35,7 @@ public class MybatisBoostAutoConfiguration {
                 cn.mybatisboost.core.Configuration.builder()
                         .setMultipleDatasource(properties.isMultipleDatasource())
                         .setLogSqlAndTime(properties.isLogSqlAndTime())
+                        .setLogSqlParameters(properties.isLogSqlParameters())
                         .setSlowSqlThresholdInMillis(properties.getSlowSqlThresholdInMillis());
         if (properties.getNameAdaptor() != null) {
             builder.setNameAdaptor(properties.getNameAdaptor().newInstance());

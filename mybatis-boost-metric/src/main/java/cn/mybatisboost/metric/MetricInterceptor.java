@@ -3,12 +3,19 @@ package cn.mybatisboost.metric;
 import cn.mybatisboost.core.Configuration;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 
@@ -33,19 +40,40 @@ public class MetricInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         StopWatch stopWatch = StopWatch.createStarted();
         Object proceed = invocation.proceed();
+        BoundSql boundSql = ((StatementHandler) invocation.getTarget()).getBoundSql();
 
-        String sql = ((StatementHandler) invocation.getTarget()).getBoundSql().getSql()
-                .replaceAll("\\s*\\n\\s*", " ");
+        List<Object> parameters = new ArrayList<>();
+        if (configuration.isLogSqlParameters()) {
+            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+            Object parameterObject = boundSql.getParameterObject();
+            MetaObject metaObject = SystemMetaObject.forObject(parameterObject);
+            if (parameterMappings.size() == 1 && !(parameterObject instanceof Map) &&
+                    !metaObject.hasGetter(parameterMappings.get(0).getProperty())) {
+                parameters.add(parameterObject);
+            } else {
+                parameterMappings.forEach(pm -> parameters.add(metaObject.getValue(pm.getProperty())));
+            }
+        }
+
+        String sql = boundSql.getSql().replaceAll("\\s*\\n\\s*", " ");
         long time = stopWatch.getTime();
         long threshold = configuration.getSlowSqlThresholdInMillis();
         if (threshold > 0 && time > threshold) {
-            logger.error(String.format("[SLOW Query took %s ms] %s", time, sql));
+            if (parameters.isEmpty()) {
+                logger.error(String.format("[SLOW Query took %s ms] %s", time, sql));
+            } else {
+                logger.error(String.format("[SLOW Query took %s ms, Parameters: %s] %s ", time, parameters, sql));
+            }
             BiConsumer<String, Long> slowSqlHandler = configuration.getSlowSqlHandler();
             if (slowSqlHandler != null) {
                 slowSqlHandler.accept(sql, time);
             }
         } else if (configuration.isLogSqlAndTime()) {
-            logger.info(String.format("[Query took %s ms] %s", time, sql));
+            if (parameters.isEmpty()) {
+                logger.info(String.format("[Query took %s ms] %s", time, sql));
+            } else {
+                logger.info(String.format("[Query took %s ms, Parameters: %s] %s ", time, parameters, sql));
+            }
         }
         return proceed;
     }
