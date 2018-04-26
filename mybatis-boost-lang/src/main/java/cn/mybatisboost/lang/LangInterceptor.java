@@ -3,7 +3,7 @@ package cn.mybatisboost.lang;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
-import cn.mybatisboost.lang.provider.CollectionArgumentEnhancement;
+import cn.mybatisboost.lang.provider.RangeArgumentsEnhancement;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -32,7 +32,7 @@ public class LangInterceptor implements Interceptor {
     }
 
     protected void initProviderList() {
-        providerList = Collections.unmodifiableList(Collections.singletonList(new CollectionArgumentEnhancement()));
+        providerList = Collections.unmodifiableList(Collections.singletonList(new RangeArgumentsEnhancement()));
     }
 
     @Override
