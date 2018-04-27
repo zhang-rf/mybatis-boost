@@ -20,20 +20,22 @@ public class RangeArgumentsEnhancement implements SqlProvider {
         MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
         Map<Integer, ParameterMapping> listParameterMappingMap = new TreeMap<>();
         List<Collection<?>> collections = new ArrayList<>();
-        for (int i = 0; i < parameterMappings.size(); i++) {
-            ParameterMapping mapping = parameterMappings.get(i);
-
-            Object value = parameterMetaObject.getValue(mapping.getProperty());
-            Collection<?> collection = null;
-            if (value instanceof Collection) {
-                collection = (Collection<?>) value;
-            } else if (value.getClass().isArray()) {
-                collection = Arrays.asList((Object[]) value);
+        if (parameterMappings.size() == 1 && !(parameterObject instanceof Map) &&
+                !parameterMetaObject.hasGetter(parameterMappings.get(0).getProperty())) {
+            if (parameterMetaObject.isCollection()) {
+                listParameterMappingMap.put(0, parameterMappings.get(0));
+                collections.add((Collection<?>) parameterObject);
+            } else {
+                return;
             }
-
-            if (collection != null) {
-                listParameterMappingMap.put(i, mapping);
-                collections.add(collection);
+        } else {
+            for (int i = 0; i < parameterMappings.size(); i++) {
+                ParameterMapping mapping = parameterMappings.get(i);
+                Object value = parameterMetaObject.getValue(mapping.getProperty());
+                if (value instanceof Collection) {
+                    listParameterMappingMap.put(i, mapping);
+                    collections.add((Collection<?>) value);
+                }
             }
         }
 
@@ -85,7 +87,7 @@ public class RangeArgumentsEnhancement implements SqlProvider {
                 for (Object o : collections.get(i)) {
                     String key;
                     parameterMappings.add(index + n++, new ParameterMapping.Builder
-                            (configuration, key = "collection-" + index + '-' + n, Object.class).build());
+                            (configuration, key = "_collection-" + index + '-' + n, Object.class).build());
                     parameterMap.put(key, o);
                 }
             }
