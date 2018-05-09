@@ -1,6 +1,6 @@
 # MybatisBoost
 
-Mybatis SQL开发神器MybatisBoost，包含通用Mapper、mybatis语法增强、无感知通用分页和SQL指标与监控功能，使用MybatisBoost来提升你的开发效率吧！
+Mybatis SQL开发神器MybatisBoost，包含通用Mapper、mybatis语法增强、无感知通用分页和SQL指标与监控功能，使用MybatisBoost来提升你的开发效率吧！
 
 ## 快速开始
 
@@ -14,9 +14,9 @@ Tips：基于Spring Boot项目的快速开始
 </dependency>
 ```
 
-如果你的数据库Table名与POJO类名一致，属性名称命名方式也一致的话，请跳过此部分内容。
+如果你的数据库Table名与POJO类名一致，属性名称命名方式也一致的话，请跳过此部分内容。
 
-MybatisBoost内置有几个常用的表名转换器，现在假设你的表名为T_AnTable，你的POJO类名为AnTable，可以使用如下配置做名称映射。
+MybatisBoost内置有几个常用的表名转换器，现在假设你的表名为T_AnTable，你的POJO类名为AnTable，可以使用如下配置做名称映射。
 
 ```
 mybatisboost.name-adaptor=cn.mybatisboost.core.adaptor.TPrefixedNameAdaptor
@@ -35,7 +35,7 @@ mybatis.configuration.map-underscore-to-camel-case=true
 public class ThatTable {
 
     @Id
-    private Long id; // 如默认以名称为“id”的字段作为主键，则可以忽略@Id注解
+    private Long id; // 如默认以名称为“id”的字段作为主键，则可以忽略@Id注解
     @Column(name="thisField")
     private String thatField;
 }
@@ -43,7 +43,7 @@ public class ThatTable {
 
 ## Mapper使用指南
 
-继承于GenericMapper<T, ID>的Mybatis Mapper接口即自动拥有了GenericMapper的所有功能。默认情况下会使用entity的所有属性进行增删查改，可使用properties，conditionProperties指定参与查询的属性。
+继承于GenericMapper<T, ID>的Mybatis Mapper接口即自动拥有了GenericMapper的所有功能。默认情况下会使用entity的所有属性进行增删查改，可使用properties，conditionProperties指定参与查询的属性。
 
 ```java
 public interface GenericMapper<T, ID> {
