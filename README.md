@@ -1,10 +1,10 @@
 # MybatisBoost
 
-Mybatis SQL¿ª·¢ÉñÆ÷MybatisBoost£¬°üº¬Í¨ÓÃMapper¡¢mybatisÓï·¨ÔöÇ¿¡¢ÎŞ¸ĞÖªÍ¨ÓÃ·ÖÒ³ºÍSQLÖ¸±êÓë¼à¿Ø¹¦ÄÜ£¬Ê¹ÓÃMybatisBoostÀ´ÌáÉıÄãµÄ¿ª·¢Ğ§ÂÊ°É£¡
+Mybatis SQLå¼€å‘ç¥å™¨MybatisBoostï¼ŒåŒ…å«é€šç”¨Mapperã€mybatisè¯­æ³•å¢å¼ºã€æ— æ„ŸçŸ¥é€šç”¨åˆ†é¡µå’ŒSQLæŒ‡æ ‡ä¸ç›‘æ§åŠŸèƒ½ï¼Œä½¿ç”¨MybatisBoostæ¥æå‡ä½ çš„å¼€å‘æ•ˆç‡å§ï¼
 
-## ¿ìËÙ¿ªÊ¼
+## å¿«é€Ÿå¼€å§‹
 
-Tips£º»ùÓÚSpring BootÏîÄ¿µÄ¿ìËÙ¿ªÊ¼
+Tipsï¼šåŸºäºSpring Booté¡¹ç›®çš„å¿«é€Ÿå¼€å§‹
 
 ```xml
 <dependency>
@@ -14,36 +14,36 @@ Tips£º»ùÓÚSpring BootÏîÄ¿µÄ¿ìËÙ¿ªÊ¼
 </dependency>
 ```
 
-Èç¹ûÄãµÄÊı¾İ¿âTableÃûÓëPOJOÀàÃûÒ»ÖÂ£¬ÊôĞÔÃû³ÆÃüÃû·½Ê½Ò²Ò»ÖÂµÄ»°£¬ÇëÌø¹ı´Ë²¿·ÖÄÚÈİ¡£
+å¦‚æœä½ çš„æ•°æ®åº“Tableåä¸POJOç±»åä¸€è‡´ï¼Œå±æ€§åç§°å‘½åæ–¹å¼ä¹Ÿä¸€è‡´çš„è¯ï¼Œè¯·è·³è¿‡æ­¤éƒ¨åˆ†å†…å®¹ã€‚
 
-MybatisBoostÄÚÖÃÓĞ¼¸¸ö³£ÓÃµÄ±íÃû×ª»»Æ÷£¬ÏÖÔÚ¼ÙÉèÄãµÄ±íÃûÎªT_AnTable£¬ÄãµÄPOJOÀàÃûÎªAnTable£¬¿ÉÒÔÊ¹ÓÃÈçÏÂÅäÖÃ×öÃû³ÆÓ³Éä¡£
+MybatisBoostå†…ç½®æœ‰å‡ ä¸ªå¸¸ç”¨çš„è¡¨åè½¬æ¢å™¨ï¼Œç°åœ¨å‡è®¾ä½ çš„è¡¨åä¸ºT_AnTableï¼Œä½ çš„POJOç±»åä¸ºAnTableï¼Œå¯ä»¥ä½¿ç”¨å¦‚ä¸‹é…ç½®åšåç§°æ˜ å°„ã€‚
 
 ```
 mybatisboost.name-adaptor=cn.mybatisboost.core.adaptor.TPrefixedNameAdaptor
 ```
 
-Èç¹ûÄãµÄÊı¾İ¿âÊôĞÔÃüÃû·½Ê½Îªsnake_case£¬¿ÉÒÔÊ¹ÓÃÈçÏÂÅäÖÃ×öÃû³ÆÓ³Éä¡£
+å¦‚æœä½ çš„æ•°æ®åº“å±æ€§å‘½åæ–¹å¼ä¸ºsnake_caseï¼Œå¯ä»¥ä½¿ç”¨å¦‚ä¸‹é…ç½®åšåç§°æ˜ å°„ã€‚
 
 ```
 mybatis.configuration.map-underscore-to-camel-case=true
 ```
 
-³ıÁË×Ô¶¯Ó³Éä·½°¸£¬MybatisBoostÍ¬ÑùÌá¹©ÊÖ¶¯Ó³ÉäµÄ·½°¸£¬ÏÖÔÚ¼ÙÉèÄãµÄ±íÃûÎªT_ThisTable£¬ÄãµÄPOJOÀàÃûÎªThatTable£¬²¢ÇÒÊôĞÔµÄÃû³ÆÒ²²»Ò»ÖÂ£¬Ôò¿ÉÒÔÊ¹ÓÃJPAÌá¹©µÄ±ê×¼×¢½â½øĞĞÊÖ¶¯Ó³Éä¡£
+é™¤äº†è‡ªåŠ¨æ˜ å°„æ–¹æ¡ˆï¼ŒMybatisBooståŒæ ·æä¾›æ‰‹åŠ¨æ˜ å°„çš„æ–¹æ¡ˆï¼Œç°åœ¨å‡è®¾ä½ çš„è¡¨åä¸ºT_ThisTableï¼Œä½ çš„POJOç±»åä¸ºThatTableï¼Œå¹¶ä¸”å±æ€§çš„åç§°ä¹Ÿä¸ä¸€è‡´ï¼Œåˆ™å¯ä»¥ä½¿ç”¨JPAæä¾›çš„æ ‡å‡†æ³¨è§£è¿›è¡Œæ‰‹åŠ¨æ˜ å°„ã€‚
 
 ```java
 @Table(name="T_ThisTable")
 public class ThatTable {
 
     @Id
-    private Long id; // ÈçÄ¬ÈÏÒÔÃû³ÆÎª¡°id¡±µÄ×Ö¶Î×÷ÎªÖ÷¼ü£¬Ôò¿ÉÒÔºöÂÔ@Id×¢½â
+    private Long id; // å¦‚é»˜è®¤ä»¥åç§°ä¸ºâ€œidâ€çš„å­—æ®µä½œä¸ºä¸»é”®ï¼Œåˆ™å¯ä»¥å¿½ç•¥@Idæ³¨è§£
     @Column(name="thisField")
     private String thatField;
 }
 ```
 
-## MapperÊ¹ÓÃÖ¸ÄÏ
+## Mapperä½¿ç”¨æŒ‡å—
 
-¼Ì³ĞÓÚGenericMapper<T, ID>µÄMybatis Mapper½Ó¿Ú¼´×Ô¶¯ÓµÓĞÁËGenericMapperµÄËùÓĞ¹¦ÄÜ¡£Ä¬ÈÏÇé¿öÏÂ»áÊ¹ÓÃentityµÄËùÓĞÊôĞÔ½øĞĞÔöÉ¾²é¸Ä£¬¿ÉÊ¹ÓÃproperties£¬conditionPropertiesÖ¸¶¨²ÎÓë²éÑ¯µÄÊôĞÔ¡£
+ç»§æ‰¿äºGenericMapper<T, ID>çš„Mybatis Mapperæ¥å£å³è‡ªåŠ¨æ‹¥æœ‰äº†GenericMapperçš„æ‰€æœ‰åŠŸèƒ½ã€‚é»˜è®¤æƒ…å†µä¸‹ä¼šä½¿ç”¨entityçš„æ‰€æœ‰å±æ€§è¿›è¡Œå¢åˆ æŸ¥æ”¹ï¼Œå¯ä½¿ç”¨propertiesï¼ŒconditionPropertiesæŒ‡å®šå‚ä¸æŸ¥è¯¢çš„å±æ€§ã€‚
 
 ```java
 public interface GenericMapper<T, ID> {
@@ -70,11 +70,11 @@ public interface GenericMapper<T, ID> {
 }
 ```
 
-## MybatisÓï·¨ÔöÇ¿
+## Mybatisè¯­æ³•å¢å¼º
 
-MybatisBoostÄ¿Ç°Ö»°üº¬Ò»¸ö·¶Î§²ÎÊıÔöÇ¿Æ÷£¬Ö±½Ó¼ûÊµÀı°É¡£
+MybatisBoostç›®å‰åªåŒ…å«ä¸€ä¸ªèŒƒå›´å‚æ•°å¢å¼ºå™¨ï¼Œç›´æ¥è§å®ä¾‹å§ã€‚
 
-¹Ø±ÕMybatisÓï·¨ÔöÇ¿
+å…³é—­Mybatisè¯­æ³•å¢å¼º
 ```xml
 <select id="selectPostIn">
     SELECT * FROM POST WHERE ID in
@@ -85,24 +85,24 @@ MybatisBoostÄ¿Ç°Ö»°üº¬Ò»¸ö·¶Î§²ÎÊıÔöÇ¿Æ÷£¬Ö±½Ó¼ûÊµÀı°É¡£
 </select>
 ```
 
-¿ªÆôMybatisÓï·¨ÔöÇ¿
+å¼€å¯Mybatisè¯­æ³•å¢å¼º
 ```xml
 <select id="selectPostIn">
     SELECT * FROM POST WHERE ID in (#{list})
 </select>
 ```
 
-## ÎŞ¸ĞÖª·ÖÒ³
+## æ— æ„ŸçŸ¥åˆ†é¡µ
 
-Ö»ĞèÔÚMapperµÄ·½·¨²ÎÊıÉÏ¼ÓÉÏÒ»¸öRowBounds²ÎÊı¼´¿ÉÊµÏÖÎŞ¸ĞÖªµÄÎïÀí·ÖÒ³¡£
+åªéœ€åœ¨Mapperçš„æ–¹æ³•å‚æ•°ä¸ŠåŠ ä¸Šä¸€ä¸ªRowBoundså‚æ•°å³å¯å®ç°æ— æ„ŸçŸ¥çš„ç‰©ç†åˆ†é¡µã€‚
 
 ```java
-List<T> selectAllWithRowBounds(RowBounds rowBounds); // RowBoundsÄÚº¬offsetºÍlimit×Ö¶Î
+List<T> selectAllWithRowBounds(RowBounds rowBounds); // RowBoundså†…å«offsetå’Œlimitå­—æ®µ
 ```
 
-## SQLÖ¸±êÓë¼à¿Ø
+## SQLæŒ‡æ ‡ä¸ç›‘æ§
 
-Ä¬ÈÏÇé¿öÏÂËùÓĞ¹¦ÄÜ¶¼ÊÇ²»¿ªÆôµÄ£¬»°²»¶àËµ£¬Ö±½ÓÉÏÅäÖÃ£¬¼òµ¥Ò×¶®¡£
+é»˜è®¤æƒ…å†µä¸‹æ‰€æœ‰åŠŸèƒ½éƒ½æ˜¯ä¸å¼€å¯çš„ï¼Œè¯ä¸å¤šè¯´ï¼Œç›´æ¥ä¸Šé…ç½®ï¼Œç®€å•æ˜“æ‡‚ã€‚
 
 ```
 mybatisboost.showQuery=Boolean
