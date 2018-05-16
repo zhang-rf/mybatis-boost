@@ -9,7 +9,7 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 
-public interface BaseMapper<T> extends GenericMapper<T> {
+public interface CrudMapper<T> extends GenericMapper<T> {
 
     @SelectProvider(type = SelectOrCount.class, method = "reserved")
     int count(T entity, String... conditionProperties);
