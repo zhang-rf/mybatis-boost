@@ -1,9 +1,12 @@
 package cn.mybatisboost.lang;
 
 import cn.mybatisboost.core.Configuration;
+import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
+import cn.mybatisboost.lang.provider.InsertEnhancement;
 import cn.mybatisboost.lang.provider.RangeArgumentsEnhancement;
+import cn.mybatisboost.lang.provider.UpdateEnhancement;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -11,13 +14,13 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 @Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
 public class LangInterceptor implements Interceptor {
-
 
     private Configuration configuration;
     private List<SqlProvider> providerList;
@@ -32,7 +35,13 @@ public class LangInterceptor implements Interceptor {
     }
 
     protected void initProviderList() {
-        providerList = Collections.unmodifiableList(Collections.singletonList(new RangeArgumentsEnhancement()));
+        providerList = Collections.unmodifiableList(Arrays.asList(
+                new RangeArgumentsEnhancement(), new InsertEnhancement(), new UpdateEnhancement()));
+        for (SqlProvider provider : providerList) {
+            if (provider instanceof ConfigurationAware) {
+                ((ConfigurationAware) provider).setConfiguration(configuration);
+            }
+        }
     }
 
     @Override
