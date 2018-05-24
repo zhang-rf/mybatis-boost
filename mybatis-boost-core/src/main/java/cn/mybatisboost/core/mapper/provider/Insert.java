@@ -76,21 +76,22 @@ public class Insert implements SqlProvider, ConfigurationAware {
                 parameterMappings = new ArrayList<>(properties.size() * entityList.size());
                 for (int i = 0; i < entityList.size(); i++) {
                     try {
-                        Object currentEntity = entityList.get(i);
                         PropertyDescriptor[] descriptors = Introspector.getBeanInfo(entityType).getPropertyDescriptors();
                         for (String property : properties) {
                             PropertyDescriptor descriptor = Arrays.stream(descriptors)
                                     .filter(d -> Objects.equals(d.getName(), property))
                                     .findAny().orElseThrow(NoSuchFieldError::new);
-                            newParameterMap.put(property + i, descriptor.getReadMethod().invoke(currentEntity));
+                            newParameterMap.put(property + i, descriptor.getReadMethod().invoke(entityList.get(i)));
                         }
                     } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
                         throw new RuntimeException(e);
                     }
+
+                    org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
+                            metaObject.getValue("delegate.configuration");
                     for (String property : properties) {
-                        parameterMappings.add(new ParameterMapping.Builder((org.apache.ibatis.session.Configuration)
-                                metaObject.getValue("delegate.configuration"),
-                                property + i, Object.class).build());
+                        parameterMappings.add(new ParameterMapping.Builder
+                                (configuration, property + i, Object.class).build());
                     }
                 }
                 entity = newParameterMap;
