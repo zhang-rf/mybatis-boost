@@ -9,7 +9,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 
-public class FromEnhancement implements SqlProvider, ConfigurationAware {
+public class TableEnhancement implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 
