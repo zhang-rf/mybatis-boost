@@ -8,6 +8,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParameterMappingsEnhancement implements SqlProvider {
@@ -16,12 +17,14 @@ public class ParameterMappingsEnhancement implements SqlProvider {
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings.isEmpty()) {
+            parameterMappings = new ArrayList<>();
             int parameterCount = StringUtils.countMatches(boundSql.getSql(), '?');
             Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
             for (int i = 0; i < parameterCount; i++) {
                 parameterMappings.add(new ParameterMapping.Builder
                         (configuration, "arg" + i, Object.class).build());
             }
+            metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         }
     }
 }
