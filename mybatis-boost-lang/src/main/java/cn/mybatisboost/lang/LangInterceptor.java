@@ -5,7 +5,7 @@ import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.lang.provider.InsertEnhancement;
-import cn.mybatisboost.lang.provider.RangeArgumentsEnhancement;
+import cn.mybatisboost.lang.provider.RangeParametersEnhancement;
 import cn.mybatisboost.lang.provider.UpdateEnhancement;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -36,7 +36,7 @@ public class LangInterceptor implements Interceptor {
 
     protected void initProviderList() {
         providerList = Collections.unmodifiableList(Arrays.asList(
-                new RangeArgumentsEnhancement(), new InsertEnhancement(), new UpdateEnhancement()));
+                new RangeParametersEnhancement(), new InsertEnhancement(), new UpdateEnhancement()));
         for (SqlProvider provider : providerList) {
             if (provider instanceof ConfigurationAware) {
                 ((ConfigurationAware) provider).setConfiguration(configuration);

@@ -9,7 +9,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.util.*;
 
-public class RangeArgumentsEnhancement implements SqlProvider {
+public class RangeParametersEnhancement implements SqlProvider {
 
     @Override
     @SuppressWarnings("unchecked")
