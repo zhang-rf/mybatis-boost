@@ -11,7 +11,7 @@ import org.apache.ibatis.session.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParameterMappingsEnhancement implements SqlProvider {
+public class ParameterMappingEnhancement implements SqlProvider {
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
