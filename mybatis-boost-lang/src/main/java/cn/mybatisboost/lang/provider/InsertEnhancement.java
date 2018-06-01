@@ -6,16 +6,13 @@ import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.EntityUtils;
 import cn.mybatisboost.core.util.MapperUtils;
 import cn.mybatisboost.core.util.MyBatisUtils;
+import cn.mybatisboost.core.util.ParameterUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +20,6 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
@@ -34,35 +30,33 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                 Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                         (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
                 StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.append("INSERT INTO ").append(EntityUtils.getTableName
-                        (entityType, configuration.getNameAdaptor()));
+                sqlBuilder.append("INSERT INTO ")
+                        .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
                 Map parameterMap = (Map) boundSql.getParameterObject();
-                Object entity = parameterMap.get("arg0");
-                List<?> entities;
-                if (entity instanceof List) {
-                    entities = (List<?>) entity;
-                } else {
-                    entities = Collections.singletonList(entity);
-                }
+                Object arg0 = parameterMap.get("arg0");
+                List<?> entities = arg0 instanceof List ? (List<?>) arg0 : Collections.singletonList(arg0);
 
-                List<String> properties;
+                List<String> properties, columns;
+                boolean mapUnderscoreToCamelCase = (boolean)
+                        metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
                 if (Objects.equals(split[1], "*")) {
                     properties = EntityUtils.getProperties(entityType);
+                    columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
                 } else {
                     if (split[1].toUpperCase().startsWith("NOT ")) {
                         properties = EntityUtils.getProperties(entityType);
-                        properties.removeAll(Arrays.stream(split[1].substring(4).split(","))
-                                .map(String::trim).collect(Collectors.toList()));
+                        properties.removeAll(EntityUtils.getPropertiesFromColumns(entityType,
+                                Arrays.stream(split[1].substring(4).split(","))
+                                        .map(String::trim).collect(Collectors.toList()), mapUnderscoreToCamelCase));
+                        columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
                     } else {
-                        properties = Arrays.stream(split[1].split(","))
+                        columns = Arrays.stream(split[1].split(","))
                                 .map(String::trim).collect(Collectors.toList());
+                        properties = EntityUtils.getPropertiesFromColumns
+                                (entityType, columns, mapUnderscoreToCamelCase);
                     }
                 }
-
-                boolean mapUnderscoreToCamelCase = (boolean)
-                        metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
-                List<String> columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
 
                 sqlBuilder.append(" (");
                 columns.forEach(c -> sqlBuilder.append(c).append(", "));
@@ -78,28 +72,15 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
 
                 List<ParameterMapping> parameterMappings;
                 if (entities.size() > 1) {
-                    parameterMap = new HashMap<>(properties.size() * entities.size());
+                    parameterMap = ParameterUtils.buildParameterMap(properties, entityType, entities);
                     parameterMappings = new ArrayList<>(properties.size() * entities.size());
                     for (int i = 0; i < entities.size(); i++) {
-                        try {
-                            PropertyDescriptor[] descriptors =
-                                    Introspector.getBeanInfo(entityType).getPropertyDescriptors();
-                            for (String property : properties) {
-                                PropertyDescriptor descriptor = Arrays.stream(descriptors)
-                                        .filter(d -> Objects.equals(d.getName(), property))
-                                        .findAny().orElseThrow(NoSuchFieldError::new);
-                                parameterMap.put(property + i, descriptor.getReadMethod().invoke(entities.get(i)));
-                            }
-                        } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
-                            throw new RuntimeException(e);
-                        }
-
                         org.apache.ibatis.session.Configuration configuration =
                                 (org.apache.ibatis.session.Configuration)
                                         metaObject.getValue("delegate.configuration");
                         for (String property : properties) {
-                            parameterMappings.add(new ParameterMapping.Builder(configuration,
-                                    property + i, Object.class).build());
+                            parameterMappings.add(new ParameterMapping.Builder
+                                    (configuration, property + i, Object.class).build());
                         }
                     }
                     metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);

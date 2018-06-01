@@ -3,20 +3,16 @@ package cn.mybatisboost.core.mapper.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.EntityUtils;
-import cn.mybatisboost.core.util.MapperUtils;
-import cn.mybatisboost.core.util.MyBatisUtils;
-import cn.mybatisboost.core.util.PropertyUtils;
+import cn.mybatisboost.core.util.*;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class Insert implements SqlProvider, ConfigurationAware {
 
@@ -72,26 +68,16 @@ public class Insert implements SqlProvider, ConfigurationAware {
             sqlBuilder.append(subSqlBuilder);
 
             if (entityList.size() > 1) {
-                Map<String, Object> newParameterMap = new HashMap<>(properties.size() * entityList.size());
                 parameterMappings = new ArrayList<>(properties.size() * entityList.size());
-                for (int i = 0; i < entityList.size(); i++) {
-                    try {
-                        PropertyDescriptor[] descriptors = Introspector.getBeanInfo(entityType).getPropertyDescriptors();
-                        for (String property : properties) {
-                            PropertyDescriptor descriptor = Arrays.stream(descriptors)
-                                    .filter(d -> Objects.equals(d.getName(), property))
-                                    .findAny().orElseThrow(NoSuchFieldError::new);
-                            newParameterMap.put(property + i, descriptor.getReadMethod().invoke(entityList.get(i)));
-                        }
-                    } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
+                Map<String, Object> newParameterMap = ParameterUtils.buildParameterMap(properties, entityType, entityList);
 
-                    org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration");
+                for (int i = 0; i < entityList.size(); i++) {
+                    org.apache.ibatis.session.Configuration configuration =
+                            (org.apache.ibatis.session.Configuration)
+                                    metaObject.getValue("delegate.configuration");
                     for (String property : properties) {
-                        parameterMappings.add(new ParameterMapping.Builder
-                                (configuration, property + i, Object.class).build());
+                        parameterMappings.add(new ParameterMapping.Builder(configuration,
+                                property + i, Object.class).build());
                     }
                 }
                 entity = newParameterMap;

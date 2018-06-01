@@ -21,7 +21,8 @@ public abstract class EntityUtils {
     private static ConcurrentMap<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, String> idPropertyCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, List<String>> propertiesCache = new ConcurrentHashMap<>();
-    private static ConcurrentMap<List<String>, List<String>> columnsCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<MultipleMapKey, List<String>> columnsCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<MultipleMapKey, List<String>> columnPropertyMappingCache = new ConcurrentHashMap<>();
 
     public static String getTableName(Class<?> type, NameAdaptor converter) {
         return tableNameCache.computeIfAbsent(type, k -> {
@@ -76,7 +77,7 @@ public abstract class EntityUtils {
     }
 
     public static List<String> getColumns(Class<?> type, List<String> properties, boolean mapUnderscoreToCamelCase) {
-        return columnsCache.computeIfAbsent(properties, k ->
+        return columnsCache.computeIfAbsent(new MultipleMapKey(type, properties), k ->
                 Collections.unmodifiableList(properties.stream().map(UncheckedFunction.of(property -> {
                     Field field = type.getDeclaredField(property);
                     if (field.isAnnotationPresent(Column.class)) {
@@ -92,5 +93,25 @@ public abstract class EntityUtils {
                     }
                 })).collect(Collectors.toList()))
         );
+    }
+
+    public static List<String> getPropertiesFromColumns(Class<?> type, List<String> columns,
+                                                        boolean mapUnderscoreToCamelCase) {
+        return columnPropertyMappingCache.computeIfAbsent(new MultipleMapKey(type, columns), k -> {
+            Set<String> columnSet = new HashSet<>(columns);
+            return Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields()).filter(field -> {
+                if (field.isAnnotationPresent(Column.class)) {
+                    return columnSet.contains(field.getAnnotation(Column.class).name());
+                } else {
+                    if (mapUnderscoreToCamelCase) {
+                        String[] words = StringUtils.splitByCharacterTypeCamelCase(field.getName());
+                        return columns.contains(Arrays.stream(words)
+                                .peek(StringUtils::uncapitalize).collect(Collectors.joining("_")));
+                    } else {
+                        return columns.contains(StringUtils.capitalize(field.getName()));
+                    }
+                }
+            }).map(Field::getName).collect(Collectors.toList()));
+        });
     }
 }

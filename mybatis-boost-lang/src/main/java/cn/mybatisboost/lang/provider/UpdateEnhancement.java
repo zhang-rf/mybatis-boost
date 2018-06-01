@@ -27,7 +27,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
         String sql = boundSql.getSql();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.UPDATE &&
                 sql.toUpperCase().startsWith("UPDATE SET ")) {
-            String[] split = new String[]{sql.substring(11)};
+            String[] split = {sql.substring(11)};
             if (split[0].contains(" where ")) {
                 split = split[0].split(" where ", 2);
             } else if (split[0].contains(" WHERE ")) {
@@ -37,39 +37,38 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("UPDATE ").append(EntityUtils.getTableName
-                    (entityType, configuration.getNameAdaptor())).append(" SET ");
+            sqlBuilder.append("UPDATE ")
+                    .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor())).append(" SET ");
 
-            List<String> columns;
-            List<ParameterMapping> parameterMappings;
+            List<String> properties, columns;
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
             if (Objects.equals(split[0], "*")) {
-                columns = EntityUtils.getProperties(entityType);
-                parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
-                        metaObject.getValue("delegate.configuration"), columns);
-                columns = EntityUtils.getColumns(entityType, columns, mapUnderscoreToCamelCase);
+                properties = EntityUtils.getProperties(entityType);
+                columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
             } else {
                 if (split[0].toUpperCase().startsWith("NOT ")) {
-                    columns = EntityUtils.getProperties(entityType);
-                    columns.removeAll(Arrays.stream(split[0].substring(4).split(","))
-                            .map(String::trim).collect(Collectors.toList()));
+                    properties = EntityUtils.getProperties(entityType);
+                    properties.removeAll(EntityUtils.getPropertiesFromColumns
+                            (entityType, Arrays.stream(split[0].substring(4).split(","))
+                                    .map(String::trim).collect(Collectors.toList()), mapUnderscoreToCamelCase));
+                    columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
                 } else {
-                    columns = Arrays.stream(split[0].split(","))
-                            .map(String::trim).collect(Collectors.toList());
+                    columns = Arrays.stream(split[0].split(",")).map(String::trim).collect(Collectors.toList());
+                    properties = EntityUtils.getPropertiesFromColumns(entityType, columns, mapUnderscoreToCamelCase);
                 }
-                parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
-                        metaObject.getValue("delegate.configuration"), columns);
-                columns = EntityUtils.getColumns(entityType, columns, mapUnderscoreToCamelCase);
             }
 
             columns.forEach(c -> sqlBuilder.append(c).append(" = ?, "));
             sqlBuilder.setLength(sqlBuilder.length() - 2);
 
+            List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
+                    ((org.apache.ibatis.session.Configuration)
+                            metaObject.getValue("delegate.configuration"), properties);
             if (split.length == 2) {
                 parameterMappings = new ArrayList<>(parameterMappings);
                 parameterMappings.addAll(boundSql.getParameterMappings());
-                sqlBuilder.append(" WHERE ").append(split[1]);
+                sqlBuilder.append(sql.contains(" WHERE ") ? " WHERE " : " where ").append(split[1]);
             }
 
             metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
