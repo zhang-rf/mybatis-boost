@@ -19,7 +19,7 @@ public class TableEnhancement implements SqlProvider, ConfigurationAware {
         if (sql.contains("#t")) {
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
-            metaObject.setValue("delegate.boundSql.sql", sql.replace("#t",
+            metaObject.setValue("delegate.boundSql.sql", sql.replaceFirst("#t",
                     EntityUtils.getTableName(entityType, configuration.getNameAdaptor())));
         }
     }
