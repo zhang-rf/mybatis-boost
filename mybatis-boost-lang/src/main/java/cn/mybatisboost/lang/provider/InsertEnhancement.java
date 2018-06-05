@@ -5,7 +5,6 @@ import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.EntityUtils;
 import cn.mybatisboost.core.util.MapperUtils;
-import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.core.util.ParameterUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -33,9 +32,9 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                 sqlBuilder.append("INSERT INTO ")
                         .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-                Map parameterMap = (Map) boundSql.getParameterObject();
-                Object arg0 = parameterMap.get("arg0");
-                List<?> entities = arg0 instanceof List ? (List<?>) arg0 : Collections.singletonList(arg0);
+                List<?> entities = boundSql.getParameterObject() instanceof Map ?
+                        (List<?>) ((Map) boundSql.getParameterObject()).get("list") :
+                        Collections.singletonList(boundSql.getParameterObject());
 
                 List<String> properties, columns;
                 boolean mapUnderscoreToCamelCase = (boolean)
@@ -70,26 +69,21 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                 }
                 sqlBuilder.setLength(sqlBuilder.length() - 2);
 
-                List<ParameterMapping> parameterMappings;
-                if (entities.size() > 1) {
-                    parameterMap = ParameterUtils.buildParameterMap(properties, entityType, entities);
-                    parameterMappings = new ArrayList<>(properties.size() * entities.size());
-                    for (int i = 0; i < entities.size(); i++) {
-                        org.apache.ibatis.session.Configuration configuration =
-                                (org.apache.ibatis.session.Configuration)
-                                        metaObject.getValue("delegate.configuration");
-                        for (String property : properties) {
-                            parameterMappings.add(new ParameterMapping.Builder
-                                    (configuration, property + i, Object.class).build());
-                        }
-                    }
-                    metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
-                    metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
-                } else {
-                    parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration"), properties);
-                }
+                Map<String, Object> parameterMap = ParameterUtils.buildParameterMap(properties, entityType, entities);
+                metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
+                metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
 
+                List<ParameterMapping> parameterMappings =
+                        new ArrayList<>(properties.size() * entities.size());
+                for (int i = 0; i < entities.size(); i++) {
+                    org.apache.ibatis.session.Configuration configuration =
+                            (org.apache.ibatis.session.Configuration)
+                                    metaObject.getValue("delegate.configuration");
+                    for (String property : properties) {
+                        parameterMappings.add(new ParameterMapping.Builder
+                                (configuration, property + i, Object.class).build());
+                    }
+                }
                 metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
                 metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
             }

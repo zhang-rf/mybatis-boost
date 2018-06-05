@@ -1,6 +1,6 @@
 # MybatisBoost
 
-Mybatis SQL开发神器MybatisBoost，包含通用Mapper、mybatis语法增强、无感知通用分页和SQL指标与监控功能，使用MybatisBoost来提升你的开发效率吧！
+Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、mybatis语法增强、无感知通用分页和SQL指标与监控功能，使用MybatisBoost来提升你的开发效率！
 
 ## 快速开始
 
