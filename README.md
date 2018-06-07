@@ -80,7 +80,7 @@ public interface CrudMapper<T> {
 
 MybatisBoost目前包含数个语法增强器：范围参数语法增强、INSERT语法增强、UPDATE语法增强、表名语法增强、参数语法增强，默认都是全部开启的，每个语法增强可以单独使用，也可以联合使用。
 
-# 范围参数语法增强
+### 范围参数语法增强
 
 关闭范围参数语法增强
 ```xml
@@ -100,7 +100,7 @@ MybatisBoost目前包含数个语法增强器：范围参数语法增强、INSER
 </select>
 ```
 
-# INSERT语法增强
+### INSERT语法增强
 
 INSERT语法增强后，可使用如下3种语法编写INSERT语句。
 
@@ -110,7 +110,7 @@ INSERT column1, column2, column3 -- 只插入POJO中指定的column1、column2�
 INSERT NOT column4, column5 -- 插入POJO中除了column4、column5以外的字段
 ```
 
-# UPDATE语法增强
+### UPDATE语法增强
 
 UPDATE语法增强后，可使用如下语法编写UPDATE语句。
 
@@ -121,7 +121,7 @@ UPDATE NOT column4, column5 -- 更新POJO中除了column4、column5以外的字�
 UPDATE * WHERE condition1 = 'condition1' -- 更新POJO中所有的字段，条件为"condition1 = 'condition1'"
 ```
 
-# 表名语法增强
+### 表名语法增强
 
 SQL语句中的表名可用"#t"简写，MybatisBoost会自动替换成正确的表名。
 
@@ -129,7 +129,7 @@ SQL语句中的表名可用"#t"简写，MybatisBoost会自动替换成正确的�
 SELECT * FROM #t
 ```
 
-# 参数语法增强
+### 参数语法增强
 
 参数语法增强后，简单的参数没必要再使用"#{}"语法去映射了，MybatisBoost会自动按照参数的声明顺序去映射。
 
