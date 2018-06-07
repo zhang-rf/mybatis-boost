@@ -8,7 +8,7 @@ public abstract class SafeProperty {
     private static ConcurrentMap<MultipleMapKey, Boolean> cache = new ConcurrentHashMap<>();
 
     public static String[] of(Class<?> type, String... properties) {
-        cache.computeIfAbsent(new MultipleMapKey(type, properties), (k) -> {
+        cache.computeIfAbsent(new MultipleMapKey(type, properties), k -> {
             for (String property : properties) {
                 try {
                     type.getDeclaredField(property);
