@@ -6,20 +6,21 @@ import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.EntityUtils;
 import cn.mybatisboost.core.util.MapperUtils;
 import cn.mybatisboost.core.util.MyBatisUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
 
+    private final static Pattern PATTERN_COLUMN = Pattern.compile("\\w+");
     private Configuration configuration;
 
     @Override
@@ -62,13 +63,27 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
             columns.forEach(c -> sqlBuilder.append(c).append(" = ?, "));
             sqlBuilder.setLength(sqlBuilder.length() - 2);
 
-            List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
-                    ((org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration"), properties);
+            org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
+                    metaObject.getValue("delegate.configuration");
+            List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping(configuration, properties);
             if (split.length == 2) {
                 parameterMappings = new ArrayList<>(parameterMappings);
-                parameterMappings.addAll(boundSql.getParameterMappings());
-                sqlBuilder.append(sql.contains(" WHERE ") ? " WHERE " : " where ").append(split[1]);
+
+                String conditions = split[1];
+                int conditionCount = StringUtils.countMatches(conditions, '?');
+                if (boundSql.getParameterMappings().size() != conditionCount) {
+                    Matcher matcher = PATTERN_COLUMN.matcher(conditions);
+                    while (matcher.find()) {
+                        String property = EntityUtils.getPropertiesFromColumns
+                                (entityType, Collections.singletonList(matcher.group()), mapUnderscoreToCamelCase)
+                                .stream().findFirst().orElseThrow(NoSuchFieldError::new);
+                        parameterMappings.add(new ParameterMapping.Builder(configuration,
+                                property, Object.class).build());
+                    }
+                } else {
+                    parameterMappings.addAll(boundSql.getParameterMappings());
+                }
+                sqlBuilder.append(sql.contains(" WHERE ") ? " WHERE " : " where ").append(conditions);
             }
 
             metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
