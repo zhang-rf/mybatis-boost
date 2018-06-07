@@ -7,12 +7,12 @@ import java.util.Objects;
 
 public abstract class PropertyUtils {
 
-    public static List<String> buildPropertiesWithCandidates(String[] candidateProperties,
-                                                             Object parameterObject, boolean isSelectiveUpdating) {
+    public static List<String> buildPropertiesWithCandidates
+            (String[] candidateProperties, Object entity, boolean isSelectiveUpdating) {
         if (candidateProperties.length > 0 && !Objects.equals(candidateProperties[0], "!")) {
             return new ArrayList<>(Arrays.asList(candidateProperties));
         } else {
-            List<String> properties = EntityUtils.getProperties(parameterObject, isSelectiveUpdating);
+            List<String> properties = EntityUtils.getProperties(entity, isSelectiveUpdating);
             if (candidateProperties.length > 0) {
                 properties.removeAll(Arrays.asList(candidateProperties));
             }
@@ -20,8 +20,8 @@ public abstract class PropertyUtils {
         }
     }
 
-    public static void rebuildPropertiesWithConditions(List<String> properties,
-                                                       Class<?> type, String[] conditionalProperties) {
+    public static void rebuildPropertiesWithConditions
+            (List<String> properties, Class<?> type, String[] conditionalProperties) {
         if (conditionalProperties.length == 0) {
             conditionalProperties = new String[]{EntityUtils.getIdProperty(type)};
         }

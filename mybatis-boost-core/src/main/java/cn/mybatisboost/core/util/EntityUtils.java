@@ -48,8 +48,8 @@ public abstract class EntityUtils {
             try {
                 return type.getDeclaredField("id").getName();
             } catch (NoSuchFieldException e) {
-                return Arrays.stream(type.getDeclaredFields())
-                        .filter(f -> f.isAnnotationPresent(Id.class)).map(Field::getName).findFirst().orElse(null);
+                return Arrays.stream(type.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Id.class))
+                        .findFirst().map(Field::getName).orElse(null);
             }
         });
     }
@@ -77,7 +77,7 @@ public abstract class EntityUtils {
     }
 
     public static List<String> getColumns(Class<?> type, List<String> properties, boolean mapUnderscoreToCamelCase) {
-        return columnsCache.computeIfAbsent(new MultipleMapKey(type, properties), k ->
+        return columnsCache.computeIfAbsent(new MultipleMapKey(type, properties, mapUnderscoreToCamelCase), k ->
                 Collections.unmodifiableList(properties.stream().map(UncheckedFunction.of(property -> {
                     Field field = type.getDeclaredField(property);
                     if (field.isAnnotationPresent(Column.class)) {
@@ -95,9 +95,9 @@ public abstract class EntityUtils {
         );
     }
 
-    public static List<String> getPropertiesFromColumns(Class<?> type, List<String> columns,
-                                                        boolean mapUnderscoreToCamelCase) {
-        return columnPropertyMappingCache.computeIfAbsent(new MultipleMapKey(type, columns), k -> {
+    public static List<String> getPropertiesFromColumns
+            (Class<?> type, List<String> columns, boolean mapUnderscoreToCamelCase) {
+        return columnPropertyMappingCache.computeIfAbsent(new MultipleMapKey(type, columns, mapUnderscoreToCamelCase), k -> {
             Set<String> columnSet = new HashSet<>(columns);
             return Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields()).filter(field -> {
                 if (field.isAnnotationPresent(Column.class)) {

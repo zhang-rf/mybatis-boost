@@ -27,10 +27,10 @@ public class Delete implements SqlProvider, ConfigurationAware {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("DELETE FROM ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        Map parameterMap = (Map) boundSql.getParameterObject();
-        Object entity = parameterMap.get("arg0");
+        Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
+        Object entity = parameterMap.get("param1");
         List<String> properties;
-        String[] conditionalProperties = (String[]) parameterMap.get("arg1");
+        String[] conditionalProperties = (String[]) parameterMap.get("param2");
         if (conditionalProperties.length == 0) {
             properties = EntityUtils.getProperties(entity, true);
         } else {
@@ -47,9 +47,9 @@ public class Delete implements SqlProvider, ConfigurationAware {
         List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
-        metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
-        metaObject.setValue("delegate.boundSql.parameterObject", entity);
         metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
+        metaObject.setValue("delegate.boundSql.parameterObject", entity);
+        metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
     }
 

@@ -24,36 +24,37 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
         sqlBuilder.append("SELECT * FROM ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
         String idProperty = EntityUtils.getIdProperty(entityType);
-        List<ParameterMapping> parameterMappings = Collections.emptyList();
         boolean multipleIds = mappedStatement.getId().endsWith("Ids");
+        List<ParameterMapping> parameterMappings = Collections.emptyList();
         if (!multipleIds) {
             sqlBuilder.append(" WHERE ").append(idProperty).append(" = ?");
             parameterMappings = Collections.singletonList(new ParameterMapping.Builder
                     ((org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration"),
-                            "arg0", Object.class).build());
+                            "param1", Object.class).build());
         } else {
-            Map parameterMap = (Map) boundSql.getParameterObject();
-            Object[] parameterArray = (Object[]) parameterMap.get("array");
-            if (parameterArray.length > 0) {
+            Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
+            Object[] ids = (Object[]) parameterMap.get("array");
+            if (ids.length > 0) {
                 sqlBuilder.append(" WHERE ").append(idProperty).append(" IN (");
-                Arrays.stream(parameterArray).forEach(c -> sqlBuilder.append("?, "));
+                Arrays.stream(ids).forEach(c -> sqlBuilder.append("?, "));
                 sqlBuilder.setLength(sqlBuilder.length() - 2);
                 sqlBuilder.append(')');
 
-                Map<String, Object> newParameterMap = new HashMap<>(parameterArray.length);
-                parameterMappings = new ArrayList<>(parameterArray.length);
-                for (int i = 0; i < parameterArray.length; i++) {
-                    newParameterMap.put(idProperty + i, parameterArray[i]);
-                    parameterMappings.add(new ParameterMapping.Builder((org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration"),
+                org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
+                        metaObject.getValue("delegate.configuration");
+                Map<String, Object> newParameterMap = new HashMap<>(ids.length);
+                parameterMappings = new ArrayList<>(ids.length);
+                for (int i = 0; i < ids.length; i++) {
+                    newParameterMap.put(idProperty + i, ids[i]);
+                    parameterMappings.add(new ParameterMapping.Builder(configuration,
                             idProperty + i, Object.class).build());
                 }
                 parameterMap = newParameterMap;
             } else {
                 parameterMap = Collections.emptyMap();
             }
-            metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
             metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
+            metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
         }
         metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());

@@ -28,11 +28,11 @@ public class SelectOrCount implements SqlProvider, ConfigurationAware {
         sqlBuilder.append(mappedStatement.getId().endsWith("count") ? "SELECT COUNT(*) FROM " : "SELECT * FROM ")
                 .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        Map parameterMap = (Map) boundSql.getParameterObject();
-        Object entity = parameterMap.get("arg0");
+        Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
+        Object entity = parameterMap.get("param1");
         List<String> properties;
-        String[] conditionalProperties = (String[]) (parameterMap.containsKey("arg1") ?
-                parameterMap.get("arg1") : parameterMap.get("arg2"));
+        String[] conditionalProperties = (String[]) (parameterMap.containsKey("param2") ?
+                parameterMap.get("param2") : parameterMap.get("param3"));
         if (conditionalProperties.length == 0) {
             properties = EntityUtils.getProperties(entity, true);
         } else {
@@ -49,9 +49,9 @@ public class SelectOrCount implements SqlProvider, ConfigurationAware {
         List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
-        metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
-        metaObject.setValue("delegate.boundSql.parameterObject", entity);
         metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
+        metaObject.setValue("delegate.boundSql.parameterObject", entity);
+        metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
     }
 
