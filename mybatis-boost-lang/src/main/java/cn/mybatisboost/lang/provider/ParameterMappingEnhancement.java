@@ -20,9 +20,9 @@ public class ParameterMappingEnhancement implements SqlProvider {
             parameterMappings = new ArrayList<>();
             int parameterCount = StringUtils.countMatches(boundSql.getSql(), '?');
             Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
-            for (int i = 0; i < parameterCount; i++) {
+            for (int i = 1; i <= parameterCount; i++) {
                 parameterMappings.add(new ParameterMapping.Builder
-                        (configuration, "arg" + i, Object.class).build());
+                        (configuration, "param" + i, Object.class).build());
             }
             metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         }
