@@ -1,15 +1,14 @@
 package cn.mybatisboost.core.util;
 
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public abstract class SafeProperty {
 
-    private static ConcurrentMap<Integer, Boolean> cache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<MultipleMapKey, Boolean> cache = new ConcurrentHashMap<>();
 
     public static String[] of(Class<?> type, String... properties) {
-        cache.computeIfAbsent(type.hashCode() ^ Arrays.hashCode(properties), (k) -> {
+        cache.computeIfAbsent(new MultipleMapKey(type, properties), (k) -> {
             for (String property : properties) {
                 try {
                     type.getDeclaredField(property);
