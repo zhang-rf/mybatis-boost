@@ -76,6 +76,8 @@ public interface CrudMapper<T> {
 }
 ```
 
+如果你不需要CrudMapper的所有方法，也可继承于GenericMapper<T>，然后把CrudMapper中你需要的方法复制到你的Mapper里即可。
+
 ## Mybatis语法增强
 
 MybatisBoost目前包含数个语法增强器：范围参数语法增强、INSERT语法增强、UPDATE语法增强、表名语法增强、参数语法增强，默认都是全部开启的，每个语法增强可以单独使用，也可以联合使用。
