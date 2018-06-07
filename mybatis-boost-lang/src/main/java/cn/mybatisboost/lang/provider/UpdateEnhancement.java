@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
 
-    private final static Pattern PATTERN_COLUMN = Pattern.compile("\\w+");
+    private final static Pattern PATTERN_COLUMN = Pattern.compile("(\\w+).*?\\?");
     private Configuration configuration;
 
     @Override
@@ -75,7 +75,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
                     Matcher matcher = PATTERN_COLUMN.matcher(conditions);
                     while (matcher.find()) {
                         String property = EntityUtils.getPropertiesFromColumns
-                                (entityType, Collections.singletonList(matcher.group()), mapUnderscoreToCamelCase)
+                                (entityType, Collections.singletonList(matcher.group(1)), mapUnderscoreToCamelCase)
                                 .stream().findFirst().orElseThrow(NoSuchFieldError::new);
                         parameterMappings.add(new ParameterMapping.Builder(configuration,
                                 property, Object.class).build());
