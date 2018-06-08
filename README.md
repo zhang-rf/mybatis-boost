@@ -150,7 +150,7 @@ int updateState(String a, String b);
 
 ## 无感知分页
 
-只需要在Mapper方法的参数列表中附加一个Mybatis自带的RowBounds参数即可实现透明的**物理分页**。
+只需要在Mapper方法的参数列表中附加一个Mybatis自带的RowBounds参数即可实现透明的**物理分页**。暂时只支持MySQL和PostgreSQL，后续会支持更多的数据库。
 
 ```java
 List<T> selectAll(RowBounds rowBounds); // RowBounds内含offset和limit字段
