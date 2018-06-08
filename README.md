@@ -1,6 +1,6 @@
 # MybatisBoost
 
-Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控和智能SQL（TODO）功能，使用MybatisBoost来提升你的开发效率！
+Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控和智能Mapper（TODO）功能，使用MybatisBoost来提升你的开发效率！
 
 ## 快速开始
 
@@ -53,9 +53,9 @@ public class ThatTable {
 
 ## 通用CrudMapper
 
-继承于CrudMapper&lt;T&gt;的Mybatis Mapper接口即自动拥有了CrudMapper的所有功能，继承时请指明范型“T”代表POJO的类型。
+继承于CrudMapper&lt;T&gt;的Mybatis Mapper接口即自动拥有了CrudMapper的所有功能，继承时请指明范型“T”代表的POJO类型。
 
-默认情况下，MybatisBoost会使用POJO的所有属性参与查询（以Selectively结尾的方法会忽略值为null的字段），可使用properties参数指定参与插入、更新的属性（如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性），使用conditionProperties参数指定用于WHERE条件的属性，CrudMapper的所有方法如下。
+默认情况下，MybatisBoost会使用POJO的所有属性参与查询（以Selectively结尾的方法会忽略值为null的字段），可使用properties参数指定参与插入、更新的属性（如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性），使用conditionProperties参数指定用于WHERE条件的属性，CrudMapper的所有方法如下。
 
 ```java
 public interface CrudMapper<T> {
@@ -139,7 +139,7 @@ SELECT * FROM #t
 
 ### 参数语法增强
 
-参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。
+参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法做映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。
 
 ```sql
 @Update("update #t set column1 = ? where condition1 = ?")
