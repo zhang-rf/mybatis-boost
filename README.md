@@ -57,6 +57,8 @@ public class ThatTable {
 
 默认情况下，MybatisBoost会使用POJO的所有属性参与查询（以Selectively结尾的方法会忽略值为null的字段），可使用properties参数指定参与插入、更新的属性（如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性），使用conditionProperties参数指定用于WHERE条件的属性，CrudMapper的所有方法如下。
 
+如果担心以字符串的方式指定属性容易出现拼写错误，可以使用MybatisBoost提供的SafeProperty类做运行时的属性拼写检查。
+
 ```java
 public interface CrudMapper<T> {
 
