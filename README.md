@@ -1,6 +1,6 @@
 # MybatisBoost [![Build Status](https://www.travis-ci.org/zhang-rf/mybatis-boost.svg?branch=master)](https://www.travis-ci.org/zhang-rf/mybatis-boost)
 
-Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控和智能Mapper（TODO）功能，使用MybatisBoost来提升你的开发效率！
+Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控和智能Mapper（TODO）功能，使用MybatisBoost来提升开发效率，内聚SQL代码！
 
 ## 快速开始
 
@@ -8,7 +8,7 @@ Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增�
 
 ```xml
 <dependency>
-    <groupId>tech.rfprojects.mybatisboost</groupId>
+    <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
     <version>1.0.3</version>
 </dependency>
