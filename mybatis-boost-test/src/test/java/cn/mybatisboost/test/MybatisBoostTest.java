@@ -17,6 +17,6 @@ public class MybatisBoostTest {
 
     @Test
     public void myTest() {
-        System.out.println(mapper.selectAll());
+        System.out.println(mapper.now());
     }
 }
