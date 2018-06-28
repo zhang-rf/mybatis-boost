@@ -20,7 +20,6 @@ public class CrudMapperTest {
 
     @Autowired
     private ProjectMapper mapper;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -38,8 +37,6 @@ public class CrudMapperTest {
         assertEquals(0, mapper.count(new Project().setGroupId("whatever")));
         assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost"),
                 SafeProperty.of(Project.class, "groupId")));
-        assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost"),
-                SafeProperty.of(Project.class, "groupId", "artifactId")));
         assertEquals(0, mapper.count(new Project().setGroupId("cn.mybatisboost").setArtifactId("whatever"),
                 SafeProperty.of(Project.class, "groupId", "artifactId")));
         assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost").setArtifactId("whatever"),
