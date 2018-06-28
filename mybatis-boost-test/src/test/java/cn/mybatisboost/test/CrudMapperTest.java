@@ -25,14 +25,14 @@ public class CrudMapperTest {
     private JdbcTemplate jdbcTemplate;
 
     @After
-    public void teardown() {
+    public void tearDown() {
         jdbcTemplate.execute("delete from project");
     }
 
     @Test
     public void count() {
         assertEquals(0, mapper.count(new Project()));
-        jdbcTemplate.execute("insert into project (groud_id) values ('cn.mybatisboost')");
+        jdbcTemplate.execute("insert into project (group_id) values ('cn.mybatisboost')");
         assertEquals(1, mapper.count(new Project()));
         assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost")));
         assertEquals(0, mapper.count(new Project().setGroupId("whatever")));
@@ -49,7 +49,7 @@ public class CrudMapperTest {
     @Test
     public void selectOne() {
         assertNull(mapper.selectOne(new Project()));
-        jdbcTemplate.execute("insert into project (groud_id) values ('cn.mybatisboost')");
+        jdbcTemplate.execute("insert into project (group_id) values ('cn.mybatisboost')");
         assertEquals("cn.mybatisboost",
                 mapper.selectOne(new Project().setGroupId("cn.mybatisboost")).getGroupId());
         assertNull(mapper.selectOne(new Project().setGroupId("whatever")));
