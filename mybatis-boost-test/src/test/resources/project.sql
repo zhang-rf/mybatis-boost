@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS test;
-CREATE TABLE Project
+CREATE TABLE `test`.`Project`
 (
   id                 int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   group_id           varchar(100)    NOT NULL,
