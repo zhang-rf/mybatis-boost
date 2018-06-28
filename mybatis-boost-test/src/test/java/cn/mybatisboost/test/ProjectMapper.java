@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import java.time.LocalDateTime;
 
 @Mapper
-public interface ProxyDogMapper extends CrudMapper<ProxyDog> {
+public interface ProjectMapper extends CrudMapper<Project> {
 
     @Select("select now()")
     LocalDateTime now();

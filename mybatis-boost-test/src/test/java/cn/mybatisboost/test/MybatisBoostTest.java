@@ -9,14 +9,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootApplication
-@SpringBootTest(classes = ProxyDogMapper.class)
+@SpringBootTest(classes = ProjectMapper.class)
 public class MybatisBoostTest {
 
     @Autowired
-    private ProxyDogMapper mapper;
+    private ProjectMapper mapper;
 
     @Test
     public void myTest() {
-        System.out.println(mapper.now());
+        Project project = new Project("cn.mybatisboost", "mybatis-boost", "MIT",
+                "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan");
+        System.out.println(mapper.insertSelectively(project));
+        System.out.println(project.getId());
     }
 }

@@ -1,2 +1,4 @@
 language: java
 services: mysql
+before_script:
+  - mysql < mybatis-boost-test/src/test/resources/project.sql
