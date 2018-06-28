@@ -1,5 +1,7 @@
 package cn.mybatisboost.test;
 
+import cn.mybatisboost.core.util.SafeProperty;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootApplication
@@ -21,17 +24,35 @@ public class CrudMapperTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @After
+    public void teardown() {
+        jdbcTemplate.execute("delete from project");
+    }
+
     @Test
     public void count() {
         assertEquals(0, mapper.count(new Project()));
         jdbcTemplate.execute("insert into project (groud_id) values ('cn.mybatisboost')");
         assertEquals(1, mapper.count(new Project()));
         assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost")));
-        assertEquals(0, mapper.count(new Project().setGroupId("group id")));
+        assertEquals(0, mapper.count(new Project().setGroupId("whatever")));
+        assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost"),
+                SafeProperty.of(Project.class, "groupId")));
+        assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost"),
+                SafeProperty.of(Project.class, "groupId", "artifactId")));
+        assertEquals(0, mapper.count(new Project().setGroupId("cn.mybatisboost").setArtifactId("whatever"),
+                SafeProperty.of(Project.class, "groupId", "artifactId")));
+        assertEquals(1, mapper.count(new Project().setGroupId("cn.mybatisboost").setArtifactId("whatever"),
+                SafeProperty.of(Project.class, "groupId")));
     }
 
     @Test
     public void selectOne() {
+        assertNull(mapper.selectOne(new Project()));
+        jdbcTemplate.execute("insert into project (groud_id) values ('cn.mybatisboost')");
+        assertEquals("cn.mybatisboost",
+                mapper.selectOne(new Project().setGroupId("cn.mybatisboost")).getGroupId());
+        assertNull(mapper.selectOne(new Project().setGroupId("whatever")));
     }
 
     @Test
