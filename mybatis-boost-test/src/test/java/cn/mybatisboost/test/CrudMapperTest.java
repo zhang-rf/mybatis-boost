@@ -120,9 +120,10 @@ public class CrudMapperTest {
     public void insert() {
         try {
             assertEquals(1, mapper.insert(new Project("cn.mybatisboost", "mybatis-boost",
-                    "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
+                    "MIT", "https://github.com/zhang-rf/mybatis-boost", null)));
             fail();
         } catch (Exception ignored) {
+            // normally, exception would happen because all columns are declared NOT NULL
         }
     }
 
@@ -131,9 +132,10 @@ public class CrudMapperTest {
         try {
             assertEquals(1, mapper.batchInsert(Collections.singletonList(
                     new Project("cn.mybatisboost", "mybatis-boost",
-                            "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan"))));
+                            "MIT", "https://github.com/zhang-rf/mybatis-boost", null))));
             fail();
         } catch (Exception ignored) {
+            // normally, exception would happen because all columns are declared NOT NULL
         }
     }
 
@@ -206,8 +208,13 @@ public class CrudMapperTest {
     public void delete() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (456, 'cn.mybatisboost2', 'mybatis-boost')");
-        assertEquals(0, mapper.delete(new Project()));
+        assertEquals(2, mapper.delete(new Project()));
+        jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
+        jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (456, 'cn.mybatisboost2', 'mybatis-boost')");
         assertEquals(2, mapper.delete(new Project().setArtifactId("mybatis-boost")));
+        jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
+        jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (456, 'cn.mybatisboost2', 'mybatis-boost')");
+        assertEquals(0, mapper.delete(new Project().setGroupId("cn.mybatisboost")));
     }
 
     @Test
