@@ -195,7 +195,7 @@ public class CrudMapperTest {
     @Test
     public void updatePartiallySelectively() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
-        assertEquals(1, mapper.updateSelectively(new Project().setId(123).setGroupId("cn.mybatisboost2"),
+        assertEquals(1, mapper.updatePartiallySelectively(new Project().setId(123).setGroupId("cn.mybatisboost2"),
                 SafeProperty.of(Project.class, "groupId")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());

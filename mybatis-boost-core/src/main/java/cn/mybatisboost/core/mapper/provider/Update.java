@@ -23,23 +23,22 @@ public class Update implements SqlProvider, ConfigurationAware {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
-        int parameterCount = parameterMap.size() / 2;
+        boolean partial = mappedStatement.getId().contains("Partially");
+        boolean selective = mappedStatement.getId().contains("Selectively");
 
+        Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
         Object entity = parameterMap.get("param1");
-        boolean selective = mappedStatement.getId().endsWith("Selectively");
         List<String> properties;
-        if (parameterCount == 2) {
+        String[] conditionalProperties;
+        if (!partial) {
             properties = EntityUtils.getProperties(entity, selective);
+            conditionalProperties = (String[]) parameterMap.get("param2");
         } else {
             String[] candidateProperties = (String[]) parameterMap.get("param2");
             properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);
-        }
-
-        String[] conditionalProperties;
-        if (parameterCount == 3) {
             conditionalProperties = (String[]) parameterMap.get("param3");
-        } else {
+        }
+        if (conditionalProperties.length == 0) {
             conditionalProperties = new String[]{EntityUtils.getIdProperty(entityType)};
         }
         PropertyUtils.rebuildPropertiesWithConditions(properties, entityType, conditionalProperties);
