@@ -17,8 +17,8 @@ public class ParameterMappingEnhancement implements SqlProvider {
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings.isEmpty()) {
-            parameterMappings = new ArrayList<>();
             int parameterCount = StringUtils.countMatches(boundSql.getSql(), '?');
+            parameterMappings = new ArrayList<>(parameterCount);
             Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
             for (int i = 1; i <= parameterCount; i++) {
                 parameterMappings.add(new ParameterMapping.Builder

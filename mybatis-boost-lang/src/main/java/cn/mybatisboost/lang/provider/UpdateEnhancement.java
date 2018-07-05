@@ -65,7 +65,17 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
 
             org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
                     metaObject.getValue("delegate.configuration");
-            List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping(configuration, properties);
+            List<ParameterMapping> parameterMappings;
+            if (boundSql.getParameterObject().getClass() == entityType) {
+                parameterMappings = MyBatisUtils.getParameterMapping(configuration, properties);
+            } else {
+                parameterMappings = new ArrayList<>(columns.size() * 2);
+                for (int i = 1; i <= columns.size(); i++) {
+                    parameterMappings.add(new ParameterMapping.Builder
+                            (configuration, "param" + i, Object.class).build());
+                }
+            }
+
             if (split.length == 2) {
                 parameterMappings = new ArrayList<>(parameterMappings);
 
