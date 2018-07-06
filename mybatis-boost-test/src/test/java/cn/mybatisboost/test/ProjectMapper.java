@@ -16,22 +16,22 @@ public interface ProjectMapper extends CrudMapper<Project> {
     List<Project> selectRange(@Param("ids") Collection<Integer> ids);
 
     @Select("select * from #t where id = ?")
-    List<Project> selectOneFromT(Integer id);
+    Project selectOneFromT(Integer id);
 
     @Insert("insert *")
     @Options(useGeneratedKeys = true)
-    int insertSome1(Collection<Project> collection);
+    int insertSome(Collection<Project> collection);
 
     @Insert("insert group_id")
     @Options(useGeneratedKeys = true)
-    int insertSome2(Project project);
+    int insertOne1(Project project);
 
-    @Insert("insert NOT id")
+    @Insert("insert NOT artifact_id")
     @Options(useGeneratedKeys = true)
-    int insertSome3(Project project);
+    int insertOne2(Project project);
 
     @Update("update set group_id where id = #{id}")
-    int updateGroupId(String groupId, int id);
+    int updateGroupId(String groupId, @Param("id") int id);
 
     @Update("update set not group_id where id = #{id}")
     int updateNotGroupId(Project project);
