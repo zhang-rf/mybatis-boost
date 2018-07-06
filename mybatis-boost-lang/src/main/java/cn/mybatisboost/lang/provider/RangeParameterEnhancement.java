@@ -6,97 +6,115 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.Configuration;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RangeParameterEnhancement implements SqlProvider {
 
+    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("\\b\\?");
+
     @Override
-    @SuppressWarnings("unchecked")
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        Object parameterObject = boundSql.getParameterObject();
+        org.apache.ibatis.session.Configuration configuration =
+                (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
 
-        MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
-        Map<Integer, ParameterMapping> listParameterMappingMap = new TreeMap<>();
-        List<Collection<?>> collections = new ArrayList<>();
-        if (parameterMappings.size() == 1 && !(parameterObject instanceof Map) &&
-                !parameterMetaObject.hasGetter(parameterMappings.get(0).getProperty())) {
-            if (parameterMetaObject.isCollection()) {
-                listParameterMappingMap.put(0, parameterMappings.get(0));
-                collections.add((Collection<?>) parameterObject);
-            } else {
-                return;
+        Map<Integer, Collection<?>> collectionMap =
+                getCollections(metaObject, boundSql.getParameterObject(), parameterMappings, configuration);
+        if (!collectionMap.isEmpty()) {
+            StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
+            replacePlaceholders(collectionMap, sqlBuilder);
+            Object[] placeholders = buildPlaceholders(collectionMap);
+            metaObject.setValue("delegate.boundSql.sql", String.format(sqlBuilder.toString(), placeholders));
+            buildParameterMappings(parameterMappings, configuration, collectionMap);
+        }
+    }
+
+    private Map<Integer, Collection<?>> getCollections(MetaObject metaObject, Object parameterObject,
+                                                       List<ParameterMapping> parameterMappings,
+                                                       org.apache.ibatis.session.Configuration configuration) {
+        Map<Integer, Collection<?>> collectionMap = new HashMap<>();
+        if (parameterMappings.isEmpty()) {
+            if (parameterObject instanceof Map) {
+                metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings = new ArrayList<>());
+
+                Map<?, ?> map = (Map<?, ?>) parameterObject;
+                if (map.size() == 2 && map.containsKey("collection") && map.containsKey("list")) {
+                    collectionMap.put(0, (Collection<?>) map.get("collection"));
+                    parameterMappings.add(new ParameterMapping.Builder
+                            (configuration, "collection", Object.class).build());
+                } else {
+                    String key;
+                    for (int i = 1; map.containsKey(key = "param" + i); i++) {
+                        Object property = map.get(key);
+                        if (property instanceof Collection) {
+                            collectionMap.put(i - 1, (Collection<?>) property);
+                            parameterMappings.add(new ParameterMapping.Builder
+                                    (configuration, key, Object.class).build());
+                        }
+                    }
+                }
             }
         } else {
+            MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
             for (int i = 0; i < parameterMappings.size(); i++) {
-                ParameterMapping mapping = parameterMappings.get(i);
-                Object value = parameterMetaObject.getValue(mapping.getProperty());
-                if (value instanceof Collection) {
-                    listParameterMappingMap.put(i, mapping);
-                    collections.add((Collection<?>) value);
+                Object property = parameterMetaObject.getValue(parameterMappings.get(i).getProperty());
+                if (property instanceof Collection) {
+                    collectionMap.put(i, (Collection<?>) property);
                 }
             }
         }
+        return collectionMap;
+    }
 
-        if (!listParameterMappingMap.isEmpty()) {
-            Map parameterMap;
-            boolean newParameterObject = false;
-            if (parameterObject instanceof Map) {
-                parameterMap = (Map) parameterObject;
-            } else {
-                newParameterObject = true;
-                parameterMap = new HashMap<>();
-                parameterMappings.forEach((m) ->
-                        parameterMap.put(m.getProperty(), parameterMetaObject.getValue(m.getProperty())));
-            }
-
-            StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
-            Iterator<Integer> indexIterator = listParameterMappingMap.keySet().iterator();
-            int lastIndex = 0, previousIndex = 0;
-            while (indexIterator.hasNext()) {
-                int nextIndex = indexIterator.next();
-                for (int i = previousIndex; i <= nextIndex; i++) {
-                    lastIndex = sqlBuilder.indexOf("?", lastIndex + 1);
-                }
-                previousIndex = nextIndex + 1;
-                sqlBuilder.replace(lastIndex, lastIndex + 1, "%s");
-            }
-
-            Object[] placeholders = new Object[listParameterMappingMap.size()];
-            StringBuilder placeholderBuilder = new StringBuilder();
-            for (int i = 0; i < listParameterMappingMap.size(); i++) {
-                placeholderBuilder.setLength(0);
-
-                placeholderBuilder.append('(');
-                collections.get(i).forEach((c) -> placeholderBuilder.append("?, "));
-                placeholderBuilder.setLength(placeholderBuilder.length() - 2);
-                placeholderBuilder.append(')');
-                placeholders[i] = placeholderBuilder.toString();
-            }
-
-            org.apache.ibatis.session.Configuration configuration =
-                    (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
-            Iterator<ParameterMapping> mappingIterator = listParameterMappingMap.values().iterator();
-            for (int i = 0; i < listParameterMappingMap.size(); i++) {
-                ParameterMapping mapping = mappingIterator.next();
-                int index = parameterMappings.indexOf(mapping);
-                parameterMappings.remove(index);
-
-                int n = 0;
-                for (Object o : collections.get(i)) {
-                    String key;
-                    parameterMappings.add(index + n++, new ParameterMapping.Builder
-                            (configuration, key = "_collection-" + index + '-' + n, Object.class).build());
-                    parameterMap.put(key, o);
+    private void replacePlaceholders(Map<Integer, Collection<?>> collectionMap, StringBuilder sqlBuilder) {
+        Matcher matcher = PATTERN_PLACEHOLDER.matcher(sqlBuilder.toString());
+        int previousIndex = 0;
+        for (Integer nextIndex : collectionMap.keySet()) {
+            for (int i = previousIndex; i <= nextIndex; i++) {
+                if (!matcher.find()) {
+                    throw new IndexOutOfBoundsException("SQL Placeholder not found");
                 }
             }
+            previousIndex = nextIndex + 1;
+            int start = matcher.start();
+            sqlBuilder.replace(start, start + 1, "%s");
+        }
+    }
 
-            if (newParameterObject) {
-                metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
-                metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
+    private Object[] buildPlaceholders(Map<Integer, Collection<?>> collectionMap) {
+        Object[] placeholders = new Object[collectionMap.size()];
+        StringBuilder placeholderBuilder = new StringBuilder();
+
+        int index = 0;
+        for (Collection<?> collection : collectionMap.values()) {
+            placeholderBuilder.setLength(0);
+
+            placeholderBuilder.append('(');
+            collection.forEach(i -> placeholderBuilder.append("?, "));
+            placeholderBuilder.setLength(placeholderBuilder.length() - 2);
+            placeholderBuilder.append(')');
+            placeholders[index++] = placeholderBuilder.toString();
+        }
+        return placeholders;
+    }
+
+    private void buildParameterMappings(List<ParameterMapping> parameterMappings,
+                                        Configuration configuration, Map<Integer, Collection<?>> collectionMap) {
+        int index = 0;
+        for (Integer i : collectionMap.keySet()) {
+            index += i;
+            String property = parameterMappings.remove(index).getProperty();
+
+            int n = 0;
+            for (Object ignored : collectionMap.get(i)) {
+                parameterMappings.add(index++, new ParameterMapping.Builder
+                        (configuration, property + '[' + n++ + ']', Object.class).build());
             }
-            metaObject.setValue("delegate.boundSql.sql", String.format(sqlBuilder.toString(), placeholders));
+            index--;
         }
     }
 }
