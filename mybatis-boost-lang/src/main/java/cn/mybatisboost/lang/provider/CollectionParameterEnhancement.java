@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class CollectionParameterEnhancement implements SqlProvider {
 
-    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("\\b\\?");
+    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?!')\\B\\?\\B(?!')");
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
