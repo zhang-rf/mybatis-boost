@@ -45,6 +45,7 @@ public class EnhancementTest {
         assertEquals(2, mapper.selectRange(Arrays.asList(123, 456)).size());
         assertEquals(123, (int) mapper.selectRange(Collections.singletonList(123)).get(0).getId());
         assertEquals(456, (int) mapper.selectRange(Collections.singletonList(456)).get(0).getId());
+        assertEquals(2, mapper.selectRange2(Arrays.asList(123, 456)).size());
     }
 
     @Test

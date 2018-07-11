@@ -15,6 +15,9 @@ public interface ProjectMapper extends CrudMapper<Project> {
     @Select("select * from project where id in #{ids}")
     List<Project> selectRange(@Param("ids") Collection<Integer> ids);
 
+    @Select("select * from #t where id in ?")
+    List<Project> selectRange2(Collection<Integer> ids);
+
     @Select("select * from #t where id = ?")
     Project selectOneFromT(Integer id);
 
