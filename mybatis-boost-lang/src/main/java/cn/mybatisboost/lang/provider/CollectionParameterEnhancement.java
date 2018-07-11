@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class CollectionParameterEnhancement implements SqlProvider {
 
-    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?!')\\B\\?\\B(?!')");
+    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
@@ -64,6 +64,9 @@ public class CollectionParameterEnhancement implements SqlProvider {
                 if (property instanceof Collection) {
                     collectionMap.put(i, (Collection<?>) property);
                 }
+            }
+            if (!collectionMap.isEmpty()) {
+                metaObject.setValue("delegate.boundSql.parameterMappings", new ArrayList<>(parameterMappings));
             }
         }
         return collectionMap;
