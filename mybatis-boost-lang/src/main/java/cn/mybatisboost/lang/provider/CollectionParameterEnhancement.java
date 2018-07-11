@@ -12,24 +12,23 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RangeParameterEnhancement implements SqlProvider {
+public class CollectionParameterEnhancement implements SqlProvider {
 
     private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("\\b\\?");
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         org.apache.ibatis.session.Configuration configuration =
                 (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
 
-        Map<Integer, Collection<?>> collectionMap =
-                getCollections(metaObject, boundSql.getParameterObject(), parameterMappings, configuration);
+        Map<Integer, Collection<?>> collectionMap = getCollections
+                (metaObject, boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
         if (!collectionMap.isEmpty()) {
             StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
             replacePlaceholders(collectionMap, sqlBuilder);
-            Object[] placeholders = buildPlaceholders(collectionMap);
+            Object[] placeholders = buildNewPlaceholders(collectionMap);
             metaObject.setValue("delegate.boundSql.sql", String.format(sqlBuilder.toString(), placeholders));
-            buildParameterMappings(parameterMappings, configuration, collectionMap);
+            refreshParameterMappings(boundSql.getParameterMappings(), configuration, collectionMap);
         }
     }
 
@@ -85,7 +84,7 @@ public class RangeParameterEnhancement implements SqlProvider {
         }
     }
 
-    private Object[] buildPlaceholders(Map<Integer, Collection<?>> collectionMap) {
+    private Object[] buildNewPlaceholders(Map<Integer, Collection<?>> collectionMap) {
         Object[] placeholders = new Object[collectionMap.size()];
         StringBuilder placeholderBuilder = new StringBuilder();
 
@@ -102,8 +101,8 @@ public class RangeParameterEnhancement implements SqlProvider {
         return placeholders;
     }
 
-    private void buildParameterMappings(List<ParameterMapping> parameterMappings,
-                                        Configuration configuration, Map<Integer, Collection<?>> collectionMap) {
+    private void refreshParameterMappings(List<ParameterMapping> parameterMappings,
+                                          Configuration configuration, Map<Integer, Collection<?>> collectionMap) {
         int index = 0;
         for (Integer i : collectionMap.keySet()) {
             index += i;

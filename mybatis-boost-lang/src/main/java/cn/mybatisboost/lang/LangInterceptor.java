@@ -34,7 +34,7 @@ public class LangInterceptor implements Interceptor {
 
     protected void initProviderList() {
         providerList = Collections.unmodifiableList(Arrays.asList(
-                new RangeParameterEnhancement(), new InsertEnhancement(), new UpdateEnhancement(),
+                new CollectionParameterEnhancement(), new InsertEnhancement(), new UpdateEnhancement(),
                 new TableEnhancement(), new ParameterMappingEnhancement()));
         for (SqlProvider provider : providerList) {
             if (provider instanceof ConfigurationAware) {
