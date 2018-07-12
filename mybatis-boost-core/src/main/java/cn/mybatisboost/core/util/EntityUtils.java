@@ -97,21 +97,22 @@ public abstract class EntityUtils {
 
     public static List<String> getPropertiesFromColumns
             (Class<?> type, List<String> columns, boolean mapUnderscoreToCamelCase) {
-        return columnPropertyMappingCache.computeIfAbsent(new MultipleMapKey(type, columns, mapUnderscoreToCamelCase), k -> {
-            Set<String> columnSet = new HashSet<>(columns);
-            return Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields()).filter(field -> {
-                if (field.isAnnotationPresent(Column.class)) {
-                    return columnSet.contains(field.getAnnotation(Column.class).name());
-                } else {
-                    if (mapUnderscoreToCamelCase) {
-                        String[] words = StringUtils.splitByCharacterTypeCamelCase(field.getName());
-                        return columns.contains(Arrays.stream(words)
-                                .peek(StringUtils::uncapitalize).collect(Collectors.joining("_")));
-                    } else {
-                        return columns.contains(StringUtils.capitalize(field.getName()));
-                    }
-                }
-            }).map(Field::getName).collect(Collectors.toList()));
-        });
+        return columnPropertyMappingCache.computeIfAbsent(new MultipleMapKey(type, columns, mapUnderscoreToCamelCase),
+                k -> {
+                    Set<String> columnSet = new HashSet<>(columns);
+                    return Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields()).filter(field -> {
+                        if (field.isAnnotationPresent(Column.class)) {
+                            return columnSet.contains(field.getAnnotation(Column.class).name());
+                        } else {
+                            if (mapUnderscoreToCamelCase) {
+                                String[] words = StringUtils.splitByCharacterTypeCamelCase(field.getName());
+                                return columnSet.contains(Arrays.stream(words)
+                                        .map(StringUtils::uncapitalize).collect(Collectors.joining("_")));
+                            } else {
+                                return columnSet.contains(StringUtils.capitalize(field.getName()));
+                            }
+                        }
+                    }).map(Field::getName).collect(Collectors.toList()));
+                });
     }
 }
