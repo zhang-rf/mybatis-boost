@@ -111,7 +111,7 @@ public class EnhancementTest {
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
             assertEquals("mybatis-boost", resultSet.getString("artifact_id"));
             assertEquals("MIT", resultSet.getString("license"));
-            assertEquals("scm", resultSet.getString("https://github.com/zhang-rf/mybatis-boost"));
+            assertEquals("https://github.com/zhang-rf/mybatis-boost", resultSet.getString("scm"));
             assertEquals("zhangrongfan", resultSet.getString("developer"));
         });
     }
@@ -119,14 +119,14 @@ public class EnhancementTest {
     @Test
     public void updateAll() {
         jdbcTemplate.execute("insert into project (group_id) values ('cn.mybatisboost1')");
-        assertEquals(1, mapper.updateNotGroupId(new Project("cn.mybatisboost", "mybatis-boost",
+        assertEquals(1, mapper.updateAll(new Project("cn.mybatisboost", "mybatis-boost",
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
             assertEquals("mybatis-boost", resultSet.getString("artifact_id"));
             assertEquals("MIT", resultSet.getString("license"));
-            assertEquals("scm", resultSet.getString("https://github.com/zhang-rf/mybatis-boost"));
+            assertEquals("https://github.com/zhang-rf/mybatis-boost", resultSet.getString("scm"));
             assertEquals("zhangrongfan", resultSet.getString("developer"));
         });
     }
