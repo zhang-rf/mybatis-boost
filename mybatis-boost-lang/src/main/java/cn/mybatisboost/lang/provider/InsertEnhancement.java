@@ -33,8 +33,8 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                         .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
                 Collection<?> entities = boundSql.getParameterObject() instanceof Map ?
-                        (List<?>) ((Map) boundSql.getParameterObject()).get("collection") :
-                        Collections.singletonList(boundSql.getParameterObject());
+                        (Collection<?>) ((Map) boundSql.getParameterObject()).get("collection") :
+                        Collections.singleton(boundSql.getParameterObject());
                 if (entities.isEmpty()) return;
 
                 List<String> properties, columns;
