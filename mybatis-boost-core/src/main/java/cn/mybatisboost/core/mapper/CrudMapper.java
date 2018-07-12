@@ -1,10 +1,10 @@
 package cn.mybatisboost.core.mapper;
 
+import cn.mybatisboost.core.mapper.provider.Delete;
 import cn.mybatisboost.core.mapper.provider.*;
-import org.apache.ibatis.annotations.DeleteProvider;
-import org.apache.ibatis.annotations.InsertProvider;
-import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.UpdateProvider;
+import cn.mybatisboost.core.mapper.provider.Insert;
+import cn.mybatisboost.core.mapper.provider.Update;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Collection;
@@ -34,7 +34,7 @@ public interface CrudMapper<T> extends GenericMapper<T> {
     List<T> selectAllWithRowBounds(RowBounds rowBounds);
 
     @SelectProvider(type = SelectByIds.class, method = "reserved")
-    T selectById(Object id);
+    T selectById(@Param("arg0") Object id);
 
     @SelectProvider(type = SelectByIds.class, method = "reserved")
     List<T> selectByIds(Object... ids);
