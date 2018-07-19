@@ -39,6 +39,6 @@ public interface ProjectMapper extends CrudMapper<Project> {
     @Update("update set not group_id")
     int updateNotGroupId(Project project);
 
-    @Update("update *")
+    @Update("update set *")
     int updateAll(Project project);
 }
