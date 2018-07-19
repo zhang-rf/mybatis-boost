@@ -16,12 +16,14 @@ public class SingleParameterPreprocessor implements SqlProvider {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         Object parameterObject = boundSql.getParameterObject();
-        if (parameterObject.getClass() != entityType && !(parameterObject instanceof Map)) {
-            Map<String, Object> parameterMap = new HashMap<>();
-            parameterMap.put("arg0", parameterObject);
-            parameterMap.put("param1", parameterObject);
-            metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
-            metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
+        if (parameterObject != null) {
+            if (parameterObject.getClass() != entityType && !(parameterObject instanceof Map)) {
+                Map<String, Object> parameterMap = new HashMap<>();
+                parameterMap.put("arg0", parameterObject);
+                parameterMap.put("param1", parameterObject);
+                metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
+                metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
+            }
         }
     }
 }
