@@ -96,7 +96,7 @@ public class EnhancementTest {
         assertEquals(1, mapper.updateGroupId("cn.mybatisboost2", 123));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
-            assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
+            assertEquals("cn.mybatisboost2", resultSet.getString("group_id"));
             assertNull(resultSet.getString("artifact_id"));
         });
     }
@@ -108,7 +108,7 @@ public class EnhancementTest {
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
-            assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
+            assertEquals("cn.mybatisboost1", resultSet.getString("group_id"));
             assertEquals("mybatis-boost", resultSet.getString("artifact_id"));
             assertEquals("MIT", resultSet.getString("license"));
             assertEquals("https://github.com/zhang-rf/mybatis-boost", resultSet.getString("scm"));

@@ -33,10 +33,10 @@ public interface ProjectMapper extends CrudMapper<Project> {
     @Options(useGeneratedKeys = true)
     int insertOne2(Project project);
 
-    @Update("update set group_id where id = #{id}")
-    int updateGroupId(String groupId, @Param("id") int id);
+    @Update("update set group_id where id = ?")
+    int updateGroupId(String groupId, int id);
 
-    @Update("update set not group_id where id = #{id}")
+    @Update("update set not group_id")
     int updateNotGroupId(Project project);
 
     @Update("update *")
