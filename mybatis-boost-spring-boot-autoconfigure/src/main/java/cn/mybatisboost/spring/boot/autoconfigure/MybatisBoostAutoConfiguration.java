@@ -73,6 +73,6 @@ public class MybatisBoostAutoConfiguration {
     }
 
     private boolean matchConditionalProperty(String name) {
-        return environment.getProperty(name, boolean.class, false);
+        return environment.getProperty(name, boolean.class, true);
     }
 }
