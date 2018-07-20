@@ -10,7 +10,7 @@ Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增�
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -141,7 +141,7 @@ SELECT * FROM #t
 
 ### 参数语法增强
 
-参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法做映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。
+参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法做映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。（参数语法增强不支持嵌套属性，即不支持自动映射到对象中的属性。）
 
 ```sql
 @Update("update #t set column1 = ? where condition1 = ?")
