@@ -16,8 +16,13 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject != null) {
-            Class<?> entityType = MapperUtils.getEntityTypeFromMapper
-                    (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
+            Class<?> entityType;
+            try {
+                entityType = MapperUtils.getEntityTypeFromMapper
+                        (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
+            } catch (Exception ignored) {
+                return;
+            }
             if (parameterObject.getClass() != entityType) {
                 if (parameterObject instanceof Map) {
                     Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;

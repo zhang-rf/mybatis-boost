@@ -8,7 +8,6 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class ListParameterEnhancement implements SqlProvider {
                 (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
 
         Map<Integer, List<?>> listMap =
-                getLists(metaObject, boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
+                getLists(boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
         if (!listMap.isEmpty()) {
             StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
             replacePlaceholders(listMap, sqlBuilder);
@@ -35,26 +34,18 @@ public class ListParameterEnhancement implements SqlProvider {
         }
     }
 
-    private Map<Integer, List<?>> getLists(MetaObject metaObject, Object parameterObject,
-                                           List<ParameterMapping> parameterMappings,
+    private Map<Integer, List<?>> getLists(Object parameterObject, List<ParameterMapping> parameterMappings,
                                            org.apache.ibatis.session.Configuration configuration) {
         Map<Integer, List<?>> listMap = new HashMap<>();
         if (parameterMappings.isEmpty()) {
             if (parameterObject instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) parameterObject;
-                if (map.size() == 2 && map.containsKey("collection") && map.containsKey("list")) {
-                    listMap.put(0, (List<?>) map.get("list"));
-                    parameterMappings.add(new ParameterMapping.Builder
-                            (configuration, "list", Object.class).build());
-                } else {
-                    String key;
-                    for (int i = 1; map.containsKey(key = "param" + i); i++) {
-                        Object property = map.get(key);
-                        if (property instanceof List) {
-                            listMap.put(i - 1, (List<?>) property);
-                            parameterMappings.add(new ParameterMapping.Builder
-                                    (configuration, key, Object.class).build());
-                        }
+                for (int i = 1; map.containsKey("param" + i); i++) {
+                    Object property = map.get("param" + i);
+                    if (property instanceof List) {
+                        listMap.put(i - 1, (List<?>) property);
+                        parameterMappings.add(new ParameterMapping.Builder
+                                (configuration, "param" + i, Object.class).build());
                     }
                 }
             }
@@ -65,9 +56,6 @@ public class ListParameterEnhancement implements SqlProvider {
                 if (property instanceof List) {
                     listMap.put(i, (List<?>) property);
                 }
-            }
-            if (!listMap.isEmpty()) {
-                metaObject.setValue("delegate.boundSql.parameterMappings", new ArrayList<>(parameterMappings));
             }
         }
         return listMap;
