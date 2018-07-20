@@ -39,7 +39,7 @@ public class ListParameterEnhancement implements SqlProvider {
                                            List<ParameterMapping> parameterMappings,
                                            org.apache.ibatis.session.Configuration configuration) {
         Map<Integer, List<?>> listMap = new HashMap<>();
-        if (parameterMappings.isEmpty()) {`
+        if (parameterMappings.isEmpty()) {
             if (parameterObject instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) parameterObject;
                 if (map.size() == 2 && map.containsKey("collection") && map.containsKey("list")) {
