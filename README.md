@@ -169,4 +169,5 @@ mybatisboost.slowQueryHandler=Class<? extends BiConsumer<String, Long>> // 慢SQ
 
 ## 欢迎使用
 
+光看文档太抽象？mybatis-boost-test模块下有所有的使用case，欢迎各位检阅单元测试代码。
 MybatisBoost中没有你想要的功能？亦或是MybatisBoost有BUG？欢迎各位提出issues！
