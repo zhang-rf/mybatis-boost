@@ -99,6 +99,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
         }
     }
 
+    @Override
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
