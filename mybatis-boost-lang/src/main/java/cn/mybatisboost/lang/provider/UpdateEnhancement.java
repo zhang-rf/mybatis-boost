@@ -49,7 +49,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
             }
             metaObject.setValue("delegate.boundSql.parameterMappings",
                     getParameterMappings(metaObject, boundSql, properties, entityType));
-            metaObject.setValue("delegate.boundSql.sql", buildRealSQL(sql, entityType, columns, split));
+            metaObject.setValue("delegate.boundSql.sql", buildUpdateSQL(sql, entityType, columns, split));
         }
     }
 
@@ -110,7 +110,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
         return parameterMappings;
     }
 
-    private String buildRealSQL(String sql, Class<?> entityType, List<String> columns, String[] split) {
+    private String buildUpdateSQL(String sql, Class<?> entityType, List<String> columns, String[] split) {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE ")
                 .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor())).append(" SET ");

@@ -4,7 +4,7 @@ import cn.mybatisboost.core.MybatisInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.mapper.MapperInterceptor;
 import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
-import cn.mybatisboost.core.preprocessor.SingleParameterPreprocessor;
+import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
 import cn.mybatisboost.lang.LangInterceptor;
 import cn.mybatisboost.limiter.LimiterInterceptor;
 import cn.mybatisboost.metric.MetricInterceptor;
@@ -58,7 +58,7 @@ public class MybatisBoostAutoConfiguration {
     public MybatisInterceptor mybatisInterceptor(cn.mybatisboost.core.Configuration configuration) {
         MybatisInterceptor interceptor = new MybatisInterceptor(configuration);
         interceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
-        interceptor.appendPreprocessor(new SingleParameterPreprocessor());
+        interceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
         if (matchConditionalProperty("mybatisboost.mapper.enabled")) {
             interceptor.appendInterceptor(new MapperInterceptor(configuration));
         }
