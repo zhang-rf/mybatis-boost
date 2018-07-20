@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 
 public abstract class SqlUtils {
 
-    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
-    private static final Pattern PATTERN_COLUMN = Pattern.compile("(\\w+).*?(?<!')\\B\\?\\B(?!')");
+    public static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
+    public static final Pattern PATTERN_COLUMN = Pattern.compile("(\\w+).*?(?<!')\\B\\?\\B(?!')");
 
     private static ConcurrentMap<String, List<String>> columnsCache = new ConcurrentHashMap<>();
 

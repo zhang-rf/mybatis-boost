@@ -1,6 +1,7 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
+import cn.mybatisboost.core.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -12,11 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ListParameterEnhancement implements SqlProvider {
-
-    private static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
@@ -62,7 +60,7 @@ public class ListParameterEnhancement implements SqlProvider {
     }
 
     private void replacePlaceholders(Map<Integer, List<?>> listMap, StringBuilder sqlBuilder) {
-        Matcher matcher = PATTERN_PLACEHOLDER.matcher(sqlBuilder.toString());
+        Matcher matcher = SqlUtils.PATTERN_PLACEHOLDER.matcher(sqlBuilder.toString());
         int previousIndex = 0;
         for (Integer nextIndex : listMap.keySet()) {
             for (int i = previousIndex; i <= nextIndex; i++) {
