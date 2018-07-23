@@ -25,13 +25,17 @@ public abstract class MyBatisUtils {
     }
 
     public static List<ParameterMapping> getParameterMapping(Configuration configuration, List<String> properties) {
-        return parameterMappingCache.compute(properties, (k, v) -> {
-            if (v != null && v.get() != null) {
-                return v;
-            }
-            return new WeakReference<>(Collections.unmodifiableList(properties.stream()
-                    .map(p -> new ParameterMapping.Builder(configuration, p, Object.class).build())
-                    .collect(Collectors.toList())));
-        }).get();
+        List<ParameterMapping> parameterMappings;
+        do {
+            parameterMappings = parameterMappingCache.compute(properties, (k, v) -> {
+                if (v != null && v.get() != null) {
+                    return v;
+                }
+                return new WeakReference<>(Collections.unmodifiableList(properties.stream()
+                        .map(p -> new ParameterMapping.Builder(configuration, p, Object.class).build())
+                        .collect(Collectors.toList())));
+            }).get();
+        } while (parameterMappings == null);
+        return parameterMappings;
     }
 }
