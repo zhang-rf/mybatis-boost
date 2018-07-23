@@ -58,7 +58,7 @@ public class EnhancementTest {
 
     @Test
     public void insertSome() {
-        assertEquals(1, mapper.insertSome(Collections.singleton(new Project(
+        assertEquals(1, mapper.insertSome(Collections.singletonList(new Project(
                 "cn.mybatisboost", "mybatis-boost",
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan"))));
         jdbcTemplate.query("select * from project", resultSet -> {
