@@ -3,7 +3,6 @@ package cn.mybatisboost.test;
 import cn.mybatisboost.core.mapper.CrudMapper;
 import org.apache.ibatis.annotations.*;
 
-import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -23,7 +22,7 @@ public interface ProjectMapper extends CrudMapper<Project> {
 
     @Insert("insert *")
     @Options(useGeneratedKeys = true)
-    int insertSome(Collection<Project> collection);
+    int insertSome(List<Project> list);
 
     @Insert("insert group_id")
     @Options(useGeneratedKeys = true)
