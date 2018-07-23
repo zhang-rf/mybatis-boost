@@ -68,8 +68,8 @@ public class ListParameterEnhancement implements SqlProvider {
                     throw new IndexOutOfBoundsException("SQL Placeholder not found");
                 }
             }
+            int start = matcher.start() + previousIndex;
             previousIndex = nextIndex + 1;
-            int start = matcher.start();
             sqlBuilder.replace(start, start + 1, "%s");
         }
     }
