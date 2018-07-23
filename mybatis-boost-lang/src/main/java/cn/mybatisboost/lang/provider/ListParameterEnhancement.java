@@ -93,17 +93,16 @@ public class ListParameterEnhancement implements SqlProvider {
 
     private void refreshParameterMappings(List<ParameterMapping> parameterMappings,
                                           Configuration configuration, Map<Integer, List<?>> listMap) {
-        int index = 0;
+        int offset = 0;
         for (Integer i : listMap.keySet()) {
-            index += i;
-            String property = parameterMappings.remove(index).getProperty();
+            String property = parameterMappings.remove(i + offset).getProperty();
 
             int n = 0;
             for (Object ignored : listMap.get(i)) {
-                parameterMappings.add(index++, new ParameterMapping.Builder
+                parameterMappings.add(i + offset++, new ParameterMapping.Builder
                         (configuration, property + '[' + n++ + ']', Object.class).build());
             }
-            index--;
+            offset--;
         }
     }
 }
