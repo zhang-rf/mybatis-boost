@@ -3,4 +3,4 @@ services: mysql
 before_script:
   - mysql < mybatis-boost-test/src/test/resources/project.sql
 after_success:
-  - mvn clean test jacoco:report coveralls:report -DrepoToken="${COVERALLS_TOKEN}"
+  - mvn clean test jacoco:report coveralls:report
