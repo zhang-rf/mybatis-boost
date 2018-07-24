@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.mapper;
+package cn.mybatisboost.core;
 
 public interface GenericMapper<T> {
 }

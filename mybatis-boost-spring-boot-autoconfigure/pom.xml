@@ -7,7 +7,7 @@
     <parent>
         <groupId>cn.mybatisboost</groupId>
         <artifactId>mybatis-boost</artifactId>
-        <version>1.1.4</version>
+        <version>1.1.5</version>
     </parent>
 
     <artifactId>mybatis-boost-spring-boot-autoconfigure</artifactId>
@@ -30,10 +30,28 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>cn.mybatisboost</groupId>
-            <artifactId>mybatis-boost-all</artifactId>
+            <artifactId>mybatis-boost-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.mybatisboost</groupId>
+            <artifactId>mybatis-boost-mapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.mybatisboost</groupId>
+            <artifactId>mybatis-boost-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.mybatisboost</groupId>
+            <artifactId>mybatis-boost-limiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.mybatisboost</groupId>
+            <artifactId>mybatis-boost-metric</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>

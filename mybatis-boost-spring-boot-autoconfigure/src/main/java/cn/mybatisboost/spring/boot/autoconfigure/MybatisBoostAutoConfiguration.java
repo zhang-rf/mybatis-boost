@@ -2,11 +2,11 @@ package cn.mybatisboost.spring.boot.autoconfigure;
 
 import cn.mybatisboost.core.MybatisInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
-import cn.mybatisboost.core.mapper.MapperInterceptor;
 import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
 import cn.mybatisboost.lang.LangInterceptor;
 import cn.mybatisboost.limiter.LimiterInterceptor;
+import cn.mybatisboost.mapper.MapperInterceptor;
 import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;

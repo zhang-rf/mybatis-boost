@@ -1,9 +1,10 @@
-package cn.mybatisboost.core.mapper;
+package cn.mybatisboost.mapper;
 
-import cn.mybatisboost.core.mapper.provider.Delete;
-import cn.mybatisboost.core.mapper.provider.*;
-import cn.mybatisboost.core.mapper.provider.Insert;
-import cn.mybatisboost.core.mapper.provider.Update;
+import cn.mybatisboost.core.GenericMapper;
+import cn.mybatisboost.mapper.provider.Delete;
+import cn.mybatisboost.mapper.provider.*;
+import cn.mybatisboost.mapper.provider.Insert;
+import cn.mybatisboost.mapper.provider.Update;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 

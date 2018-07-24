@@ -1,6 +1,6 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.core.mapper.CrudMapper;
+import cn.mybatisboost.mapper.CrudMapper;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

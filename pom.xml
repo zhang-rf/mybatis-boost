@@ -6,12 +6,13 @@
 
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>mybatis-boost-all</module>
         <module>mybatis-boost-core</module>
+        <module>mybatis-boost-mapper</module>
         <module>mybatis-boost-lang</module>
         <module>mybatis-boost-limiter</module>
         <module>mybatis-boost-metric</module>
@@ -22,7 +23,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version>1.1.4</version>
+        <version>1.1.5</version>
     </properties>
 
     <dependencyManagement>
@@ -35,6 +36,11 @@
             <dependency>
                 <groupId>cn.mybatisboost</groupId>
                 <artifactId>mybatis-boost-core</artifactId>
+                <version>${version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.mybatisboost</groupId>
+                <artifactId>mybatis-boost-mapper</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>
@@ -108,9 +114,9 @@
                 <version>0.7.6.201602180812</version>
                 <executions>
                     <execution>
-                        <id>prepare-agent-integration</id>
+                        <id>prepare-agent</id>
                         <goals>
-                            <goal>prepare-agent-integration</goal>
+                            <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                 </executions>

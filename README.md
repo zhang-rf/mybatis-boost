@@ -10,7 +10,7 @@ Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增�
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5</version>
 </dependency>
 ```
 
@@ -169,5 +169,5 @@ mybatisboost.slowQueryHandler=Class<? extends BiConsumer<String, Long>> // 慢SQ
 
 ## 欢迎使用
 
-光看文档太抽象？mybatis-boost-test模块下有所有的使用case，欢迎各位检阅单元测试代码。
+光看文档太抽象？mybatis-boost-test模块下有所有的使用case，欢迎各位检阅测试代码。
 MybatisBoost中没有你想要的功能？亦或是MybatisBoost有BUG？欢迎各位提出issues！

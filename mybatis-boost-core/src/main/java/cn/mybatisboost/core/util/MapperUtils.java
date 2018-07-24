@@ -1,6 +1,6 @@
 package cn.mybatisboost.core.util;
 
-import cn.mybatisboost.core.mapper.GenericMapper;
+import cn.mybatisboost.core.GenericMapper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

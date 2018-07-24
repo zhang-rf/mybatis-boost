@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.mapper;
+package cn.mybatisboost.mapper;
 
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
