@@ -1,7 +1,6 @@
 language: java
 services: mysql
 before_script:
-  - gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 5e874604b2535abb
   - mysql < mybatis-boost-test/src/test/resources/project.sql
 after_success:
   - mvn clean test jacoco:report coveralls:report
