@@ -13,94 +13,111 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class InsertEnhancement implements SqlProvider, ConfigurationAware {
 
+    private static final Pattern PATTERN_LITERAL_COLUMNS = Pattern.compile("(((NOT|not) )?(\\w+, ?)*\\w+|\\*)");
     private Configuration configuration;
 
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
+        String sqlUpperCase = sql.toUpperCase();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT &&
-                !sql.toUpperCase().startsWith("INSERT INTO")) {
-            String[] split = sql.split(" ", 2);
-            if (split.length == 2 && "INSERT".equalsIgnoreCase(split[0])) {
-                Class<?> entityType = MapperUtils.getEntityTypeFromMapper
-                        (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
-                StringBuilder sqlBuilder = new StringBuilder();
-                sqlBuilder.append("INSERT INTO ")
-                        .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
-
-                Collection<?> entities = boundSql.getParameterObject() instanceof Map ?
-                        (Collection<?>) ((Map) boundSql.getParameterObject()).get("param1") :
-                        Collections.singleton(boundSql.getParameterObject());
-                if (entities.isEmpty()) return;
-
-                List<String> properties, columns;
-                boolean mapUnderscoreToCamelCase = (boolean)
-                        metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
-                if (Objects.equals(split[1], "*")) {
-                    properties = EntityUtils.getProperties(entityType);
-                    columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
-                } else {
-                    if (split[1].toUpperCase().startsWith("NOT ")) {
-                        properties = EntityUtils.getProperties(entityType);
-                        properties.removeAll(EntityUtils.getPropertiesFromColumns(entityType,
-                                Arrays.stream(split[1].substring(4).split(","))
-                                        .map(String::trim).collect(Collectors.toList()), mapUnderscoreToCamelCase));
-                        columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
-                    } else {
-                        columns = Arrays.stream(split[1].split(","))
-                                .map(String::trim).collect(Collectors.toList());
-                        properties = EntityUtils.getPropertiesFromColumns
-                                (entityType, columns, mapUnderscoreToCamelCase);
-                    }
-                }
-
-                sqlBuilder.append(" (");
-                columns.forEach(c -> sqlBuilder.append(c).append(", "));
-                sqlBuilder.setLength(sqlBuilder.length() - 2);
-                sqlBuilder.append(") VALUES ");
-                for (int i = 0, size = entities.size(); i < size; i++) {
-                    sqlBuilder.append("(");
-                    columns.forEach(c -> sqlBuilder.append("?, "));
-                    sqlBuilder.setLength(sqlBuilder.length() - 2);
-                    sqlBuilder.append("), ");
-                }
-                sqlBuilder.setLength(sqlBuilder.length() - 2);
-
-                Object entity;
-                List<ParameterMapping> parameterMappings;
-                if (entities.size() > 1) {
-                    entity = Collections.singletonMap("collection", entities);
-                    parameterMappings = new ArrayList<>(properties.size() * entities.size());
-
-                    for (int i = 0; i < entities.size(); i++) {
-                        org.apache.ibatis.session.Configuration configuration =
-                                (org.apache.ibatis.session.Configuration)
-                                        metaObject.getValue("delegate.configuration");
-                        for (String property : properties) {
-                            parameterMappings.add(new ParameterMapping.Builder(configuration,
-                                    "collection[" + i + "]." + property, Object.class).build());
-                        }
-                    }
-                } else {
-                    entity = entities.iterator().next();
-                    parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
-                            metaObject.getValue("delegate.configuration"), properties);
-                }
-
-                metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
-                metaObject.setValue("delegate.boundSql.parameterObject", entity);
-                metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
-                metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
+                !sqlUpperCase.startsWith("INSERT INTO ") && sqlUpperCase.startsWith("INSERT ")) {
+            Matcher matcher = PATTERN_LITERAL_COLUMNS.matcher(sql = sql.substring(7));
+            if (!matcher.find()) {
+                throw new IllegalStateException("Found INSERT statement but no column is specified");
             }
+
+            String literalColumns = matcher.group();
+            String additionalStatement = sql.substring(literalColumns.length());
+            Class<?> entityType = MapperUtils.getEntityTypeFromMapper
+                    (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
+            boolean mapUnderscoreToCamelCase = (boolean)
+                    metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
+            List<String> properties, columns;
+            if (Objects.equals(literalColumns, "*") || literalColumns.toUpperCase().startsWith("NOT ")) {
+                properties = EntityUtils.getProperties(entityType);
+                if (literalColumns.toUpperCase().startsWith("NOT ")) {
+                    properties.removeAll(EntityUtils.getPropertiesFromColumns
+                            (entityType, Arrays.stream(literalColumns.substring(4).split(","))
+                                    .map(String::trim).collect(Collectors.toList()), mapUnderscoreToCamelCase));
+                }
+                columns = EntityUtils.getColumns(entityType, properties, mapUnderscoreToCamelCase);
+            } else {
+                columns = Arrays.stream(literalColumns.split(",")).map(String::trim).collect(Collectors.toList());
+                properties = EntityUtils.getPropertiesFromColumns(entityType, columns, mapUnderscoreToCamelCase);
+            }
+
+            List<?> entities = boundSql.getParameterObject() instanceof Map ?
+                    (List<?>) ((Map) boundSql.getParameterObject()).get("param1") :
+                    Collections.singletonList(boundSql.getParameterObject());
+            if (entities.isEmpty()) return;
+
+            Object parameterObject = getParameterObject(entities);
+            List<ParameterMapping> parameterMappings;
+            if (entities.size() > 1) {
+                parameterMappings = buildParameterMappings(metaObject, properties, entities);
+            } else {
+                parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
+                        metaObject.getValue("delegate.configuration"), properties);
+            }
+
+            metaObject.setValue("delegate.parameterHandler.parameterObject", parameterObject);
+            metaObject.setValue("delegate.boundSql.parameterObject", parameterObject);
+            metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
+            metaObject.setValue("delegate.boundSql.sql",
+                    buildSql(entityType, columns, entities.size(), additionalStatement));
         }
     }
 
     @Override
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    private Object getParameterObject(List<?> entities) {
+        if (entities.size() > 1) {
+            return Collections.singletonMap("list", entities);
+        } else {
+            return entities.iterator().next();
+        }
+    }
+
+    private List<ParameterMapping> buildParameterMappings
+            (MetaObject metaObject, List<String> properties, List<?> entities) {
+        List<ParameterMapping> parameterMappings = new ArrayList<>(properties.size() * entities.size());
+        org.apache.ibatis.session.Configuration configuration =
+                (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
+        for (int i = 0; i < entities.size(); i++) {
+            for (String property : properties) {
+                parameterMappings.add(new ParameterMapping.Builder
+                        (configuration, "list[" + i + "]." + property, Object.class).build());
+            }
+        }
+        return parameterMappings;
+    }
+
+    private String buildSql(Class<?> entityType, List<String> columns, int batchSize, String additionalStatement) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("INSERT INTO ")
+                .append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
+        sqlBuilder.append(" (");
+        columns.forEach(c -> sqlBuilder.append(c).append(", "));
+        sqlBuilder.setLength(sqlBuilder.length() - 2);
+        sqlBuilder.append(") VALUES ");
+        for (int i = 0; i < batchSize; i++) {
+            sqlBuilder.append("(");
+            columns.forEach(c -> sqlBuilder.append("?, "));
+            sqlBuilder.setLength(sqlBuilder.length() - 2);
+            sqlBuilder.append("), ");
+        }
+        sqlBuilder.setLength(sqlBuilder.length() - 2);
+        sqlBuilder.append(additionalStatement);
+        return sqlBuilder.toString();
     }
 }
