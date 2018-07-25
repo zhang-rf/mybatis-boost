@@ -9,6 +9,7 @@
         <artifactId>mybatis-boost</artifactId>
         <version>1.1.5</version>
     </parent>
+    <packaging>pom</packaging>
 
     <artifactId>mybatis-boost-all</artifactId>
 
