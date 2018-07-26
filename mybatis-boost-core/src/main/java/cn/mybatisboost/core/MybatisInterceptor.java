@@ -17,26 +17,22 @@ import java.util.Properties;
 public class MybatisInterceptor implements Interceptor {
 
     private Configuration configuration;
-    private List<SqlProvider> preprocessorList = new ArrayList<>();
-    private List<Interceptor> interceptorList = new ArrayList<>();
-
-    public MybatisInterceptor() {
-        this(new Configuration());
-    }
+    private List<SqlProvider> preprocessors = new ArrayList<>();
+    private List<Interceptor> interceptors = new ArrayList<>();
 
     public MybatisInterceptor(Configuration configuration) {
         this.configuration = configuration;
     }
 
     public synchronized void appendPreprocessor(SqlProvider provider) {
-        preprocessorList.add(provider);
+        preprocessors.add(provider);
         if (provider instanceof ConfigurationAware) {
             ((ConfigurationAware) provider).setConfiguration(configuration);
         }
     }
 
     public synchronized void appendInterceptor(Interceptor interceptor) {
-        interceptorList.add(interceptor);
+        interceptors.add(interceptor);
     }
 
     @Override
@@ -44,8 +40,8 @@ public class MybatisInterceptor implements Interceptor {
         MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-        preprocessorList.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
-        interceptorList.forEach(UncheckedConsumer.of(i -> i.intercept(invocation)));
+        preprocessors.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
+        interceptors.forEach(UncheckedConsumer.of(i -> i.intercept(invocation)));
         return invocation.proceed();
     }
 

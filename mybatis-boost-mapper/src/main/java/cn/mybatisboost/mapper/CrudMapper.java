@@ -8,7 +8,6 @@ import cn.mybatisboost.mapper.provider.Update;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface CrudMapper<T> extends GenericMapper<T> {
@@ -44,13 +43,13 @@ public interface CrudMapper<T> extends GenericMapper<T> {
     int insert(T entity, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int batchInsert(Collection<T> entities, String... properties);
+    int batchInsert(List<T> entities, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
     int insertSelectively(T entity, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int batchInsertSelectively(Collection<T> entities, String... properties);
+    int batchInsertSelectively(List<T> entities, String... properties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
     int update(T entity, String... conditionProperties);

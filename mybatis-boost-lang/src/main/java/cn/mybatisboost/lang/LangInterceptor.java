@@ -5,38 +5,32 @@ import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.lang.provider.*;
-import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-@Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
 public class LangInterceptor implements Interceptor {
 
     private Configuration configuration;
-    private List<SqlProvider> providerList;
-
-    public LangInterceptor() {
-        this(new Configuration());
-    }
+    private List<SqlProvider> providers;
 
     public LangInterceptor(Configuration configuration) {
         this.configuration = configuration;
-        initProviderList();
+        initProviders();
     }
 
-    protected void initProviderList() {
-        providerList = Collections.unmodifiableList(Arrays.asList(
-                new InsertEnhancement(), new UpdateEnhancement(),
+    protected void initProviders() {
+        providers = Collections.unmodifiableList(Arrays.asList(new InsertEnhancement(), new UpdateEnhancement(),
                 new TableEnhancement(), new ListParameterEnhancement(), new ParameterMappingEnhancement()));
-        for (SqlProvider provider : providerList) {
+        for (SqlProvider provider : providers) {
             if (provider instanceof ConfigurationAware) {
                 ((ConfigurationAware) provider).setConfiguration(configuration);
             }
@@ -48,7 +42,7 @@ public class LangInterceptor implements Interceptor {
         MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-        providerList.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
+        providers.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
         return invocation.proceed();
     }
 

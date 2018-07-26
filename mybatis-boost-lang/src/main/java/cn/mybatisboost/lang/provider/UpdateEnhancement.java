@@ -25,7 +25,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
         String sql = boundSql.getSql();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.UPDATE &&
                 sql.toUpperCase().startsWith("UPDATE SET ")) {
-            String[] split = getSplit(sql); // split[0] = columns, split[1] = conditions(if there are)
+            String[] split = getSplit(sql); // split[0] = columns, split[1] = conditions(if there were)
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
             boolean mapUnderscoreToCamelCase = (boolean)

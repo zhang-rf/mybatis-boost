@@ -5,10 +5,11 @@ import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.limiter.provider.MySQL;
 import cn.mybatisboost.limiter.provider.PostgreSQL;
-import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.sql.Connection;
@@ -16,16 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-@Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
 public class LimiterInterceptor implements Interceptor {
 
     private Configuration configuration;
     private Map<String, SqlProvider> providerMap = new HashMap<>();
     private volatile SqlProvider provider;
-
-    public LimiterInterceptor() {
-        this(new Configuration());
-    }
 
     public LimiterInterceptor(Configuration configuration) {
         this.configuration = configuration;

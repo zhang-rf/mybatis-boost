@@ -28,20 +28,15 @@ public class MetricInterceptor implements Interceptor {
     private static Logger logger = LoggerFactory.getLogger(MetricInterceptor.class);
     private Configuration configuration;
 
-    public MetricInterceptor() {
-        this(new Configuration());
-    }
-
     public MetricInterceptor(Configuration configuration) {
         this.configuration = configuration;
     }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        StopWatch stopWatch = StopWatch.createStarted();
-        Object proceed = invocation.proceed();
         BoundSql boundSql = ((StatementHandler) invocation.getTarget()).getBoundSql();
 
+        String sql = boundSql.getSql().replaceAll("\\s*\\n\\s*", " ");
         List<Object> parameters = new ArrayList<>();
         if (configuration.isShowQueryWithParameters()) {
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
@@ -55,7 +50,8 @@ public class MetricInterceptor implements Interceptor {
             }
         }
 
-        String sql = boundSql.getSql().replaceAll("\\s*\\n\\s*", " ");
+        StopWatch stopWatch = StopWatch.createStarted();
+        Object proceed = invocation.proceed();
         long time = stopWatch.getTime();
         if (time > configuration.getSlowQueryThresholdInMillis()) {
             if (parameters.isEmpty()) {

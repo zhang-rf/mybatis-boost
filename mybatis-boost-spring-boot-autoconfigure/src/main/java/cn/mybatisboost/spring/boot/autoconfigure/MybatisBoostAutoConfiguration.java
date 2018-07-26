@@ -10,13 +10,13 @@ import cn.mybatisboost.mapper.MapperInterceptor;
 import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
@@ -25,11 +25,18 @@ import org.springframework.core.env.Environment;
 public class MybatisBoostAutoConfiguration {
 
     private final MybatisBoostProperties properties;
-    private final Environment environment;
 
-    public MybatisBoostAutoConfiguration(MybatisBoostProperties properties, Environment environment) {
+    @Value("${mybatisboost.mapper.enabled:true}")
+    private boolean isMapperEnabled;
+    @Value("${mybatisboost.lang.enabled:true}")
+    private boolean isLangEnabled;
+    @Value("${mybatisboost.limiter.enabled:true}")
+    private boolean isLimiterEnabled;
+    @Value("${mybatisboost.metric.enabled:true}")
+    private boolean isMetricEnabled;
+
+    public MybatisBoostAutoConfiguration(MybatisBoostProperties properties) {
         this.properties = properties;
-        this.environment = environment;
     }
 
     @Bean
@@ -55,26 +62,25 @@ public class MybatisBoostAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MybatisInterceptor mybatisInterceptor(cn.mybatisboost.core.Configuration configuration) {
-        MybatisInterceptor interceptor = new MybatisInterceptor(configuration);
-        interceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
-        interceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
-        if (matchConditionalProperty("mybatisboost.mapper.enabled")) {
-            interceptor.appendInterceptor(new MapperInterceptor(configuration));
-        }
-        if (matchConditionalProperty("mybatisboost.lang.enabled")) {
-            interceptor.appendInterceptor(new LangInterceptor(configuration));
-        }
-        if (matchConditionalProperty("mybatisboost.limiter.enabled")) {
-            interceptor.appendInterceptor(new LimiterInterceptor(configuration));
-        }
-        if (matchConditionalProperty("mybatisboost.metric.enabled")) {
-            interceptor.appendInterceptor(new MetricInterceptor(configuration));
-        }
-        return interceptor;
+    public MetricInterceptor metricInterceptor(cn.mybatisboost.core.Configuration configuration) {
+        return isMetricEnabled ? new MetricInterceptor(configuration) : null;
     }
 
-    private boolean matchConditionalProperty(String name) {
-        return environment.getProperty(name, boolean.class, true);
+    @Bean
+    @ConditionalOnMissingBean
+    public MybatisInterceptor mybatisInterceptor(cn.mybatisboost.core.Configuration configuration) {
+        MybatisInterceptor mybatisInterceptor = new MybatisInterceptor(configuration);
+        mybatisInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
+        mybatisInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
+        if (isMapperEnabled) {
+            mybatisInterceptor.appendInterceptor(new MapperInterceptor(configuration));
+        }
+        if (isLangEnabled) {
+            mybatisInterceptor.appendInterceptor(new LangInterceptor(configuration));
+        }
+        if (isLimiterEnabled) {
+            mybatisInterceptor.appendInterceptor(new LimiterInterceptor(configuration));
+        }
+        return mybatisInterceptor;
     }
 }

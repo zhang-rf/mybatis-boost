@@ -5,28 +5,23 @@ import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.core.util.MyBatisUtils;
 import cn.mybatisboost.core.util.function.UncheckedFunction;
-import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
-import java.sql.Connection;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
 public class MapperInterceptor implements Interceptor {
 
     private Configuration configuration;
-    private ConcurrentMap<Object, SqlProvider> providerMap = new ConcurrentHashMap<>();
-
-    public MapperInterceptor() {
-        this(new Configuration());
-    }
+    private ConcurrentMap<Class<?>, SqlProvider> providerMap = new ConcurrentHashMap<>();
 
     public MapperInterceptor(Configuration configuration) {
         this.configuration = configuration;
@@ -38,15 +33,20 @@ public class MapperInterceptor implements Interceptor {
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
         if (Objects.equals(boundSql.getSql(), SqlProvider.MYBATIS_BOOST)) {
             MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
-            Class providerType = (Class)
+            Class<?> providerType = (Class<?>)
                     SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("providerType");
-            SqlProvider provider = providerMap.computeIfAbsent(providerType, UncheckedFunction.of(k -> {
-                SqlProvider p = (SqlProvider) providerType.newInstance();
-                if (p instanceof ConfigurationAware) {
-                    ((ConfigurationAware) p).setConfiguration(configuration);
+            SqlProvider provider = providerMap.get(providerType);
+            if (provider == null) {
+                synchronized (providerType) {
+                    provider = providerMap.computeIfAbsent(providerType, UncheckedFunction.of(k -> {
+                        SqlProvider p = (SqlProvider) providerType.newInstance();
+                        if (p instanceof ConfigurationAware) {
+                            ((ConfigurationAware) p).setConfiguration(configuration);
+                        }
+                        return p;
+                    }));
                 }
-                return p;
-            }));
+            }
             if (provider != null) {
                 provider.replace(metaObject, mappedStatement, boundSql);
             }
