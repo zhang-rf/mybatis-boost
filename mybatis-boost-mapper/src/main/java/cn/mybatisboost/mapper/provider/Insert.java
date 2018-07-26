@@ -12,7 +12,10 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class Insert implements SqlProvider, ConfigurationAware {
 
@@ -27,9 +30,9 @@ public class Insert implements SqlProvider, ConfigurationAware {
 
         Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
         Object entity = parameterMap.get("param1");
-        Collection<?> entities;
-        if (entity instanceof Collection) {
-            entities = (Collection<?>) entity;
+        List<?> entities;
+        if (entity instanceof List) {
+            entities = (List<?>) entity;
             if (entities.isEmpty()) return;
             entity = entities.iterator().next();
         } else {
@@ -69,7 +72,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
             sqlBuilder.append(subSqlBuilder);
 
             if (entities.size() > 1) {
-                entity = Collections.singletonMap("collection", entities);
+                entity = Collections.singletonMap("list", entities);
                 parameterMappings = new ArrayList<>(properties.size() * entities.size());
 
                 for (int i = 0; i < entities.size(); i++) {
@@ -78,7 +81,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
                                     metaObject.getValue("delegate.configuration");
                     for (String property : properties) {
                         parameterMappings.add(new ParameterMapping.Builder(configuration,
-                                "collection[" + i + "]." + property, Object.class).build());
+                                "list[" + i + "]." + property, Object.class).build());
                     }
                 }
             } else {

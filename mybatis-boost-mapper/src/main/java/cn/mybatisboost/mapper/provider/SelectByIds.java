@@ -33,7 +33,7 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
                             "param1", Object.class).build());
         } else {
             Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
-            Object[] ids = (Object[]) parameterMap.get("array");
+            Object[] ids = (Object[]) parameterMap.get("param1");
             if (ids.length > 0) {
                 sqlBuilder.append(" WHERE ").append(idProperty).append(" IN (");
                 Arrays.stream(ids).forEach(c -> sqlBuilder.append("?, "));

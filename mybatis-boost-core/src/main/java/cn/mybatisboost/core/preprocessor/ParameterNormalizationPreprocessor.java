@@ -32,6 +32,11 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
                         parameterMap.clear();
                         parameterMap.put("arg0", collection);
                         parameterMap.put("param1", collection);
+                    } else if (parameterMap.size() == 1 && parameterMap.containsKey("array")) {
+                        Object array = parameterMap.get("array");
+                        parameterMap.clear();
+                        parameterMap.put("arg0", array);
+                        parameterMap.put("param1", array);
                     }
                 } else {
                     Map<String, Object> parameterMap = new HashMap<>();
