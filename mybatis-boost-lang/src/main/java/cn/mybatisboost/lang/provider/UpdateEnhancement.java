@@ -99,7 +99,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         Object parameterObject = boundSql.getParameterObject();
         if (!parameterMappings.isEmpty() || parameterObject.getClass() == entityType) {
-            parameterMappings.addAll(0, MyBatisUtils.getParameterMapping(configuration, properties));
+            parameterMappings.addAll(0, MyBatisUtils.getParameterMappings(configuration, properties));
         } else {
             Map<?, ?> parameterMap = (Map<?, ?>) parameterObject;
             for (int i = 1; parameterMap.containsKey("param" + i); i++) {

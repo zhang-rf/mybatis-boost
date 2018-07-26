@@ -16,6 +16,7 @@ public abstract class SqlUtils {
     public static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
     public static final Pattern PATTERN_COLUMN = Pattern.compile("(\\w+).*?(?<!')\\B\\?\\B(?!')");
 
+    private static ConcurrentMap<String, Integer> placeholderCountCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<String, List<String>> columnsCache = new ConcurrentHashMap<>();
 
     public static StringBuilder appendWhere(StringBuilder sqlBuilder, Stream<String> stream) {
@@ -40,12 +41,12 @@ public abstract class SqlUtils {
     }
 
     public static int countPlaceholders(String sql) {
-        int count = 0;
-        Matcher matcher = PATTERN_PLACEHOLDER.matcher(sql);
-        while (matcher.find()) {
-            count++;
-        }
-        return count;
+        return placeholderCountCache.computeIfAbsent(sql, k -> {
+            int count = 0;
+            Matcher matcher = PATTERN_PLACEHOLDER.matcher(sql);
+            while (matcher.find()) count++;
+            return count;
+        });
     }
 
     public static List<String> findColumnsFromSQL(String sql) {

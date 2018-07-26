@@ -44,7 +44,7 @@ public class Delete implements SqlProvider, ConfigurationAware {
             SqlUtils.appendWhere(sqlBuilder, columns.stream());
         }
 
-        List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
+        List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMappings
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
         metaObject.setValue("delegate.parameterHandler.parameterObject", entity);

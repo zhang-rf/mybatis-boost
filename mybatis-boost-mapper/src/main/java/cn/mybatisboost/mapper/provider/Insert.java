@@ -82,7 +82,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
                     }
                 }
             } else {
-                parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
+                parameterMappings = MyBatisUtils.getParameterMappings((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
             }
         }

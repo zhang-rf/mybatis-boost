@@ -54,7 +54,7 @@ public class Update implements SqlProvider, ConfigurationAware {
             SqlUtils.appendWhere(sqlBuilder, columns.stream().skip(columns.size() - conditionalProperties.length));
         }
 
-        List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMapping
+        List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMappings
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
         metaObject.setValue("delegate.parameterHandler.parameterObject", entity);

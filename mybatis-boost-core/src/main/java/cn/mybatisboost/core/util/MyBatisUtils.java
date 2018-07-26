@@ -5,16 +5,14 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
-import java.lang.ref.WeakReference;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 public abstract class MyBatisUtils {
 
-    private static ConcurrentMap<List<String>, WeakReference<List<ParameterMapping>>> parameterMappingCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<String, ParameterMapping> parameterMappingCache = new ConcurrentHashMap<>();
 
     public static MetaObject getRealMetaObject(Object target) {
         MetaObject metaObject;
@@ -24,18 +22,13 @@ public abstract class MyBatisUtils {
         return metaObject;
     }
 
-    public static List<ParameterMapping> getParameterMapping(Configuration configuration, List<String> properties) {
-        List<ParameterMapping> parameterMappings;
-        do {
-            parameterMappings = parameterMappingCache.compute(properties, (k, v) -> {
-                if (v != null && v.get() != null) {
-                    return v;
-                }
-                return new WeakReference<>(Collections.unmodifiableList(properties.stream()
-                        .map(p -> new ParameterMapping.Builder(configuration, p, Object.class).build())
-                        .collect(Collectors.toList())));
-            }).get();
-        } while (parameterMappings == null);
+    public static List<ParameterMapping> getParameterMappings(Configuration configuration, List<String> properties) {
+        List<ParameterMapping> parameterMappings = new ArrayList<>(properties.size());
+        for (String property : properties) {
+            ParameterMapping pm = parameterMappingCache.computeIfAbsent(property, k ->
+                    new ParameterMapping.Builder(configuration, property, Object.class).build());
+            parameterMappings.add(pm);
+        }
         return parameterMappings;
     }
 }

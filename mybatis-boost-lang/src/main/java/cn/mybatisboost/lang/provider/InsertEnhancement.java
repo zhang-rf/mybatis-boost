@@ -63,7 +63,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
             if (entities.size() > 1) {
                 parameterMappings = buildParameterMappings(metaObject, properties, entities);
             } else {
-                parameterMappings = MyBatisUtils.getParameterMapping((org.apache.ibatis.session.Configuration)
+                parameterMappings = MyBatisUtils.getParameterMappings((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
             }
 
