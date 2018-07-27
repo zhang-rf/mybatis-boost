@@ -109,8 +109,8 @@ public class CrudMapperTest {
     @Test
     public void selectNullable() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost', 'mybatis-boost')");
-        assertNotNull(mapper.selectNullable(null, null, null));
         assertNotNull(mapper.selectNullable(null, "mybatis-boost", null));
+        assertNull(mapper.selectNullable("cn.mybatisboost", null, null));
         assertNull(mapper.selectNullable(null, null, null));
     }
 
