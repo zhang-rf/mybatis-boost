@@ -20,6 +20,9 @@ public interface ProjectMapper extends CrudMapper<Project> {
     @Select("select * from #t where id = ?")
     Project selectOneFromT(Integer id);
 
+    @Select("select * from #t where group_id != ? and artifact_id = ? and scm = ?")
+    Project selectNullable(String groupId, String artifactId, String scm);
+
     @Insert("insert *")
     @Options(useGeneratedKeys = true)
     int insertSome(List<Project> list);

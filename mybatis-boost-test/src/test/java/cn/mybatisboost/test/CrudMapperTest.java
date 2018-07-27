@@ -107,13 +107,11 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void selectByIds() {
-        assertTrue(mapper.selectByIds(123).isEmpty());
-        jdbcTemplate.execute("insert into project (id, group_id) values (123, 'cn.mybatisboost1')");
-        jdbcTemplate.execute("insert into project (id, group_id) values (456, 'cn.mybatisboost2')");
-        assertEquals(2, mapper.selectByIds(123, 456).size());
-        assertEquals(123, mapper.selectByIds(123, 456).get(0).getId().intValue());
-        assertEquals(456, mapper.selectByIds(123, 456).get(1).getId().intValue());
+    public void selectNullable() {
+        jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost', 'mybatis-boost')");
+        assertNotNull(mapper.selectNullable(null, null, null));
+        assertNotNull(mapper.selectNullable(null, "mybatis-boost", null));
+        assertNull(mapper.selectNullable(null, null, null));
     }
 
     @Test
