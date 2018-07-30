@@ -1,6 +1,6 @@
 # MybatisBoost [![Maven central](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost) [![Build Status](https://www.travis-ci.org/zhang-rf/mybatis-boost.svg?branch=master)](https://www.travis-ci.org/zhang-rf/mybatis-boost) [![Coverage Status](https://coveralls.io/repos/github/zhang-rf/mybatis-boost/badge.svg)](https://coveralls.io/github/zhang-rf/mybatis-boost)
 
-Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控和智能Mapper（TODO）功能，使用MybatisBoost来提升开发效率，内聚SQL代码！
+Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、SQL指标与监控功能，使用MybatisBoost来提升开发效率，内聚SQL代码！
 
 ## 快速开始
 
@@ -49,15 +49,20 @@ public class ThatTable {
 }
 ```
 
-到此，MybatisBoost的基础配置就完成了，下面将逐一介绍MybatisBoost的所有功能。
+到此，MybatisBoost的基础配置就完成了，下面将逐一介绍MybatisBoost的各种功能。
 
 ## 通用CrudMapper
 
 继承于CrudMapper&lt;T&gt;的Mybatis Mapper接口即自动拥有了CrudMapper的所有功能，继承时请指明范型“T”代表的POJO类型。
 
-默认情况下，MybatisBoost会使用POJO的所有属性参与查询（以Selectively结尾的方法会忽略值为null的字段），可使用properties参数指定参与插入、更新的属性（如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性），使用conditionProperties参数指定用于WHERE条件的属性，CrudMapper的所有方法如下。
+默认情况下，MybatisBoost使用POJO的所有属性参与CRUD（以Selectively结尾的方法会过滤值为null的字段，即POJO中值为null的字段不参与CRUD），
+带有properties参数的方法，可使用properties参数指定参与插入、更新的属性（如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性，如“{"!", "id"}”则代表除“id”以外，其他属性都参与CRUD），
+带有conditionProperties参数的方法，可使用conditionProperties参数指定用于WHERE条件的属性。
 
+properties和conditionProperties使用的都是POJO中的字段名，而不是数据库Table中的列名，
 如果担心以字符串的方式指定属性容易出现拼写错误，可以使用MybatisBoost提供的SafeProperty类做运行时的属性拼写检查。
+
+CrudMapper的所有方法如下
 
 ```java
 public interface CrudMapper<T> {
@@ -72,9 +77,9 @@ public interface CrudMapper<T> {
     T selectById(Object id);
     List<T> selectByIds(Object... ids);
     int insert(T entity, String... properties);
-    int batchInsert(Collection<T> entities, String... properties);
+    int batchInsert(List<T> entities, String... properties);
     int insertSelectively(T entity, String... properties);
-    int batchInsertSelectively(Collection<T> entities, String... properties);
+    int batchInsertSelectively(List<T> entities, String... properties);
     int update(T entity, String... conditionProperties);
     int updatePartially(T entity, String[] properties, String... conditionProperties);
     int updateSelectively(T entity, String... conditionProperties);
@@ -84,13 +89,13 @@ public interface CrudMapper<T> {
 }
 ```
 
-如果你不需要CrudMapper的所有方法，请继承于GenericMapper&lt;T&gt;接口，然后再把CrudMapper接口中需要的方法复制到你的Mapper里即可。
+如果你不需要CrudMapper的所有方法，请继承于GenericMapper&lt;T&gt;接口，然后再把CrudMapper接口所需的方法复制到你的Mapper里即可。
 
 ## Mybatis语法增强
 
-MybatisBoost目前包含数个语法增强器，包括范围参数增强、INSERT增强、UPDATE增强、表名增强和参数增强。默认全部开启，每个语法增强都可以单独使用，也可以联合使用。
+MybatisBoost目前包含数个语法增强器，包括范围参数增强、INSERT增强、UPDATE增强、表名增强、参数增强和空值增强。默认全部开启，每个语法增强都可以单独使用，也可以联合使用。
 
-### 范围参数语法增强
+### 范围参数增强
 
 关闭范围参数语法增强时的SQL编写方式
 ```xml
@@ -104,34 +109,60 @@ MybatisBoost目前包含数个语法增强器，包括范围参数增强、INSER
 ```
 
 开启范围参数语法增强时的SQL编写方式
-```xml
-<select>
-    SELECT * FROM POST WHERE ID IN #{list}
-</select>
+```sql
+SELECT * FROM POST WHERE ID IN #{list}
 ```
 
-### INSERT语法增强
+Mapper接口编写方式
+```java
+    List<Post> select(List<Integer> list);
+```
 
-INSERT语法增强后，可使用如下3种语法编写INSERT语句。
+多个范围参数的情况下，需要使用"@Param"注解指定参数名称
+```sql
+SELECT * FROM POST WHERE ID IN #{ids} AND Name IN #{names}
+```
+
+```java
+    List<Post> select(@Param("ids") List<Integer> ids, @Param("names") List<Integer> names);
+```
+
+### INSERT增强
+
+INSERT语法增强后，可使用如下3种语法编写INSERT语句，INSERT语法增强同样支持批量插入。
+需要注意的是，INSERT语句中所使用的都是Table中的列名，而不是POJO中的字段名。
 
 ```sql
-INSERT * -- 插入POJO中所有的字段
-INSERT column1, column2, column3 -- 只插入POJO中指定的column1、column2、column3三个字段
-INSERT NOT column4, column5 -- 插入POJO中除了column4、column5以外的字段
+INSERT * -- 插入Table中所有的列
+INSERT column1, column2, column3 -- 只插入Table中column1、column2、column3三个列
+INSERT NOT column4, column5 -- 插入Table中除了column4、column5以外的列
 ```
 
-### UPDATE语法增强
+Mapper接口编写方式
+```java
+    int insertOne(T entities); // 插入一条记录
+    int insertMany(List<T> entities); // 批量插入
+```
+
+### UPDATE增强
 
 UPDATE语法增强后，可使用如下几种语法编写UPDATE语句。
+同样，UPDATE语句中所使用的都是Table中的列名，而不是POJO中的字段名。
 
 ```sql
-UPDATE SET * -- 更新POJO中所有的字段
-UPDATE SET column1, column2, column3 -- 只更新POJO中指定的column1、column2、column3三个字段
-UPDATE SET NOT column4, column5 -- 更新POJO中除了column4、column5以外的字段
-UPDATE SET * WHERE condition1 = 'condition1' -- 更新POJO中所有的字段，条件为"condition1 = 'condition1'"
+UPDATE SET * -- 更新Table中所有的列
+UPDATE SET column1, column2, column3 -- 只更新Table中column1、column2、column3三个列
+UPDATE SET NOT column4, column5 -- 更新Table中除了column4、column5以外的列
+UPDATE SET * WHERE condition1 = 'condition1' -- 更新Table中所有的字段，条件为"condition1 = 'condition1'"
 ```
 
-### 表名语法增强
+UPDATE语法增强的Mapper接口编写方式有如下的两种
+```java
+    int update(T entities);
+    int update(@Param("property1") String property1, @Param("property2") String property2, @Param("property3") String property3);
+```
+
+### 表名增强
 
 表名语法增强后，SQL语句中的表名可使用"#t"代替，MybatisBoost会自动替换成正确的表名。
 
@@ -139,13 +170,28 @@ UPDATE SET * WHERE condition1 = 'condition1' -- 更新POJO中所有的字段，�
 SELECT * FROM #t
 ```
 
-### 参数语法增强
+### 参数增强
 
-参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法做映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。（参数语法增强不支持嵌套属性，即不支持自动映射到对象中的属性。）
+参数语法增强后，简单的参数就没有必要再使用Mybatis的"#{}"语法做映射了，也没有必要编写@Param注解来声明参数名称了，MybatisBoost会自动按照参数的声明顺序做出正确的映射。
+（参数语法增强不支持嵌套属性，即不支持自动映射到对象中的属性。）
 
-```sql
+```java
 @Update("update #t set column1 = ? where condition1 = ?")
 int updateState(String a, String b);
+```
+
+### 空值增强
+
+空值语法增强后，在传入的参数为null的情况下，会自动重写SQL相应条件部分为“IS NULL”或“IS NOT NULL”
+
+```sql
+SELECT * FROM Post WHERE Id = #{id} AND Name != #{name}
+```
+
+假定传入的id和name参数都为null，则SQL会自动重写为如下的形式
+
+```sql
+SELECT * FROM Post WHERE Id IS NULL AND Name IS NOT NULL
 ```
 
 ## 无感知分页
