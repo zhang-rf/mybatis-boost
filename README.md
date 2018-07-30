@@ -60,7 +60,7 @@ public class ThatTable {
 带有properties参数的方法，可使用properties参数指定参与插入、更新的属性。如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性，如“new String[]{"!", "id"}”则代表除“id”以外，其他属性都参与CRUD。
 带有conditionProperties参数的方法，可使用conditionProperties参数指定用于WHERE条件的属性。
 
-properties和conditionProperties使用的都是POJO中的字段名，而不是数据库Table中的列名。
+需要注意的是，properties和conditionProperties使用的都是POJO中的字段名，而不是数据库Table中的列名。
 如果担心以字符串的方式指定属性容易出现拼写错误，可以使用MybatisBoost提供的SafeProperty类做运行时的属性拼写检查。
 
 CrudMapper的所有方法如下
