@@ -116,7 +116,7 @@ SELECT * FROM POST WHERE ID IN #{list}
 
 Mapper接口编写方式
 ```java
-    List<Post> select(List<Integer> list);
+List<Post> select(List<Integer> list);
 ```
 
 多个范围参数的情况下，需要使用"@Param"注解指定参数名称
@@ -125,7 +125,7 @@ SELECT * FROM POST WHERE ID IN #{ids} AND Name IN #{names}
 ```
 
 ```java
-    List<Post> select(@Param("ids") List<Integer> ids, @Param("names") List<Integer> names);
+List<Post> select(@Param("ids") List<Integer> ids, @Param("names") List<Integer> names);
 ```
 
 ### INSERT增强
@@ -141,8 +141,8 @@ INSERT NOT column4, column5 -- 插入Table中除了column4、column5以外的列
 
 Mapper接口编写方式
 ```java
-    int insertOne(T entities); // 插入一条记录
-    int insertMany(List<T> entities); // 批量插入
+int insertOne(T entities); // 插入一条记录
+int insertMany(List<T> entities); // 批量插入
 ```
 
 ### UPDATE增强
@@ -159,8 +159,8 @@ UPDATE SET * WHERE condition1 = 'condition1' -- 更新Table中所有的字段，
 
 UPDATE语法增强的Mapper接口编写方式有如下的两种
 ```java
-    int update(T entities);
-    int update(@Param("property1") String property1, @Param("property2") String property2, @Param("property3") String property3);
+int update(T entities);
+int update(@Param("property1") String property1, @Param("property2") String property2, @Param("property3") String property3);
 ```
 
 ### 表名增强
