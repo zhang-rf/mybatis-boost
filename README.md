@@ -141,7 +141,7 @@ INSERT NOT column4, column5 -- 插入Table中除了column4、column5以外的列
 
 Mapper接口编写方式
 ```java
-int insertOne(T entities); // 插入一条记录
+int insertOne(T entity); // 插入一条记录
 int insertMany(List<T> entities); // 批量插入
 ```
 
@@ -159,7 +159,7 @@ UPDATE SET * WHERE condition1 = 'condition1' -- 更新Table中所有的字段，
 
 UPDATE语法增强的Mapper接口编写方式有如下的两种
 ```java
-int update(T entities);
+int update(T entity);
 int update(@Param("property1") String property1, @Param("property2") String property2, @Param("property3") String property3);
 ```
 
