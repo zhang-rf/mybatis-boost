@@ -24,19 +24,21 @@ public class NullEnhancement implements SqlProvider {
             StringBuilder sqlBuilder = new StringBuilder(sql);
             int offset = 0;
             while (matcher.find() && iterator.hasNext()) {
-                ParameterMapping next = iterator.next();
-                if (parameterMetaObject.getValue(next.getProperty()) == null) {
-                    iterator.remove();
-                    String substring = sql.substring(matcher.start() - 3, matcher.end());
-                    substring = substring.replaceFirst("!= ?\\?$|<> ?\\$",
-                            sql.startsWith("SELECT") ? "IS NOT NULL" : "is not null");
-                    if (substring.length() == 4) {
-                        substring = substring.replaceFirst("= ?\\?$",
-                                sql.startsWith("SELECT") ? "IS NULL" : "is null");
-                    }
-                    sqlBuilder.replace(matcher.start() + offset - 3, matcher.end() + offset, substring);
-                    offset += substring.length() - 4;
+                try {
+                    if (parameterMetaObject.getValue(iterator.next().getProperty()) != null) continue;
+                } catch (Exception e) {
+                    continue;
                 }
+                iterator.remove();
+                String substring = sql.substring(matcher.start() - 3, matcher.end());
+                substring = substring.replaceFirst("!= ?\\?$|<> ?\\$",
+                        sql.startsWith("SELECT") ? "IS NOT NULL" : "is not null");
+                if (substring.length() == 4) {
+                    substring = substring.replaceFirst("= ?\\?$",
+                            sql.startsWith("SELECT") ? "IS NULL" : "is null");
+                }
+                sqlBuilder.replace(matcher.start() + offset - 3, matcher.end() + offset, substring);
+                offset += substring.length() - 4;
             }
             metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
         }

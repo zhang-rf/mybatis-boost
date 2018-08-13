@@ -9,6 +9,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +51,13 @@ public class ListParameterEnhancement implements SqlProvider {
         } else {
             MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
             for (int i = 0; i < parameterMappings.size(); i++) {
-                Object property = parameterMetaObject.getValue(parameterMappings.get(i).getProperty());
-                if (property instanceof List) {
-                    listMap.put(i, (List<?>) property);
+                try {
+                    Object property = parameterMetaObject.getValue(parameterMappings.get(i).getProperty());
+                    if (property instanceof List) {
+                        listMap.put(i, (List<?>) property);
+                    }
+                } catch (Exception ignored) {
+                    return Collections.emptyMap();
                 }
             }
         }
