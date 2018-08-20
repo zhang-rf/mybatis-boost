@@ -7,30 +7,59 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
+import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
+import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
+import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
 public class ListParameterEnhancement implements SqlProvider {
 
+    private static ConcurrentMap<String, Boolean> filterCache = new ConcurrentHashMap<>();
+
     @Override
     public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        org.apache.ibatis.session.Configuration configuration =
-                (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
+        if (filter(mappedStatement)) {
+            org.apache.ibatis.session.Configuration configuration =
+                    (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
 
-        Map<Integer, List<?>> listMap =
-                getLists(boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
-        if (!listMap.isEmpty()) {
-            StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
-            replacePlaceholders(listMap, sqlBuilder);
-            metaObject.setValue("delegate.boundSql.sql",
-                    String.format(sqlBuilder.toString(), buildNewPlaceholders(listMap)));
-            refreshParameterMappings(boundSql.getParameterMappings(), configuration, listMap);
+            Map<Integer, List<?>> listMap =
+                    getLists(boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
+            if (!listMap.isEmpty()) {
+                StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
+                replacePlaceholders(listMap, sqlBuilder);
+                metaObject.setValue("delegate.boundSql.sql",
+                        String.format(sqlBuilder.toString(), buildNewPlaceholders(listMap)));
+                refreshParameterMappings(boundSql.getParameterMappings(), configuration, listMap);
+            }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean filter(MappedStatement mappedStatement) {
+        return filterCache.computeIfAbsent(mappedStatement.getId(), k -> {
+            if (mappedStatement.getSqlSource() instanceof DynamicSqlSource) {
+                SqlNode rootSqlNode = (SqlNode)
+                        SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("rootSqlNode");
+                if (rootSqlNode instanceof ForEachSqlNode) return false;
+                if (rootSqlNode instanceof MixedSqlNode) {
+                    List<SqlNode> contents = (List<SqlNode>)
+                            SystemMetaObject.forObject(rootSqlNode).getValue("contents");
+                    for (SqlNode sqlNode : contents) {
+                        if (sqlNode instanceof ForEachSqlNode) return false;
+                    }
+                }
+            }
+            return true;
+        });
     }
 
     private Map<Integer, List<?>> getLists(Object parameterObject, List<ParameterMapping> parameterMappings,

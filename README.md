@@ -10,7 +10,7 @@ Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增�
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 </dependency>
 ```
 
@@ -127,6 +127,8 @@ SELECT * FROM POST WHERE ID IN #{ids} AND Name IN #{names}
 ```java
 List<Post> select(@Param("ids") List<Integer> ids, @Param("names") List<Integer> names);
 ```
+
+需要注意的是，范围参数增强无法和MyBatis提供的"<foreach>"一起使用，使用"<foreach>"后，范围参数增强将失效。
 
 ### INSERT增强
 
