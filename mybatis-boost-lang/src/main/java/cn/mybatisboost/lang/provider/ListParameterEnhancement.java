@@ -9,14 +9,11 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
-import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -43,22 +40,29 @@ public class ListParameterEnhancement implements SqlProvider {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private boolean filter(MappedStatement mappedStatement) {
-        if (mappedStatement.getSqlSource() instanceof DynamicSqlSource) {
-            return filterCache.computeIfAbsent(mappedStatement.getId(), k -> {
-                SqlNode rootSqlNode = (SqlNode)
-                        SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("rootSqlNode");
-                if (rootSqlNode instanceof ForEachSqlNode) return false;
-                if (rootSqlNode instanceof MixedSqlNode) {
-                    List<SqlNode> contents = (List<SqlNode>)
-                            SystemMetaObject.forObject(rootSqlNode).getValue("contents");
-                    for (SqlNode sqlNode : contents) {
-                        if (sqlNode instanceof ForEachSqlNode) return false;
+        return !(mappedStatement.getSqlSource() instanceof DynamicSqlSource) ||
+                filterCache.computeIfAbsent(mappedStatement.getId(), k -> filter(Collections.singletonList((SqlNode)
+                        SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("rootSqlNode"))));
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean filter(List<SqlNode> contents) {
+        for (SqlNode content : contents) {
+            if (content instanceof ForEachSqlNode) return false;
+            for (Field field : content.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                try {
+                    if (SqlNode.class.isAssignableFrom(field.getType())) {
+                        if (!filter(Collections.singletonList((SqlNode) field.get(content)))) return false;
+                    } else if (Objects.equals(field.getGenericType().getTypeName(),
+                            "java.util.List<org.apache.ibatis.scripting.xmltags.SqlNode>")) {
+                        if (!filter((List<SqlNode>) field.get(content))) return false;
                     }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
-                return true;
-            });
+            }
         }
         return true;
     }

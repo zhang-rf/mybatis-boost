@@ -10,7 +10,7 @@ Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增�
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>1.1.9</version>
+    <version>1.1.10</version>
 </dependency>
 ```
 
