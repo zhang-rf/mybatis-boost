@@ -45,8 +45,8 @@ public class ListParameterEnhancement implements SqlProvider {
 
     @SuppressWarnings("unchecked")
     private boolean filter(MappedStatement mappedStatement) {
-        return filterCache.computeIfAbsent(mappedStatement.getId(), k -> {
-            if (mappedStatement.getSqlSource() instanceof DynamicSqlSource) {
+        if (mappedStatement.getSqlSource() instanceof DynamicSqlSource) {
+            return filterCache.computeIfAbsent(mappedStatement.getId(), k -> {
                 SqlNode rootSqlNode = (SqlNode)
                         SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("rootSqlNode");
                 if (rootSqlNode instanceof ForEachSqlNode) return false;
@@ -57,9 +57,10 @@ public class ListParameterEnhancement implements SqlProvider {
                         if (sqlNode instanceof ForEachSqlNode) return false;
                     }
                 }
-            }
-            return true;
-        });
+                return true;
+            });
+        }
+        return true;
     }
 
     private Map<Integer, List<?>> getLists(Object parameterObject, List<ParameterMapping> parameterMappings,
