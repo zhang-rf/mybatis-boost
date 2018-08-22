@@ -96,6 +96,8 @@ public interface CrudMapper<T> {
 
 MybatisBoost目前包含数个语法增强器，包括范围参数增强、INSERT增强、UPDATE增强、表名增强、参数增强和空值增强。默认全部开启，每个语法增强都可以单独使用，也可以联合使用。
 
+大部分的语法增强都依赖于GenericMapper<T>接口，所以使用了语法增强的Mapper必须继承于CrudMapper<T>或GenericMapper<T>接口。
+
 ### 范围参数增强
 
 关闭范围参数语法增强时的SQL编写方式
