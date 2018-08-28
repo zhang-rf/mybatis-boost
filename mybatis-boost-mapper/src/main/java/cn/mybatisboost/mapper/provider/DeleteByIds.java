@@ -31,12 +31,14 @@ public class DeleteByIds implements SqlProvider, ConfigurationAware {
         Object[] ids = (Object[]) parameterMap.get("param1");
         parameterMap.clear();
         if (ids.length > 0) {
-            String idProperty = EntityUtils.getIdProperty(entityType);
-            sqlBuilder.append(" WHERE ").append(idProperty).append(" IN (");
+            String idColumn = EntityUtils.getIdColumn(entityType, (boolean)
+                    metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
+            sqlBuilder.append(" WHERE ").append(idColumn).append(" IN (");
             Arrays.stream(ids).forEach(c -> sqlBuilder.append("?, "));
             sqlBuilder.setLength(sqlBuilder.length() - 2);
             sqlBuilder.append(')');
 
+            String idProperty = EntityUtils.getIdProperty(entityType);
             org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
                     metaObject.getValue("delegate.configuration");
             List<ParameterMapping> parameterMappings = new ArrayList<>(ids.length);

@@ -54,6 +54,19 @@ public abstract class EntityUtils {
         });
     }
 
+    public static String getIdColumn(Class<?> type, boolean mapUnderscoreToCamelCase) {
+        String idProperty = getIdProperty(type);
+        if (idProperty != null) {
+            if (mapUnderscoreToCamelCase) {
+                String[] words = StringUtils.splitByCharacterTypeCamelCase(idProperty);
+                return Arrays.stream(words).map(StringUtils::uncapitalize).collect(Collectors.joining("_"));
+            } else {
+                return StringUtils.capitalize(idProperty);
+            }
+        }
+        return null;
+    }
+
     public static List<String> getProperties(Class<?> type) {
         return new ArrayList<>(propertiesCache.computeIfAbsent(type, UncheckedFunction.of(k ->
                 Collections.unmodifiableList(Arrays.stream(Introspector.getBeanInfo(type).getPropertyDescriptors())
@@ -86,7 +99,7 @@ public abstract class EntityUtils {
                         if (mapUnderscoreToCamelCase) {
                             String[] words = StringUtils.splitByCharacterTypeCamelCase(property);
                             return Arrays.stream(words)
-                                    .peek(StringUtils::uncapitalize).collect(Collectors.joining("_"));
+                                    .map(StringUtils::uncapitalize).collect(Collectors.joining("_"));
                         } else {
                             return StringUtils.capitalize(property);
                         }

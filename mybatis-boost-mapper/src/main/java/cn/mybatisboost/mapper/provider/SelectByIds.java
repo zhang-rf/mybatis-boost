@@ -23,11 +23,12 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT * FROM ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        String idProperty = EntityUtils.getIdProperty(entityType);
+        String idColumn = EntityUtils.getIdColumn(entityType, (boolean)
+                metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
         boolean multipleIds = mappedStatement.getId().endsWith("Ids");
         List<ParameterMapping> parameterMappings = Collections.emptyList();
         if (!multipleIds) {
-            sqlBuilder.append(" WHERE ").append(idProperty).append(" = ?");
+            sqlBuilder.append(" WHERE ").append(idColumn).append(" = ?");
             parameterMappings = Collections.singletonList(new ParameterMapping.Builder
                     ((org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration"),
                             "param1", Object.class).build());
@@ -35,11 +36,12 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
             Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
             Object[] ids = (Object[]) parameterMap.get("param1");
             if (ids.length > 0) {
-                sqlBuilder.append(" WHERE ").append(idProperty).append(" IN (");
+                sqlBuilder.append(" WHERE ").append(idColumn).append(" IN (");
                 Arrays.stream(ids).forEach(c -> sqlBuilder.append("?, "));
                 sqlBuilder.setLength(sqlBuilder.length() - 2);
                 sqlBuilder.append(')');
 
+                String idProperty = EntityUtils.getIdProperty(entityType);
                 org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration");
                 Map<String, Object> newParameterMap = new HashMap<>(ids.length);
