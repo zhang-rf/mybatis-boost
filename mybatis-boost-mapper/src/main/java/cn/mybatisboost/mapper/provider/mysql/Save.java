@@ -23,7 +23,7 @@ public class Save extends Insert {
             StringBuilder builder = new StringBuilder(sql);
             builder.append(" ON DUPLICATE KEY UPDATE ");
             Arrays.stream(matcher.group(1).split(", "))
-                    .forEach(it -> builder.append(it).append(" = ").append(it).append(", "));
+                    .forEach(it -> builder.append(it).append(" = VALUES(").append(it).append("), "));
             builder.setLength(builder.length() - 2);
             metaObject.setValue("delegate.boundSql.sql", builder.toString());
         }
