@@ -1,6 +1,6 @@
 package cn.mybatisboost.spring.boot.autoconfigure;
 
-import cn.mybatisboost.core.MybatisInterceptor;
+import cn.mybatisboost.core.MybatisBoostInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
@@ -17,11 +17,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
+@AutoConfigureAfter(MybatisAutoConfiguration.class)
+@ConditionalOnBean(SqlSessionFactory.class)
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
-@ConditionalOnBean(SqlSessionFactory.class)
-@AutoConfigureAfter(MybatisAutoConfiguration.class)
+@Import(NosqlConfiguration.class)
 public class MybatisBoostAutoConfiguration {
 
     private final MybatisBoostProperties properties;
@@ -68,19 +70,19 @@ public class MybatisBoostAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MybatisInterceptor mybatisInterceptor(cn.mybatisboost.core.Configuration configuration) {
-        MybatisInterceptor mybatisInterceptor = new MybatisInterceptor(configuration);
-        mybatisInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
-        mybatisInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
+    public MybatisBoostInterceptor mybatisBoostInterceptor(cn.mybatisboost.core.Configuration configuration) {
+        MybatisBoostInterceptor mybatisBoostInterceptor = new MybatisBoostInterceptor(configuration);
+        mybatisBoostInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
+        mybatisBoostInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
         if (isMapperEnabled) {
-            mybatisInterceptor.appendInterceptor(new MapperInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor(new MapperInterceptor(configuration));
         }
         if (isLangEnabled) {
-            mybatisInterceptor.appendInterceptor(new LangInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor(new LangInterceptor(configuration));
         }
         if (isLimiterEnabled) {
-            mybatisInterceptor.appendInterceptor(new LimiterInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor(new LimiterInterceptor(configuration));
         }
-        return mybatisInterceptor;
+        return mybatisBoostInterceptor;
     }
 }

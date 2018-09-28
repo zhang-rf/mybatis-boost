@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Properties;
 
 @Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
-public class MybatisInterceptor implements Interceptor {
+public class MybatisBoostInterceptor implements Interceptor {
 
     private Configuration configuration;
     private List<SqlProvider> preprocessors = new ArrayList<>();
     private List<Interceptor> interceptors = new ArrayList<>();
 
-    public MybatisInterceptor(Configuration configuration) {
+    public MybatisBoostInterceptor(Configuration configuration) {
         this.configuration = configuration;
     }
 

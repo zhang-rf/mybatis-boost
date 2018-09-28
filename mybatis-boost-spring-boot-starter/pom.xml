@@ -7,7 +7,7 @@
     <parent>
         <groupId>cn.mybatisboost</groupId>
         <artifactId>mybatis-boost</artifactId>
-        <version>1.2.1</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
