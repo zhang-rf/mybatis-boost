@@ -1,29 +1,26 @@
 package cn.mybatisboost.nosql;
 
-import cn.mybatisboost.core.util.EntityUtils;
-import cn.mybatisboost.core.util.MapperUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MethodNameParser {
 
-    private String declaringClassName;
     private String methodName;
     private boolean mapUnderscoreToCamelCase;
     private String sql;
     private int offset, limit;
 
-    public MethodNameParser(String declaringClassName, String methodName, boolean mapUnderscoreToCamelCase) {
-        this.declaringClassName = declaringClassName;
+    public MethodNameParser(String methodName, boolean mapUnderscoreToCamelCase) {
         this.methodName = methodName;
         this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
     }
 
     public String toSql() {
         if (sql != null) return sql;
-        Class<?> type = MapperUtils.getEntityTypeFromMapper(declaringClassName);
         String[] words = StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(methodName));
         StringBuilder sqlBuilder = new StringBuilder(), buffer = new StringBuilder();
 
@@ -34,8 +31,15 @@ public class MethodNameParser {
                 try {
                     Predicate predicate = Predicate.of(words[i]);
                     if (buffer.length() > 0) {
-                        EntityUtils.getColumnFromProperty(type, buffer.toString(), mapUnderscoreToCamelCase)
-                                .ifPresent(it -> sqlBuilder.append(it).append(' '));
+                        if (mapUnderscoreToCamelCase) {
+                            sqlBuilder.append(
+                                    Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(buffer.toString()))
+                                            .map(StringUtils::uncapitalize)
+                                            .collect(Collectors.joining("_")))
+                                    .append(' ');
+                        } else {
+                            sqlBuilder.append(StringUtils.capitalize(buffer.toString())).append(' ');
+                        }
                         if (!predicate.conditional()) {
                             sqlBuilder.append("= ? ");
                         }
@@ -52,8 +56,15 @@ public class MethodNameParser {
             }
         }
         if (buffer.length() > 0) {
-            EntityUtils.getColumnFromProperty(type, buffer.toString(), mapUnderscoreToCamelCase)
-                    .ifPresent(it -> sqlBuilder.append(it).append(" = ?"));
+            if (mapUnderscoreToCamelCase) {
+                sqlBuilder.append(
+                        Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(buffer.toString()))
+                                .map(StringUtils::uncapitalize)
+                                .collect(Collectors.joining("_")))
+                        .append(" = ?");
+            } else {
+                sqlBuilder.append(StringUtils.capitalize(buffer.toString())).append(" = ?");
+            }
         }
         return sql = sqlBuilder.toString().trim();
     }

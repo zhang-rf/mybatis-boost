@@ -6,11 +6,14 @@ import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 import org.apache.ibatis.session.RowBounds;
+
+import java.util.UUID;
 
 public class MapperModifier {
 
@@ -20,12 +23,10 @@ public class MapperModifier {
             CtClass ctClass = ClassPool.getDefault().get(className);
             for (CtMethod ctMethod : ctClass.getMethods()) {
                 if (ctMethod.hasAnnotation(Nosql.class)) {
-                    MethodNameParser parser = new MethodNameParser
-                            (className, ctMethod.getName(), mapUnderscoreToCamelCase);
+                    MethodNameParser parser =
+                            new MethodNameParser(ctMethod.getName(), mapUnderscoreToCamelCase);
                     addSelectAnnotation(ctMethod, parser.toSql());
-                    if (parser.toRowBounds() != RowBounds.DEFAULT) {
-                        addRowBoundsParameter(ctMethod, parser.toRowBounds());
-                    }
+                    addRowBoundsParameter(ctMethod, parser.toRowBounds());
                     modified = true;
                 }
             }
@@ -49,17 +50,34 @@ public class MapperModifier {
     }
 
     private static void addRowBoundsParameter(CtMethod ctMethod, RowBounds rowBounds) {
+        if (rowBounds == RowBounds.DEFAULT) return;
         try {
-            CtMethod copiedCtMethod = CtNewMethod.copy(ctMethod, ctMethod.getDeclaringClass(), null);
-            ctMethod.addParameter(ClassPool.getDefault().get("org.apache.ibatis.session.rowBounds"));
-            ctMethod.setName(ctMethod.getName() + "2");
-            StringBuilder body = new StringBuilder(ctMethod.getName() + "2(");
-            for (int i = 1; i <= copiedCtMethod.getParameterTypes().length; i++) {
-                body.append("$").append(i).append(", ");
+            String newMethodName = ctMethod.getName() + "$" +
+                    UUID.randomUUID().toString().replace("-", "");
+            CtMethod ctNewMethod = CtNewMethod.copy(ctMethod, newMethodName, ctMethod.getDeclaringClass(), null);
+            ctNewMethod.addParameter(ClassPool.getDefault().get("org.apache.ibatis.session.RowBounds"));
+            ctNewMethod.getMethodInfo().addAttribute
+                    (ctMethod.getMethodInfo().removeAttribute(AnnotationsAttribute.visibleTag));
+            if (rowBounds.getLimit() == 1) {
+                MethodInfo methodInfo = ctNewMethod.getMethodInfo();
+                String descriptor = methodInfo.getDescriptor();
+                String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
+                methodInfo.setDescriptor(descriptor =
+                        descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
+                ctNewMethod.setGenericSignature
+                        (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
             }
-            body.append("new org.apache.ibatis.session.rowBounds(")
-                    .append(rowBounds.getOffset()).append(", ").append(rowBounds.getLimit()).append("));");
-            copiedCtMethod.setBody(body.toString());
+            ctMethod.getDeclaringClass().addMethod(ctNewMethod);
+            if (rowBounds.getLimit() == 1) {
+                String body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
+                        "return !list.isEmpty() ? list.get(0) : null; }";
+                body = String.format(body, newMethodName, rowBounds.getOffset(), rowBounds.getLimit());
+                ctMethod.setBody(body);
+            } else {
+                String body = String.format("{ return %s($$, new org.apache.ibatis.session.RowBounds(%s, %s)); }",
+                        newMethodName, rowBounds.getOffset(), rowBounds.getLimit());
+                ctMethod.setBody(body);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

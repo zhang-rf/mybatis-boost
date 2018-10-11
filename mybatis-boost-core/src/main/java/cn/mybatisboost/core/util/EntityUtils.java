@@ -43,26 +43,6 @@ public abstract class EntityUtils {
         });
     }
 
-    public static Optional<String> getColumnFromProperty
-            (Class<?> type, String property, boolean mapUnderscoreToCamelCase) {
-        try {
-            Field field = type.getDeclaredField(StringUtils.uncapitalize(property));
-            if (field.isAnnotationPresent(Column.class)) {
-                return Optional.of(field.getAnnotation(Column.class).name());
-            } else {
-                if (mapUnderscoreToCamelCase) {
-                    String[] words = StringUtils.splitByCharacterTypeCamelCase(property);
-                    return Optional.of(Arrays.stream(words)
-                            .map(StringUtils::uncapitalize).collect(Collectors.joining("_")));
-                } else {
-                    return Optional.of(StringUtils.capitalize(property));
-                }
-            }
-        } catch (NoSuchFieldException e) {
-            return Optional.empty();
-        }
-    }
-
     public static String getIdProperty(Class<?> type) {
         return idPropertyCache.computeIfAbsent(type, k -> {
             try {
