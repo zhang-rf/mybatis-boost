@@ -11,6 +11,10 @@ public class MultipleMapKey {
         this.keys = keys;
     }
 
+    public Object[] getKeys() {
+        return keys;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -23,5 +27,10 @@ public class MultipleMapKey {
     @Override
     public int hashCode() {
         return Objects.hash(keys);
+    }
+
+    @Override
+    public String toString() {
+        return "MultipleMapKey" + Arrays.toString(keys);
     }
 }

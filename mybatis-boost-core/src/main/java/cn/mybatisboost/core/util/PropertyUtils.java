@@ -1,9 +1,12 @@
 package cn.mybatisboost.core.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class PropertyUtils {
 
@@ -28,5 +31,10 @@ public abstract class PropertyUtils {
         List<String> conditionalPropertyList = Arrays.asList(conditionalProperties);
         properties.removeAll(conditionalPropertyList);
         properties.addAll(conditionalPropertyList);
+    }
+
+    public static String normalizeProperty(String property) {
+        return StringUtils.uncapitalize
+                (Arrays.stream(property.split("_")).map(StringUtils::capitalize).collect(Collectors.joining()));
     }
 }

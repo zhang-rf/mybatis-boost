@@ -8,6 +8,7 @@ import cn.mybatisboost.lang.LangInterceptor;
 import cn.mybatisboost.limiter.LimiterInterceptor;
 import cn.mybatisboost.mapper.MapperInterceptor;
 import cn.mybatisboost.metric.MetricInterceptor;
+import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,24 +65,27 @@ public class MybatisBoostAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MetricInterceptor metricInterceptor(cn.mybatisboost.core.Configuration configuration) {
-        return isMetricEnabled ? new MetricInterceptor(configuration) : null;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public MybatisBoostInterceptor mybatisBoostInterceptor(cn.mybatisboost.core.Configuration configuration) {
         MybatisBoostInterceptor mybatisBoostInterceptor = new MybatisBoostInterceptor(configuration);
         mybatisBoostInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
         mybatisBoostInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
         if (isMapperEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new MapperInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor
+                    (StatementHandler.class, "prepare", new MapperInterceptor(configuration));
         }
         if (isLangEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new LangInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor
+                    (StatementHandler.class, "prepare", new LangInterceptor(configuration));
         }
         if (isLimiterEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new LimiterInterceptor(configuration));
+            mybatisBoostInterceptor.appendInterceptor
+                    (StatementHandler.class, "prepare", new LimiterInterceptor(configuration));
+        }
+        if (isMetricEnabled) {
+            MetricInterceptor interceptor = new MetricInterceptor(configuration);
+            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "batch", interceptor);
+            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "update", interceptor);
+            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "query", interceptor);
         }
         return mybatisBoostInterceptor;
     }
