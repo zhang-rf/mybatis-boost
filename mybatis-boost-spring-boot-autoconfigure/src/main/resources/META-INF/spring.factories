@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.mybatisboost.spring.boot.autoconfigure.MybatisBoostAutoConfiguration
+org.springframework.boot.env.EnvironmentPostProcessor=\
+cn.mybatisboost.spring.boot.autoconfigure.EnvironmentHolder

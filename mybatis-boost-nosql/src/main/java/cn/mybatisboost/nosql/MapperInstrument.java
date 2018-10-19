@@ -15,24 +15,25 @@ import org.apache.ibatis.session.RowBounds;
 
 import java.util.UUID;
 
-public class MapperModifier {
+public class MapperInstrument {
 
-    public static void modify(String className, boolean mapUnderscoreToCamelCase) {
+    public static boolean modify(String className, boolean mapUnderscoreToCamelCase) {
         try {
             boolean modified = false;
             CtClass ctClass = ClassPool.getDefault().get(className);
             for (CtMethod ctMethod : ctClass.getMethods()) {
-                if (ctMethod.hasAnnotation(Nosql.class)) {
+                if (ctMethod.hasAnnotation(MapperMethod.class)) {
                     MethodNameParser parser =
-                            new MethodNameParser(ctMethod.getName(), mapUnderscoreToCamelCase);
+                            new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
                     addSelectAnnotation(ctMethod, parser.toSql());
                     addRowBoundsParameter(ctMethod, parser.toRowBounds());
                     modified = true;
                 }
             }
             if (modified) {
-                ctClass.toClass(MapperModifier.class.getClassLoader(), MapperModifier.class.getProtectionDomain());
+                ctClass.toClass(MapperInstrument.class.getClassLoader(), MapperInstrument.class.getProtectionDomain());
             }
+            return modified;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

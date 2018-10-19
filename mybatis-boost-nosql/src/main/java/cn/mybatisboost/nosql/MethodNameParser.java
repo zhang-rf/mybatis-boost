@@ -1,76 +1,57 @@
 package cn.mybatisboost.nosql;
 
+import cn.mybatisboost.core.util.SqlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MethodNameParser {
 
-    private String methodName;
+    private String methodName, tableName;
     private boolean mapUnderscoreToCamelCase;
-    private String sql;
+    private String parsedSql;
     private int offset, limit;
 
-    public MethodNameParser(String methodName, boolean mapUnderscoreToCamelCase) {
+    public MethodNameParser(String methodName, String tableName, boolean mapUnderscoreToCamelCase) {
         this.methodName = methodName;
+        this.tableName = tableName;
         this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
     }
 
     public String toSql() {
-        if (sql != null) return sql;
+        if (parsedSql != null) return parsedSql;
+
         String[] words = StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(methodName));
         StringBuilder sqlBuilder = new StringBuilder(), buffer = new StringBuilder();
-
-        sqlBuilder.append(Command.valueOf(words[0]).sqlFragment()).append(" #t ");
+        sqlBuilder.append(Command.valueOf(words[0]).sqlFragment()).append(' ').append(tableName).append(' ');
         for (int i = 1; i < words.length; i++) {
             int step = process(sqlBuilder, words[i], i + 1 < words.length ? words[i + 1] : null);
-            if (step < 0) {
+            if (step >= 0) {
+                i += step;
+            } else {
                 try {
                     Predicate predicate = Predicate.of(words[i]);
                     if (buffer.length() > 0) {
-                        if (mapUnderscoreToCamelCase) {
-                            sqlBuilder.append(
-                                    Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(buffer.toString()))
-                                            .map(StringUtils::uncapitalize)
-                                            .collect(Collectors.joining("_")))
-                                    .append(' ');
-                        } else {
-                            sqlBuilder.append(StringUtils.capitalize(buffer.toString())).append(' ');
-                        }
-                        if (!predicate.conditional()) {
-                            sqlBuilder.append("= ? ");
-                        }
+                        sqlBuilder.append(SqlUtils.normalizeColumn(buffer.toString(), mapUnderscoreToCamelCase))
+                                .append(' ');
                         buffer.setLength(0);
-                        i--;
-                    } else {
-                        sqlBuilder.append(predicate.sqlFragment()).append(' ');
+                        if (!predicate.conditional()) sqlBuilder.append("= ? ");
                     }
+                    sqlBuilder.append(predicate.sqlFragment()).append(' ');
                 } catch (IllegalArgumentException ignored) {
                     buffer.append(words[i]);
                 }
-            } else {
-                i += step;
             }
         }
         if (buffer.length() > 0) {
-            if (mapUnderscoreToCamelCase) {
-                sqlBuilder.append(
-                        Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(buffer.toString()))
-                                .map(StringUtils::uncapitalize)
-                                .collect(Collectors.joining("_")))
-                        .append(" = ?");
-            } else {
-                sqlBuilder.append(StringUtils.capitalize(buffer.toString())).append(" = ?");
-            }
+            sqlBuilder.append(SqlUtils.normalizeColumn(buffer.toString(), mapUnderscoreToCamelCase)).append(" = ?");
         }
-        return sql = sqlBuilder.toString().trim();
+        return parsedSql = sqlBuilder.toString().trim();
     }
 
     public RowBounds toRowBounds() {
-        if (sql == null) toSql();
+        if (parsedSql == null) toSql();
         return offset > 0 || limit > 0 ? new RowBounds(offset, limit) : RowBounds.DEFAULT;
     }
 

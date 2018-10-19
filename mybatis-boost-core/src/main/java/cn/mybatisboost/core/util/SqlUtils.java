@@ -1,14 +1,17 @@
 package cn.mybatisboost.core.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class SqlUtils {
@@ -58,5 +61,14 @@ public abstract class SqlUtils {
             }
             return Collections.unmodifiableList(columns);
         });
+    }
+
+    public static String normalizeColumn(String column, boolean mapUnderscoreToCamelCase) {
+        if (mapUnderscoreToCamelCase) {
+            return Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(column))
+                    .map(StringUtils::uncapitalize).collect(Collectors.joining("_"));
+        } else {
+            return StringUtils.capitalize(column);
+        }
     }
 }
