@@ -7,7 +7,6 @@ import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
 import cn.mybatisboost.lang.LangInterceptor;
 import cn.mybatisboost.limiter.LimiterInterceptor;
 import cn.mybatisboost.mapper.MapperInterceptor;
-import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
@@ -81,12 +80,12 @@ public class MybatisBoostAutoConfiguration {
             mybatisBoostInterceptor.appendInterceptor
                     (StatementHandler.class, "prepare", new LimiterInterceptor(configuration));
         }
-        if (isMetricEnabled) {
-            MetricInterceptor interceptor = new MetricInterceptor(configuration);
-            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "batch", interceptor);
-            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "update", interceptor);
-            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "query", interceptor);
-        }
+//        if (isMetricEnabled) {
+//            MetricInterceptor interceptor = new MetricInterceptor(configuration);
+//            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "batch", interceptor);
+//            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "update", interceptor);
+//            mybatisBoostInterceptor.appendInterceptor(StatementHandler.class, "query", interceptor);
+//        }
         return mybatisBoostInterceptor;
     }
 }
