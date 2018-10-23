@@ -5,19 +5,24 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.ResultHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 
+@Intercepts({
+        @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class}),
+        @Signature(type = StatementHandler.class, method = "update", args = {Statement.class}),
+        @Signature(type = StatementHandler.class, method = "query", args = {Statement.class, ResultHandler.class})})
 public class MetricInterceptor implements Interceptor {
 
     private static Logger logger = LoggerFactory.getLogger(MetricInterceptor.class);
@@ -70,7 +75,7 @@ public class MetricInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        return target;
+        return Plugin.wrap(target, this);
     }
 
     @Override

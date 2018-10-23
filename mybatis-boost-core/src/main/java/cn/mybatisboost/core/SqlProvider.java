@@ -6,7 +6,7 @@ import org.apache.ibatis.reflection.MetaObject;
 
 public interface SqlProvider {
 
-    String MYBATIS_BOOST = "#mybatis-boost#";
+    String MYBATIS_BOOST = "#mybatisboost#";
 
     default String reserved() {
         return MYBATIS_BOOST;

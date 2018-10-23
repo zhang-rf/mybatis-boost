@@ -8,7 +8,7 @@ public interface UncheckedConsumer<T> {
     void accept(T t) throws Throwable;
 
     static <T> Consumer<T> of(UncheckedConsumer<T> consumer) {
-        return (t) -> {
+        return t -> {
             try {
                 consumer.accept(t);
             } catch (Throwable e) {

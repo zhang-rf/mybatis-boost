@@ -8,7 +8,7 @@ public interface UncheckedPredicate<T> {
     boolean test(T t) throws Throwable;
 
     static <T> Predicate<T> of(UncheckedPredicate<T> predicate) {
-        return (t) -> {
+        return t -> {
             try {
                 return predicate.test(t);
             } catch (Throwable e) {

@@ -1,29 +1,24 @@
 package cn.mybatisboost.core;
 
-import cn.mybatisboost.core.util.MultipleMapKey;
 import cn.mybatisboost.core.util.MyBatisUtils;
-import cn.mybatisboost.core.util.function.UncheckedFunction;
+import cn.mybatisboost.core.util.function.UncheckedConsumer;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.session.ResultHandler;
 
 import java.sql.Connection;
-import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
-@Intercepts({
-        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}),
-        @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class}),
-        @Signature(type = StatementHandler.class, method = "update", args = {Statement.class}),
-        @Signature(type = StatementHandler.class, method = "query", args = {Statement.class, ResultHandler.class})})
+@Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
 public class MybatisBoostInterceptor implements Interceptor {
 
     private Configuration configuration;
     private List<SqlProvider> preprocessors = new ArrayList<>();
-    private Map<MultipleMapKey, List<Interceptor>> interceptorMap = new HashMap<>();
+    private List<Interceptor> interceptors = new ArrayList<>();
 
     public MybatisBoostInterceptor(Configuration configuration) {
         this.configuration = configuration;
@@ -36,26 +31,17 @@ public class MybatisBoostInterceptor implements Interceptor {
         }
     }
 
-    public synchronized void appendInterceptor(Class<?> target, String methodName, Interceptor interceptor) {
-        interceptorMap.computeIfAbsent(new MultipleMapKey(target, methodName), k -> new ArrayList<>()).add(interceptor);
+    public synchronized void appendInterceptor(Interceptor interceptor) {
+        interceptors.add(interceptor);
     }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        Class<?> type = invocation.getTarget().getClass();
-        String name = invocation.getMethod().getName();
-        List<Interceptor> interceptors = interceptorMap.get(interceptorMap.keySet().stream()
-                .filter(it -> ((Class<?>) it.getKeys()[0]).isAssignableFrom(type) &&
-                        Objects.equals(it.getKeys()[1], name))
-                .findAny().orElse(null));
-        if (interceptors != null) {
-            MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
-            MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
-            BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-            preprocessors.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
-            return interceptors.stream().map(UncheckedFunction.of(i -> i.intercept(invocation)))
-                    .filter(Objects::nonNull).findAny().orElse(invocation.proceed());
-        }
+        MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
+        MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
+        BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
+        preprocessors.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
+        interceptors.forEach(UncheckedConsumer.of(i -> i.intercept(invocation)));
         return invocation.proceed();
     }
 
