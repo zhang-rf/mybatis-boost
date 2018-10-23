@@ -9,12 +9,14 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
+
 public class TableEnhancement implements SqlProvider, ConfigurationAware {
 
     private Configuration configuration;
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         if (sql.contains("#t")) {
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper

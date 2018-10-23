@@ -10,6 +10,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         String sqlUpperCase = sql.toUpperCase();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT &&

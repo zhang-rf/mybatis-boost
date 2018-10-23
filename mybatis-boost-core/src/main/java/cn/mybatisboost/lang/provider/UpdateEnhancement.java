@@ -10,6 +10,7 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.UPDATE &&
                 sql.toUpperCase().startsWith("UPDATE SET ")) {

@@ -5,6 +5,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,8 +16,8 @@ public class Save extends Insert {
             Pattern.compile("INSERT INTO \\w+ ?\\((.*?)\\)", Pattern.CASE_INSENSITIVE);
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        super.replace(metaObject, mappedStatement, boundSql);
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+        super.replace(connection, metaObject, mappedStatement, boundSql);
         String sql = boundSql.getSql();
         Matcher matcher = PATTERN_COLUMNS.matcher(sql);
         if (matcher.find()) {

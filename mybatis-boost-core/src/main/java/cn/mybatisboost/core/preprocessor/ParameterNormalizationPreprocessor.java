@@ -6,6 +6,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject != null) {
             Class<?> entityType;

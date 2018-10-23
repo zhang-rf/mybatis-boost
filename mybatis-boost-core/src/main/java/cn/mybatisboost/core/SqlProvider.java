@@ -4,6 +4,8 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 
+import java.sql.Connection;
+
 public interface SqlProvider {
 
     String MYBATIS_BOOST = "#mybatisboost#";
@@ -12,5 +14,5 @@ public interface SqlProvider {
         return MYBATIS_BOOST;
     }
 
-    void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
+    void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
 }

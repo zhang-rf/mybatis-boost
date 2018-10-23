@@ -4,9 +4,9 @@ import cn.mybatisboost.core.MybatisBoostInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
-import cn.mybatisboost.lang.LangInterceptor;
-import cn.mybatisboost.limiter.LimiterInterceptor;
-import cn.mybatisboost.mapper.MapperInterceptor;
+import cn.mybatisboost.lang.LangProviderChain;
+import cn.mybatisboost.limiter.LimiterProviderChain;
+import cn.mybatisboost.mapper.MapperProviderChain;
 import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
@@ -75,13 +75,13 @@ public class MybatisBoostAutoConfiguration {
         mybatisBoostInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
         mybatisBoostInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
         if (isMapperEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new MapperInterceptor(configuration));
+            mybatisBoostInterceptor.appendProvider(new MapperProviderChain(configuration));
         }
         if (isLangEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new LangInterceptor(configuration));
+            mybatisBoostInterceptor.appendProvider(new LangProviderChain(configuration));
         }
         if (isLimiterEnabled) {
-            mybatisBoostInterceptor.appendInterceptor(new LimiterInterceptor(configuration));
+            mybatisBoostInterceptor.appendProvider(new LimiterProviderChain(configuration));
         }
         return mybatisBoostInterceptor;
     }

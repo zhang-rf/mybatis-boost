@@ -7,10 +7,12 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.RowBounds;
 
+import java.sql.Connection;
+
 public class PostgreSQL implements SqlProvider {
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         metaObject.setValue("delegate.boundSql.sql",
                 SqlUtils.appendLimitOffset(boundSql.getSql(),
                         (RowBounds) metaObject.getValue("delegate.rowBounds")));

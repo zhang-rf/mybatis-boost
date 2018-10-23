@@ -1,7 +1,6 @@
 package cn.mybatisboost.core;
 
 import cn.mybatisboost.core.util.MyBatisUtils;
-import cn.mybatisboost.core.util.function.UncheckedConsumer;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -18,7 +17,7 @@ public class MybatisBoostInterceptor implements Interceptor {
 
     private Configuration configuration;
     private List<SqlProvider> preprocessors = new ArrayList<>();
-    private List<Interceptor> interceptors = new ArrayList<>();
+    private List<SqlProvider> providers = new ArrayList<>();
 
     public MybatisBoostInterceptor(Configuration configuration) {
         this.configuration = configuration;
@@ -31,17 +30,18 @@ public class MybatisBoostInterceptor implements Interceptor {
         }
     }
 
-    public synchronized void appendInterceptor(Interceptor interceptor) {
-        interceptors.add(interceptor);
+    public synchronized void appendProvider(SqlProvider provider) {
+        providers.add(provider);
     }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        Connection connection = (Connection) invocation.getArgs()[0];
         MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-        preprocessors.forEach(p -> p.replace(metaObject, mappedStatement, boundSql));
-        interceptors.forEach(UncheckedConsumer.of(i -> i.intercept(invocation)));
+        preprocessors.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
+        providers.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
         return invocation.proceed();
     }
 

@@ -9,13 +9,14 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
+import java.sql.Connection;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 
 public class NullEnhancement implements SqlProvider {
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
             String sql = boundSql.getSql();
             Matcher matcher = SqlUtils.PATTERN_PLACEHOLDER.matcher(sql);

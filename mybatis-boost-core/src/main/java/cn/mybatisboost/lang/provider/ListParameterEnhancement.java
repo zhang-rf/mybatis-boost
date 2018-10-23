@@ -13,6 +13,7 @@ import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -23,7 +24,7 @@ public class ListParameterEnhancement implements SqlProvider {
     private static ConcurrentMap<String, Boolean> filterCache = new ConcurrentHashMap<>();
 
     @Override
-    public void replace(MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (filter(mappedStatement)) {
             org.apache.ibatis.session.Configuration configuration =
                     (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
