@@ -35,7 +35,8 @@ public class MapperInstrument {
             }
             return modified;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
