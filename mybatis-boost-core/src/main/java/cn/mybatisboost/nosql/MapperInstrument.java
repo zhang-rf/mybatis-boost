@@ -87,10 +87,8 @@ public class MapperInstrument {
                 int index = signature.lastIndexOf(')');
                 ctNewMethod.setGenericSignature(signature.substring(0, index) +
                         "Lorg/apache/ibatis/session/RowBounds;" + signature.substring(index, signature.length() - 1));
-
                 body = String.format("{ return %s($$, new org.apache.ibatis.session.RowBounds(%s, %s)); }",
                         newMethodName, rowBounds.getOffset(), rowBounds.getLimit());
-                ctMethod.setBody(body);
             }
             ctMethod.getDeclaringClass().addMethod(ctNewMethod);
             ctMethod.setBody(body);
