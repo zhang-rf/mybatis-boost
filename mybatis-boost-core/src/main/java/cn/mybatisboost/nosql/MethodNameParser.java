@@ -13,6 +13,10 @@ public class MethodNameParser {
     private String parsedSql;
     private int offset, limit;
 
+    public static void main(String[] args) {
+        System.out.println(new MethodNameParser("selectAllOrderByGroupIdDesc", "#t", true).toSql());
+    }
+
     public MethodNameParser(String methodName, String tableName, boolean mapUnderscoreToCamelCase) {
         this.methodName = methodName;
         this.tableName = tableName;
@@ -26,6 +30,14 @@ public class MethodNameParser {
         StringBuilder sqlBuilder = new StringBuilder(), buffer = new StringBuilder();
         sqlBuilder.append(Command.valueOf(words[0]).sqlFragment()).append(' ').append(tableName).append(' ');
         for (int i = 1; i < words.length; i++) {
+            if (buffer.length() > 0) {
+                try {
+                    Predicate predicate = Predicate.of(buffer.toString() + words[i]);
+                    sqlBuilder.append(predicate.sqlFragment()).append(' ');
+                    buffer.setLength(0);
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
             int step = process(sqlBuilder, words[i], i + 1 < words.length ? words[i + 1] : null);
             if (step >= 0) {
                 i += step;
@@ -40,17 +52,7 @@ public class MethodNameParser {
                     }
                     sqlBuilder.append(predicate.sqlFragment()).append(' ');
                 } catch (IllegalArgumentException ignored) {
-                    if (buffer.length() == 0) {
-                        buffer.append(words[i]);
-                    } else {
-                        try {
-                            Predicate predicate = Predicate.of(buffer.toString() + words[i]);
-                            buffer.setLength(0);
-                            sqlBuilder.append(predicate.sqlFragment()).append(' ');
-                        } catch (IllegalArgumentException ignored2) {
-                            buffer.append(words[i]);
-                        }
-                    }
+                    buffer.append(words[i]);
                 }
             }
         }
