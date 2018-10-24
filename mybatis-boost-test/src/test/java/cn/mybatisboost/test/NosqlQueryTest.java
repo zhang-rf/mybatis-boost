@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootApplication
-@SpringBootTest(classes = ProjectMapper.class)
+@SpringBootTest
 public class NosqlQueryTest {
 
     @Autowired

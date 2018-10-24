@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootApplication
-@SpringBootTest(classes = ProjectMapper.class)
+@SpringBootTest
 public class CrudMapperTest {
 
     @Autowired
