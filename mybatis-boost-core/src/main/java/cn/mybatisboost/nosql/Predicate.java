@@ -18,8 +18,8 @@ public enum Predicate {
     OrderBy("Ob", "ORDER BY", false),
     Not("Not", "NOT", false),
     In("In", "IN ?", true),
-    True("True", "= TRUE", true),
-    False("False", "= FALSE", true),
+    IsTrue("True", "= TRUE", true),
+    IsFalse("False", "= FALSE", true),
     Asc("Asc", "ASC", true),
     Desc("Desc", "DESC", true);
 
