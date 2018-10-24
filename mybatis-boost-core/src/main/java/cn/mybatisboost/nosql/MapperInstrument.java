@@ -64,20 +64,21 @@ public class MapperInstrument {
             String newMethodName = ctMethod.getName() + "$" +
                     UUID.randomUUID().toString().replace("-", "");
             CtMethod ctNewMethod = CtNewMethod.copy(ctMethod, newMethodName, ctMethod.getDeclaringClass(), null);
+            ctNewMethod.setGenericSignature(ctMethod.getGenericSignature());
             ctNewMethod.addParameter(ClassPool.getDefault().get("org.apache.ibatis.session.RowBounds"));
             ctNewMethod.getMethodInfo().addAttribute
                     (ctMethod.getMethodInfo().removeAttribute(AnnotationsAttribute.visibleTag));
 
-            MethodInfo methodInfo = ctNewMethod.getMethodInfo();
-            String descriptor = methodInfo.getDescriptor();
-            String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
-            methodInfo.setDescriptor(descriptor =
-                    descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
-            ctNewMethod.setGenericSignature
-                    (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
-            ctMethod.getDeclaringClass().addMethod(ctNewMethod);
-
             if (rowBounds.getLimit() == 1) {
+                MethodInfo methodInfo = ctNewMethod.getMethodInfo();
+                String descriptor = methodInfo.getDescriptor();
+                String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
+                methodInfo.setDescriptor(descriptor =
+                        descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
+                ctNewMethod.setGenericSignature
+                        (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
+                ctMethod.getDeclaringClass().addMethod(ctNewMethod);
+
                 String body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
                         "return !list.isEmpty() ? (%s) list.get(0) : null; }";
                 body = String.format(body, newMethodName, rowBounds.getOffset(), rowBounds.getLimit(),
