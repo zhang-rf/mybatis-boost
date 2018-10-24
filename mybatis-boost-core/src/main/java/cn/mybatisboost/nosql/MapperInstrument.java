@@ -31,7 +31,7 @@ public class MapperInstrument {
                     if (ctMethod.hasAnnotation(NosqlQuery.class)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
-                        addSelectAnnotation(ctMethod, parser.toSql());
+                        addQueryAnnotation(ctMethod, parser.toSql());
                         addRowBoundsParameter(ctMethod, parser.toRowBounds());
                         modified = true;
                     }
@@ -47,11 +47,12 @@ public class MapperInstrument {
         }
     }
 
-    private static void addSelectAnnotation(CtMethod ctMethod, String sql) {
+    private static void addQueryAnnotation(CtMethod ctMethod, String sql) {
         AnnotationsAttribute attribute = (AnnotationsAttribute)
                 ctMethod.getMethodInfo().getAttribute(AnnotationsAttribute.visibleTag);
         ConstPool constPool = attribute.getConstPool();
-        Annotation annotation = new Annotation("org.apache.ibatis.annotations.Select", constPool);
+        Annotation annotation = new Annotation(ctMethod.getName().startsWith("delete") ?
+                "org.apache.ibatis.annotations.Delete" : "org.apache.ibatis.annotations.Select", constPool);
         ArrayMemberValue memberValue = new ArrayMemberValue(new StringMemberValue(constPool), constPool);
         memberValue.setValue(new MemberValue[]{new StringMemberValue(sql, constPool)});
         annotation.addMemberValue("value", memberValue);
