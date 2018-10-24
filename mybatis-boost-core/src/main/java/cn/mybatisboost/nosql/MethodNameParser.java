@@ -41,6 +41,12 @@ public class MethodNameParser {
                     sqlBuilder.append(predicate.sqlFragment()).append(' ');
                 } catch (IllegalArgumentException ignored) {
                     buffer.append(words[i]);
+                    try {
+                        Predicate predicate = Predicate.of(buffer.toString());
+                        buffer.setLength(0);
+                        sqlBuilder.append(predicate.sqlFragment()).append(' ');
+                    } catch (IllegalArgumentException ignored2) {
+                    }
                 }
             }
         }
