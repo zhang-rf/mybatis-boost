@@ -32,7 +32,10 @@ public class Insert implements SqlProvider, ConfigurationAware {
         List<?> entities;
         if (entity instanceof List) {
             entities = (List<?>) entity;
-            if (entities.isEmpty()) return;
+            if (entities.isEmpty()) {
+                metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
+                return;
+            }
             entity = entities.iterator().next();
         } else {
             entities = Collections.singletonList(entity);

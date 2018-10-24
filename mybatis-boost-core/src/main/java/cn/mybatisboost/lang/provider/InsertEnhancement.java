@@ -57,7 +57,10 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
             List<?> entities = boundSql.getParameterObject() instanceof Map ?
                     (List<?>) ((Map) boundSql.getParameterObject()).get("param1") :
                     Collections.singletonList(boundSql.getParameterObject());
-            if (entities.isEmpty()) return;
+            if (entities.isEmpty()) {
+                metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
+                return;
+            }
 
             Object parameterObject = getParameterObject(entities);
             List<ParameterMapping> parameterMappings;
