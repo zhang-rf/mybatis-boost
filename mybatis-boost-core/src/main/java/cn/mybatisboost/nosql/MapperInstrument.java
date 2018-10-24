@@ -77,7 +77,6 @@ public class MapperInstrument {
                         descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
                 ctNewMethod.setGenericSignature
                         (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
-                ctMethod.getDeclaringClass().addMethod(ctNewMethod);
 
                 body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
                         "return !list.isEmpty() ? (%s) list.get(0) : null; }";
