@@ -59,10 +59,12 @@ public class MapperInstrument {
             ctNewMethod.addParameter(ClassPool.getDefault().get("org.apache.ibatis.session.RowBounds"));
             ctNewMethod.getMethodInfo().addAttribute
                     (ctMethod.getMethodInfo().removeAttribute(AnnotationsAttribute.visibleTag));
+
+            MethodInfo methodInfo = ctNewMethod.getMethodInfo();
+            String descriptor = methodInfo.getDescriptor();
+            String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
+
             if (rowBounds.getLimit() == 1) {
-                MethodInfo methodInfo = ctNewMethod.getMethodInfo();
-                String descriptor = methodInfo.getDescriptor();
-                String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
                 methodInfo.setDescriptor(descriptor =
                         descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
                 ctNewMethod.setGenericSignature
@@ -71,8 +73,9 @@ public class MapperInstrument {
             ctMethod.getDeclaringClass().addMethod(ctNewMethod);
             if (rowBounds.getLimit() == 1) {
                 String body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
-                        "return !list.isEmpty() ? list.get(0) : null; }";
-                body = String.format(body, newMethodName, rowBounds.getOffset(), rowBounds.getLimit());
+                        "return !list.isEmpty() ? (%s) list.get(0) : null; }";
+                body = String.format(body, newMethodName, rowBounds.getOffset(), rowBounds.getLimit(),
+                        returnType.substring(1, returnType.length() - 1).replace('/', '.'));
                 ctMethod.setBody(body);
             } else {
                 String body = String.format("{ return %s($$, new org.apache.ibatis.session.RowBounds(%s, %s)); }",
