@@ -1,6 +1,7 @@
 package cn.mybatisboost.test;
 
 import cn.mybatisboost.mapper.CrudMapper;
+import cn.mybatisboost.nosql.NosqlQuery;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -43,4 +44,28 @@ public interface ProjectMapper extends CrudMapper<Project> {
 
     @Update("update set *")
     int updateAll(Project project);
+
+    @NosqlQuery
+    int deleteAll();
+
+    @NosqlQuery
+    Project selectFirst();
+
+    @NosqlQuery
+    List<Project> selectTop2();
+
+    @NosqlQuery
+    Project selectAllOffset1Limit1();
+
+    @NosqlQuery
+    List<Project> selectByGroupIdAndArtifactId(String groupId, String artifactId);
+
+    @NosqlQuery
+    List<Project> selectByGroupIdOrArtifactId(String groupId, String artifactId);
+
+    @NosqlQuery
+    List<Project> selectByNotArtifactId(String artifactId);
+
+    @NosqlQuery
+    List<Project> selectAllOrderByGroupIdDesc();
 }
