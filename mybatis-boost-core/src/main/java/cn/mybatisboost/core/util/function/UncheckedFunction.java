@@ -12,6 +12,9 @@ public interface UncheckedFunction<T, R> {
             try {
                 return function.apply(t);
             } catch (Throwable e) {
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
                 throw new RuntimeException(e);
             }
         };

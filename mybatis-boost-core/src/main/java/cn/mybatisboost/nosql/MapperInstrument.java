@@ -1,9 +1,6 @@
 package cn.mybatisboost.nosql;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
+import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.MethodInfo;
@@ -41,7 +38,7 @@ public class MapperInstrument {
                     modifiedClassNames.add(className);
                 }
                 return modified;
-            } catch (Exception e) {
+            } catch (CannotCompileException | NotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -93,7 +90,7 @@ public class MapperInstrument {
             }
             ctMethod.getDeclaringClass().addMethod(ctNewMethod);
             ctMethod.setBody(body);
-        } catch (Exception e) {
+        } catch (CannotCompileException | NotFoundException e) {
             throw new RuntimeException(e);
         }
     }
