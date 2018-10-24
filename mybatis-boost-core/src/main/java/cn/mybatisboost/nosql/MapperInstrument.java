@@ -71,14 +71,12 @@ public class MapperInstrument {
             MethodInfo methodInfo = ctNewMethod.getMethodInfo();
             String descriptor = methodInfo.getDescriptor();
             String returnType = descriptor.substring(descriptor.lastIndexOf(')') + 1);
-
-            if (rowBounds.getLimit() == 1) {
-                methodInfo.setDescriptor(descriptor =
-                        descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
-                ctNewMethod.setGenericSignature
-                        (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
-            }
+            methodInfo.setDescriptor(descriptor =
+                    descriptor.substring(0, descriptor.length() - returnType.length()) + "Ljava/util/List;");
+            ctNewMethod.setGenericSignature
+                    (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
             ctMethod.getDeclaringClass().addMethod(ctNewMethod);
+
             if (rowBounds.getLimit() == 1) {
                 String body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
                         "return !list.isEmpty() ? (%s) list.get(0) : null; }";

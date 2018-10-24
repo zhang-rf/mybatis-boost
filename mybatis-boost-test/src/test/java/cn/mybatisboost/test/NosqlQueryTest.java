@@ -86,7 +86,7 @@ public class NosqlQueryTest {
 
     @Test
     public void selectAllOrderByGroupIdDesc() {
-        List<Project> list = mapper.selectAllOrderByGroupIdDesc();
+        List<Project> list = mapper.selectAllOrderbyGroupIdDesc();
         assertEquals(3, list.size());
         assertEquals(789, (int) list.get(0).getId());
         assertEquals(456, (int) list.get(1).getId());
