@@ -1,4 +1,4 @@
-package cn.mybatisboost.test;
+package cn.mybatisboost.test.project;
 
 import cn.mybatisboost.mapper.CrudMapper;
 import cn.mybatisboost.nosql.NosqlQuery;
