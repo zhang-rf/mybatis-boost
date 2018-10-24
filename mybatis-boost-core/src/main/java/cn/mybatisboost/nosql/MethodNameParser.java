@@ -40,12 +40,16 @@ public class MethodNameParser {
                     }
                     sqlBuilder.append(predicate.sqlFragment()).append(' ');
                 } catch (IllegalArgumentException ignored) {
-                    buffer.append(words[i]);
-                    try {
-                        Predicate predicate = Predicate.of(buffer.toString());
-                        buffer.setLength(0);
-                        sqlBuilder.append(predicate.sqlFragment()).append(' ');
-                    } catch (IllegalArgumentException ignored2) {
+                    if (buffer.length() == 0) {
+                        buffer.append(words[i]);
+                    } else {
+                        try {
+                            Predicate predicate = Predicate.of(buffer.toString() + words[i]);
+                            buffer.setLength(0);
+                            sqlBuilder.append(predicate.sqlFragment()).append(' ');
+                        } catch (IllegalArgumentException ignored2) {
+                            buffer.append(words[i]);
+                        }
                     }
                 }
             }
