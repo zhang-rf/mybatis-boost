@@ -13,31 +13,37 @@ import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class MapperInstrument {
 
+    private static Set<String> modifiedClassNames = new ConcurrentSkipListSet<>();
+
     public static boolean modify(String className, boolean mapUnderscoreToCamelCase) {
-        try {
-            boolean modified = false;
-            CtClass ctClass = ClassPool.getDefault().get(className);
-            for (CtMethod ctMethod : ctClass.getMethods()) {
-                if (ctMethod.hasAnnotation(NosqlQuery.class)) {
-                    MethodNameParser parser =
-                            new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
-                    addSelectAnnotation(ctMethod, parser.toSql());
-                    addRowBoundsParameter(ctMethod, parser.toRowBounds());
-                    modified = true;
+        synchronized (className.intern()) {
+            if (modifiedClassNames.contains(className)) return true;
+            try {
+                boolean modified = false;
+                CtClass ctClass = ClassPool.getDefault().get(className);
+                for (CtMethod ctMethod : ctClass.getMethods()) {
+                    if (ctMethod.hasAnnotation(NosqlQuery.class)) {
+                        MethodNameParser parser =
+                                new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
+                        addSelectAnnotation(ctMethod, parser.toSql());
+                        addRowBoundsParameter(ctMethod, parser.toRowBounds());
+                        modified = true;
+                    }
                 }
+                if (modified) {
+                    ctClass.toClass(MapperInstrument.class.getClassLoader(), MapperInstrument.class.getProtectionDomain());
+                    modifiedClassNames.add(className);
+                }
+                return modified;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            if (modified) {
-                ctClass.toClass(MapperInstrument.class.getClassLoader(), MapperInstrument.class.getProtectionDomain());
-            }
-            return modified;
-        } catch (Exception e) {
-//            throw new RuntimeException(e);
-            e.printStackTrace();
-            return false;
         }
     }
 
