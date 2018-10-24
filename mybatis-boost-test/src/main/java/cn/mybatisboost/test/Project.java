@@ -1,4 +1,4 @@
-package cn.mybatisboost.test.project;
+package cn.mybatisboost.test;
 
 public class Project {
 

@@ -1,4 +1,4 @@
-package cn.mybatisboost.test.project;
+package cn.mybatisboost.test;
 
 import cn.mybatisboost.mapper.CrudMapper;
 import org.apache.ibatis.annotations.*;

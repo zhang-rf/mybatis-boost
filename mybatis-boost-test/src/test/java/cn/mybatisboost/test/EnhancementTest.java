@@ -1,7 +1,5 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.test.project.Project;
-import cn.mybatisboost.test.project.ProjectMapper;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +15,8 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootApplication(scanBasePackages = "cn.mybatisboost.test.project")
-@SpringBootTest
+@SpringBootApplication
+@SpringBootTest(classes = ProjectMapper.class)
 public class EnhancementTest {
 
     @Autowired
