@@ -1,7 +1,7 @@
 package cn.mybatisboost.test;
 
 import cn.mybatisboost.core.util.SafeProperty;
-import org.apache.ibatis.annotations.Mapper;
+import cn.mybatisboost.mapper.CrudMapper;
 import org.apache.ibatis.session.RowBounds;
 import org.junit.After;
 import org.junit.Test;
@@ -17,8 +17,8 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootApplication(scanBasePackageClasses = Mapper.class)
-@SpringBootTest
+@SpringBootApplication
+@SpringBootTest(classes = CrudMapper.class)
 public class CrudMapperTest {
 
     @Autowired
