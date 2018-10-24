@@ -1,5 +1,6 @@
 package cn.mybatisboost.test;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackageClasses = Mapper.class)
 @SpringBootTest
 public class NosqlQueryTest {
 
