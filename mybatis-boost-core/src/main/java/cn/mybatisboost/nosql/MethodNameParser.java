@@ -13,10 +13,6 @@ public class MethodNameParser {
     private String parsedSql;
     private int offset, limit;
 
-    public static void main(String[] args) {
-        System.out.println(new MethodNameParser("selectAllOrderByGroupIdDesc", "#t", true).toSql());
-    }
-
     public MethodNameParser(String methodName, String tableName, boolean mapUnderscoreToCamelCase) {
         this.methodName = methodName;
         this.tableName = tableName;
@@ -35,6 +31,7 @@ public class MethodNameParser {
                     Predicate predicate = Predicate.of(buffer.toString() + words[i]);
                     sqlBuilder.append(predicate.sqlFragment()).append(' ');
                     buffer.setLength(0);
+                    continue;
                 } catch (IllegalArgumentException ignored) {
                 }
             }
