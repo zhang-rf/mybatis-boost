@@ -64,11 +64,11 @@ public class MapperInstrument {
             String newMethodName = ctMethod.getName() + "$" +
                     UUID.randomUUID().toString().replace("-", "");
             CtMethod ctNewMethod = CtNewMethod.copy(ctMethod, newMethodName, ctMethod.getDeclaringClass(), null);
-            ctNewMethod.setGenericSignature(ctMethod.getGenericSignature());
             ctNewMethod.addParameter(ClassPool.getDefault().get("org.apache.ibatis.session.RowBounds"));
             ctNewMethod.getMethodInfo().addAttribute
                     (ctMethod.getMethodInfo().removeAttribute(AnnotationsAttribute.visibleTag));
 
+            String body;
             if (rowBounds.getLimit() == 1) {
                 MethodInfo methodInfo = ctNewMethod.getMethodInfo();
                 String descriptor = methodInfo.getDescriptor();
@@ -79,16 +79,22 @@ public class MapperInstrument {
                         (descriptor.substring(0, descriptor.length() - 1) + "<" + returnType + ">;");
                 ctMethod.getDeclaringClass().addMethod(ctNewMethod);
 
-                String body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
+                body = "{ java.util.List list = %s($$, new org.apache.ibatis.session.RowBounds(%s, %s));" +
                         "return !list.isEmpty() ? (%s) list.get(0) : null; }";
                 body = String.format(body, newMethodName, rowBounds.getOffset(), rowBounds.getLimit(),
                         returnType.substring(1, returnType.length() - 1).replace('/', '.'));
-                ctMethod.setBody(body);
             } else {
-                String body = String.format("{ return %s($$, new org.apache.ibatis.session.RowBounds(%s, %s)); }",
+                String signature = ctMethod.getGenericSignature();
+                int index = signature.lastIndexOf(')');
+                ctNewMethod.setGenericSignature(signature.substring(0, index) +
+                        "Lorg/apache/ibatis/session/RowBounds;" + signature.substring(index, signature.length() - 1));
+
+                body = String.format("{ return %s($$, new org.apache.ibatis.session.RowBounds(%s, %s)); }",
                         newMethodName, rowBounds.getOffset(), rowBounds.getLimit());
                 ctMethod.setBody(body);
             }
+            ctMethod.getDeclaringClass().addMethod(ctNewMethod);
+            ctMethod.setBody(body);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
