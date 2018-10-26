@@ -122,17 +122,18 @@ public class MethodNameParser {
 
     private Optional<BinaryTuple<String, Integer>> extractKeyNumber(String s, String key, boolean fromEnd) {
         int index = fromEnd ? s.lastIndexOf(key) : s.indexOf(key);
-        if (index >= 0) {
-            char[] chars = s.toCharArray();
-            for (int i = index + key.length(); i < chars.length; i++) {
-                if (!Character.isDigit(chars[i])) {
-                    char[] copy = Arrays.copyOfRange(chars, index + key.length(), i);
-                    return Optional.of(new BinaryTuple<>
-                            (new StringBuilder(s).replace(index, i, "").toString(),
-                                    Integer.parseInt(new String(copy))));
-                }
+        if (index < 0) return Optional.empty();
+
+        char[] chars = s.toCharArray();
+        for (int i = index + key.length(); i < chars.length; i++) {
+            if (!Character.isDigit(chars[i]) || i + 1 == chars.length) {
+                char[] copy = Arrays.copyOfRange(chars, index + key.length(),
+                        Character.isDigit(chars[i]) ? i + 1 : i);
+                return Optional.of(new BinaryTuple<>
+                        (new StringBuilder(s).replace(index, i, "").toString(),
+                                Integer.parseInt(new String(copy))));
             }
         }
-        return Optional.empty();
+        throw new IllegalArgumentException("Invalid string");
     }
 }

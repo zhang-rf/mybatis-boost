@@ -78,7 +78,7 @@ public class NosqlQueryTest {
 
     @Test
     public void selectByNotArtifactId() {
-        List<Project> list = mapper.selectByNotArtifactId("mybatis-boost1");
+        List<Project> list = mapper.selectByArtifactIdNot("mybatis-boost1");
         assertEquals(2, list.size());
         assertEquals(456, (int) list.get(0).getId());
         assertEquals(789, (int) list.get(1).getId());

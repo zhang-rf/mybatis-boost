@@ -28,7 +28,7 @@ public interface ProjectNosqlMapper extends GenericMapper<Project> {
     List<Project> selectByGroupIdOrArtifactId(String groupId, String artifactId);
 
     @NosqlQuery
-    List<Project> selectByNotArtifactId(String artifactId);
+    List<Project> selectByArtifactIdNot(String artifactId);
 
     @NosqlQuery
     List<Project> selectAllOrderByGroupIdDesc();
