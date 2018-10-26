@@ -25,7 +25,7 @@ public class LangProviderChain implements SqlProvider {
 
     protected void initProviders() {
         providers = Collections.unmodifiableList(Arrays.asList(new InsertEnhancement(), new UpdateEnhancement(),
-                new TableEnhancement(), new ListParameterEnhancement(), new ParameterMappingEnhancement(),
+                new TableEnhancement(), new ParameterMappingEnhancement(), new ListParameterEnhancement(),
                 new NullEnhancement()));
         for (SqlProvider provider : providers) {
             if (provider instanceof ConfigurationAware) {
