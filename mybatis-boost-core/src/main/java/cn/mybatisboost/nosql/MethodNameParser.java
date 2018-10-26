@@ -28,6 +28,9 @@ public class MethodNameParser {
 
         String expression = this.methodName.substring(command.name().length());
         expression = prepare(sqlBuilder, expression);
+        if (expression.isEmpty()) {
+            return parsedSql = sqlBuilder.toString().trim();
+        }
 
         Map<Integer, String> keywordMap = new TreeMap<>();
         for (String kw : Predicate.keywords()) {
@@ -119,13 +122,15 @@ public class MethodNameParser {
 
     private Optional<BinaryTuple<String, Integer>> extractKeyNumber(String s, String key, boolean fromEnd) {
         int index = fromEnd ? s.lastIndexOf(key) : s.indexOf(key);
-        char[] chars = s.toCharArray();
-        for (int i = index + key.length(); i < chars.length; i++) {
-            if (!Character.isDigit(chars[i])) {
-                char[] copy = Arrays.copyOfRange(chars, index + key.length(), i);
-                return Optional.of(new BinaryTuple<>
-                        (new StringBuilder(s).replace(index, i, "").toString(),
-                                Integer.parseInt(new String(copy))));
+        if (index >= 0) {
+            char[] chars = s.toCharArray();
+            for (int i = index + key.length(); i < chars.length; i++) {
+                if (!Character.isDigit(chars[i])) {
+                    char[] copy = Arrays.copyOfRange(chars, index + key.length(), i);
+                    return Optional.of(new BinaryTuple<>
+                            (new StringBuilder(s).replace(index, i, "").toString(),
+                                    Integer.parseInt(new String(copy))));
+                }
             }
         }
         return Optional.empty();
