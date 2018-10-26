@@ -32,6 +32,11 @@ public class ListParameterEnhancement implements SqlProvider {
             Map<Integer, List<?>> listMap =
                     getLists(boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
             if (!listMap.isEmpty()) {
+                boolean isEmpty = listMap.values().stream().anyMatch(List::isEmpty);
+                if (isEmpty) {
+                    throw new IllegalArgumentException("Can't enhance empty list");
+                }
+
                 StringBuilder sqlBuilder = new StringBuilder(boundSql.getSql());
                 replacePlaceholders(listMap, sqlBuilder);
                 metaObject.setValue("delegate.boundSql.sql",

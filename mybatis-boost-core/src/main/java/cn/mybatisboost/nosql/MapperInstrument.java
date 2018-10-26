@@ -24,7 +24,7 @@ public class MapperInstrument {
             try {
                 boolean modified = false;
                 CtClass ctClass = ClassPool.getDefault().get(className);
-                for (CtMethod ctMethod : ctClass.getMethods()) {
+                for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
                     if (ctMethod.hasAnnotation(NosqlQuery.class)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
@@ -36,6 +36,10 @@ public class MapperInstrument {
                 if (modified) {
                     ctClass.toClass(MapperInstrument.class.getClassLoader(), MapperInstrument.class.getProtectionDomain());
                     modifiedClassNames.add(className);
+                }
+
+                for (CtClass i : ctClass.getInterfaces()) {
+                    modified &= modify(i.getName(), mapUnderscoreToCamelCase);
                 }
                 return modified;
             } catch (CannotCompileException | NotFoundException e) {
