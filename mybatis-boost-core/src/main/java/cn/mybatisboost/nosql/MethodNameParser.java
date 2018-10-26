@@ -127,8 +127,8 @@ public class MethodNameParser {
         char[] chars = s.toCharArray();
         for (int i = index + key.length(); i < chars.length; i++) {
             if (!Character.isDigit(chars[i]) || i + 1 == chars.length) {
-                char[] copy = Arrays.copyOfRange(chars, index + key.length(),
-                        Character.isDigit(chars[i]) ? i + 1 : i);
+                if (i + 1 == chars.length) i++;
+                char[] copy = Arrays.copyOfRange(chars, index + key.length(), i);
                 return Optional.of(new BinaryTuple<>
                         (new StringBuilder(s).replace(index, i, "").toString(),
                                 Integer.parseInt(new String(copy))));
