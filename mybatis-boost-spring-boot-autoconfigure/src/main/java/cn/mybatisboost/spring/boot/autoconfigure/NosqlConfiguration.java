@@ -13,10 +13,16 @@ import org.springframework.core.type.AnnotationMetadata;
 public class NosqlConfiguration implements ImportBeanDefinitionRegistrar {
 
     private static Logger logger = LoggerFactory.getLogger(NosqlConfiguration.class);
-    private static boolean mapUnderscoreToCamelCase = EnvironmentHolder.getEnvironment()
-            .getProperty("mybatis.configuration.map-underscore-to-camel-case", boolean.class, false);
+    private static boolean mapUnderscoreToCamelCase;
 
     static {
+        try {
+            mapUnderscoreToCamelCase = EnvironmentHolder.getEnvironment()
+                    .getProperty("mybatis.configuration.map-underscore-to-camel-case",
+                            boolean.class, false);
+        } catch (EnvironmentHolder.EnvironmentNotSetError e) {
+            logger.info("Use default mapUnderscoreToCamelCase value", e);
+        }
         try {
             CtClass ctClass = ClassPool.getDefault().get("org.mybatis.spring.mapper.ClassPathMapperScanner");
             ctClass.getDeclaredMethod("checkCandidate").insertAfter("if ($_) " +

@@ -10,7 +10,7 @@ public class EnvironmentHolder implements EnvironmentPostProcessor {
 
     public static ConfigurableEnvironment getEnvironment() {
         if (environment == null) {
-            throw new Error("Environment haven't been set yet");
+            throw new EnvironmentNotSetError("Environment haven't been set yet");
         }
         return environment;
     }
@@ -18,5 +18,12 @@ public class EnvironmentHolder implements EnvironmentPostProcessor {
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         EnvironmentHolder.environment = environment;
+    }
+
+    public static class EnvironmentNotSetError extends Error {
+
+        EnvironmentNotSetError(String message) {
+            super(message);
+        }
     }
 }
