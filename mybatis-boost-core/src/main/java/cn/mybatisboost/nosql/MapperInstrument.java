@@ -39,7 +39,7 @@ public class MapperInstrument {
                 }
 
                 for (CtClass i : ctClass.getInterfaces()) {
-                    modified &= modify(i.getName(), mapUnderscoreToCamelCase);
+                    modified |= modify(i.getName(), mapUnderscoreToCamelCase);
                 }
                 return modified;
             } catch (CannotCompileException | NotFoundException e) {

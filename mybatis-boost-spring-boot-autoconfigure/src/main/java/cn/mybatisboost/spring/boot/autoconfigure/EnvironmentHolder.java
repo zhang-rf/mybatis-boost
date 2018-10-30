@@ -6,11 +6,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 
 public class EnvironmentHolder implements EnvironmentPostProcessor {
 
-    private static ConfigurableEnvironment environment;
+    private static volatile ConfigurableEnvironment environment;
 
     public static ConfigurableEnvironment getEnvironment() {
         if (environment == null) {
-            throw new EnvironmentNotSetError("Environment haven't been set yet");
+            throw new EnvironmentNotSetException();
         }
         return environment;
     }
@@ -20,10 +20,6 @@ public class EnvironmentHolder implements EnvironmentPostProcessor {
         EnvironmentHolder.environment = environment;
     }
 
-    public static class EnvironmentNotSetError extends Error {
-
-        EnvironmentNotSetError(String message) {
-            super(message);
-        }
+    public static class EnvironmentNotSetException extends RuntimeException {
     }
 }

@@ -20,8 +20,8 @@ public class NosqlConfiguration implements ImportBeanDefinitionRegistrar {
             mapUnderscoreToCamelCase = EnvironmentHolder.getEnvironment()
                     .getProperty("mybatis.configuration.map-underscore-to-camel-case",
                             boolean.class, false);
-        } catch (EnvironmentHolder.EnvironmentNotSetError e) {
-            logger.info("Use default mapUnderscoreToCamelCase value", e);
+        } catch (EnvironmentHolder.EnvironmentNotSetException e) {
+            logger.warn("Use default mapUnderscoreToCamelCase value, because Environment wasn't set");
         }
         try {
             CtClass ctClass = ClassPool.getDefault().get("org.mybatis.spring.mapper.ClassPathMapperScanner");
