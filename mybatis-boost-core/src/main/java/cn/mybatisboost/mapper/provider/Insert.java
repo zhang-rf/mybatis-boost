@@ -10,7 +10,10 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Insert implements SqlProvider, ConfigurationAware {
@@ -46,7 +49,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
                 properties = EntityUtils.getProperties(entity, selective);
             } else {
                 properties = entities.stream().map(it -> EntityUtils.getProperties(it, selective))
-                        .max(Comparator.comparingInt(List::size)).orElseThrow(Error::new);
+                        .flatMap(List::stream).distinct().collect(Collectors.toList());
             }
         } else {
             properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);
