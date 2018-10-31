@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.util.function;
+package cn.mybatisboost.util.function;
 
 import java.util.function.Function;
 

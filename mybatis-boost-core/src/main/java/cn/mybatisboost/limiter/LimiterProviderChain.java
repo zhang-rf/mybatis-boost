@@ -36,7 +36,7 @@ public class LimiterProviderChain implements SqlProvider {
     }
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         SqlProvider provider = this.provider;
         if (provider == null || configuration.isMultipleDatasource()) {
             try {
@@ -47,7 +47,7 @@ public class LimiterProviderChain implements SqlProvider {
             }
         }
         if (provider != null) {
-            provider.replace(connection, metaObject, mappedStatement, boundSql);
+            provider.handle(connection, metaObject, mappedStatement, boundSql);
         }
     }
 }

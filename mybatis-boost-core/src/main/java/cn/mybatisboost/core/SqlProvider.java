@@ -8,11 +8,11 @@ import java.sql.Connection;
 
 public interface SqlProvider {
 
-    String MYBATIS_BOOST = "#mybatisboost#";
+    String MYBATIS_BOOST = "#MYBATIS_BOOST#";
 
     default String reserved() {
         return MYBATIS_BOOST;
     }
 
-    void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
+    void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
 }

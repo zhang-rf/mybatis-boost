@@ -1,6 +1,6 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.core.util.SafeProperty;
+import cn.mybatisboost.util.SafeProperty;
 import org.apache.ibatis.session.RowBounds;
 import org.junit.After;
 import org.junit.Test;

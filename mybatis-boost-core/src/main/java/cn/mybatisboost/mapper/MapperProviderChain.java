@@ -3,7 +3,7 @@ package cn.mybatisboost.mapper;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.function.UncheckedFunction;
+import cn.mybatisboost.util.function.UncheckedFunction;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
@@ -24,7 +24,7 @@ public class MapperProviderChain implements SqlProvider {
     }
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (Objects.equals(boundSql.getSql(), SqlProvider.MYBATIS_BOOST)) {
             Class<?> providerType = (Class<?>)
                     SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("providerType");
@@ -41,7 +41,7 @@ public class MapperProviderChain implements SqlProvider {
                 }
             }
             if (provider != null) {
-                provider.replace(connection, metaObject, mappedStatement, boundSql);
+                provider.handle(connection, metaObject, mappedStatement, boundSql);
             }
         }
     }

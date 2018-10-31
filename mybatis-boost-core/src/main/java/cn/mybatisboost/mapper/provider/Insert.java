@@ -3,17 +3,14 @@ package cn.mybatisboost.mapper.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.*;
+import cn.mybatisboost.util.*;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Insert implements SqlProvider, ConfigurationAware {
@@ -21,7 +18,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
@@ -45,7 +42,12 @@ public class Insert implements SqlProvider, ConfigurationAware {
         String[] candidateProperties = (String[]) parameterMap.get("param2");
         List<String> properties;
         if (candidateProperties.length == 0) {
-            properties = EntityUtils.getProperties(entity, selective);
+            if (entities.size() == 1) {
+                properties = EntityUtils.getProperties(entity, selective);
+            } else {
+                properties = entities.stream().map(it -> EntityUtils.getProperties(it, selective))
+                        .max(Comparator.comparingInt(List::size)).orElseThrow(Error::new);
+            }
         } else {
             properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);
         }

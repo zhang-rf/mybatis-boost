@@ -3,7 +3,7 @@ package cn.mybatisboost.lang.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.*;
+import cn.mybatisboost.util.*;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -22,7 +22,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         String sqlUpperCase = sql.toUpperCase();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT &&

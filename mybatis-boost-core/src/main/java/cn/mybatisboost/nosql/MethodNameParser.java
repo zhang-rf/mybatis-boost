@@ -1,7 +1,7 @@
 package cn.mybatisboost.nosql;
 
-import cn.mybatisboost.core.util.SqlUtils;
-import cn.mybatisboost.core.util.tuple.BinaryTuple;
+import cn.mybatisboost.util.SqlUtils;
+import cn.mybatisboost.util.tuple.BinaryTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 

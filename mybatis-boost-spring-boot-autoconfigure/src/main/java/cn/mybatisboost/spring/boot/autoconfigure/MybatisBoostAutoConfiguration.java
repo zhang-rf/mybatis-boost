@@ -1,6 +1,6 @@
 package cn.mybatisboost.spring.boot.autoconfigure;
 
-import cn.mybatisboost.core.MybatisBoostInterceptor;
+import cn.mybatisboost.MybatisBoostInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;

@@ -3,9 +3,9 @@ package cn.mybatisboost.mapper.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.EntityUtils;
-import cn.mybatisboost.core.util.MapperUtils;
-import cn.mybatisboost.core.util.SqlUtils;
+import cn.mybatisboost.util.EntityUtils;
+import cn.mybatisboost.util.MapperUtils;
+import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -19,7 +19,7 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();

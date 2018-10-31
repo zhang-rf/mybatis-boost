@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.util.tuple;
+package cn.mybatisboost.util.tuple;
 
 import java.util.Objects;
 

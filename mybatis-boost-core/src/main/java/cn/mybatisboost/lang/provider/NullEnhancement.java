@@ -1,7 +1,7 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.SqlUtils;
+import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 public class NullEnhancement implements SqlProvider {
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
             String sql = boundSql.getSql();
             Matcher matcher = SqlUtils.PATTERN_PLACEHOLDER.matcher(sql);

@@ -1,16 +1,16 @@
-package cn.mybatisboost.core.util.function;
+package cn.mybatisboost.util.function;
 
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
 @FunctionalInterface
-public interface UncheckedPredicate<T> {
+public interface UncheckedConsumer<T> {
 
-    boolean test(T t) throws Throwable;
+    void accept(T t) throws Throwable;
 
-    static <T> Predicate<T> of(UncheckedPredicate<T> predicate) {
+    static <T> Consumer<T> of(UncheckedConsumer<T> consumer) {
         return t -> {
             try {
-                return predicate.test(t);
+                consumer.accept(t);
             } catch (Throwable e) {
                 if (e instanceof RuntimeException) {
                     throw (RuntimeException) e;

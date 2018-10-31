@@ -1,8 +1,8 @@
-package cn.mybatisboost.core.util;
+package cn.mybatisboost.util;
 
 import cn.mybatisboost.core.adaptor.NameAdaptor;
-import cn.mybatisboost.core.util.function.UncheckedFunction;
-import cn.mybatisboost.core.util.function.UncheckedPredicate;
+import cn.mybatisboost.util.function.UncheckedFunction;
+import cn.mybatisboost.util.function.UncheckedPredicate;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.Id;

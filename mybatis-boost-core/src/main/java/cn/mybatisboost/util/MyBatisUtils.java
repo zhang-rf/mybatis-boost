@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.util;
+package cn.mybatisboost.util;
 
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;

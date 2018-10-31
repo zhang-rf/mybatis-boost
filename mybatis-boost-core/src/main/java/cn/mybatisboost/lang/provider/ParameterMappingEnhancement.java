@@ -1,7 +1,7 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.SqlUtils;
+import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -15,7 +15,7 @@ import java.util.Map;
 public class ParameterMappingEnhancement implements SqlProvider {
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         if (parameterMappings.isEmpty() && parameterObject instanceof Map) {

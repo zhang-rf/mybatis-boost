@@ -16,8 +16,8 @@ public class Save extends Insert {
             Pattern.compile("INSERT INTO \\w+ ?\\((.*?)\\)", Pattern.CASE_INSENSITIVE);
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        super.replace(connection, metaObject, mappedStatement, boundSql);
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+        super.handle(connection, metaObject, mappedStatement, boundSql);
         String sql = boundSql.getSql();
         Matcher matcher = PATTERN_COLUMNS.matcher(sql);
         if (matcher.find()) {

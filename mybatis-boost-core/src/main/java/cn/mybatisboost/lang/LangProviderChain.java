@@ -35,7 +35,7 @@ public class LangProviderChain implements SqlProvider {
     }
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        providers.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+        providers.forEach(p -> p.handle(connection, metaObject, mappedStatement, boundSql));
     }
 }

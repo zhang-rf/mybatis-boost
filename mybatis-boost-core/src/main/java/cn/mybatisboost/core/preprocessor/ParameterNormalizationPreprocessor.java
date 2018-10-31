@@ -1,7 +1,7 @@
 package cn.mybatisboost.core.preprocessor;
 
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.MapperUtils;
+import cn.mybatisboost.util.MapperUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
@@ -14,7 +14,7 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject != null) {
             Class<?> entityType;

@@ -1,7 +1,7 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.core.util.SqlUtils;
+import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -24,7 +24,7 @@ public class ListParameterEnhancement implements SqlProvider {
     private static ConcurrentMap<String, Boolean> filterCache = new ConcurrentHashMap<>();
 
     @Override
-    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (filter(mappedStatement)) {
             org.apache.ibatis.session.Configuration configuration =
                     (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");

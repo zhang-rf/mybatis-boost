@@ -1,4 +1,4 @@
-package cn.mybatisboost.core.util;
+package cn.mybatisboost.util;
 
 import java.util.Arrays;
 import java.util.Objects;

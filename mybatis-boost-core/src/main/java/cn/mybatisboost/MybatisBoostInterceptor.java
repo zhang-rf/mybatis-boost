@@ -1,6 +1,9 @@
-package cn.mybatisboost.core;
+package cn.mybatisboost;
 
-import cn.mybatisboost.core.util.MyBatisUtils;
+import cn.mybatisboost.core.Configuration;
+import cn.mybatisboost.core.ConfigurationAware;
+import cn.mybatisboost.core.SqlProvider;
+import cn.mybatisboost.util.MyBatisUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -40,8 +43,8 @@ public class MybatisBoostInterceptor implements Interceptor {
         MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-        preprocessors.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
-        providers.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
+        preprocessors.forEach(p -> p.handle(connection, metaObject, mappedStatement, boundSql));
+        providers.forEach(p -> p.handle(connection, metaObject, mappedStatement, boundSql));
         return invocation.proceed();
     }
 
