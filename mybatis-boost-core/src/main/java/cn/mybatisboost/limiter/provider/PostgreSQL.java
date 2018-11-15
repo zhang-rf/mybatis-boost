@@ -12,10 +12,9 @@ import java.sql.Connection;
 public class PostgreSQL implements SqlProvider {
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         metaObject.setValue("delegate.boundSql.sql",
-                SqlUtils.appendLimitOffset(boundSql.getSql(),
-                        (RowBounds) metaObject.getValue("delegate.rowBounds")));
+                SqlUtils.appendLimitOffset(boundSql.getSql(), (RowBounds) metaObject.getValue("delegate.rowBounds")));
         metaObject.setValue("delegate.rowBounds", RowBounds.DEFAULT);
         metaObject.setValue("delegate.resultSetHandler.rowBounds", RowBounds.DEFAULT);
     }

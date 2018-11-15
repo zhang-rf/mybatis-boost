@@ -107,6 +107,13 @@ public class CrudMapperTest {
     }
 
     @Test
+    public void selectByIds() {
+        assertTrue(mapper.selectByIds(123).isEmpty());
+        jdbcTemplate.execute("insert into project (id, group_id) values (123, 'cn.mybatisboost')");
+        assertEquals(123, mapper.selectByIds(123).get(0).getId().intValue());
+    }
+
+    @Test
     public void selectNullable() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost', 'mybatis-boost')");
         assertNotNull(mapper.selectNullable(null, "mybatis-boost", null));
@@ -138,8 +145,8 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void insertSelectively() {
-        assertEquals(1, mapper.insertSelectively(new Project("cn.mybatisboost", "mybatis-boost",
+    public void insertSelective() {
+        assertEquals(1, mapper.insertSelective(new Project("cn.mybatisboost", "mybatis-boost",
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
@@ -147,8 +154,8 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void batchInsertSelectively() {
-        assertEquals(1, mapper.batchInsertSelectively(Collections.singletonList(
+    public void batchInsertSelective() {
+        assertEquals(1, mapper.batchInsertSelective(Collections.singletonList(
                 new Project("cn.mybatisboost", "mybatis-boost",
                         "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan"))));
         jdbcTemplate.query("select * from project", resultSet -> {
@@ -168,9 +175,9 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void updatePartially() {
+    public void updatePartial() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
-        assertEquals(1, mapper.updatePartially(new Project().setId(123).setGroupId("cn.mybatisboost2"),
+        assertEquals(1, mapper.updatePartial(new Project().setId(123).setGroupId("cn.mybatisboost2"),
                 SafeProperty.of(Project.class, "groupId")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
@@ -180,9 +187,9 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void updateSelectively() {
+    public void updateSelective() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
-        assertEquals(1, mapper.updateSelectively(new Project().setId(123).setGroupId("cn.mybatisboost2")));
+        assertEquals(1, mapper.updateSelective(new Project().setId(123).setGroupId("cn.mybatisboost2")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost2", resultSet.getString("group_id"));
@@ -191,9 +198,9 @@ public class CrudMapperTest {
     }
 
     @Test
-    public void updatePartiallySelectively() {
+    public void updatePartialSelective() {
         jdbcTemplate.execute("insert into project (id, group_id, artifact_id) values (123, 'cn.mybatisboost1', 'mybatis-boost')");
-        assertEquals(1, mapper.updatePartiallySelectively(new Project().setId(123).setGroupId("cn.mybatisboost2"),
+        assertEquals(1, mapper.updatePartialSelective(new Project().setId(123).setGroupId("cn.mybatisboost2"),
                 SafeProperty.of(Project.class, "groupId")));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());

@@ -19,14 +19,14 @@ public class Update implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        boolean partial = mappedStatement.getId().contains("Partially");
-        boolean selective = mappedStatement.getId().contains("Selectively");
+        boolean partial = mappedStatement.getId().contains("Partial");
+        boolean selective = mappedStatement.getId().contains("Selective");
 
         Map<?, ?> parameterMap = (Map<?, ?>) boundSql.getParameterObject();
         Object entity = parameterMap.get("param1");

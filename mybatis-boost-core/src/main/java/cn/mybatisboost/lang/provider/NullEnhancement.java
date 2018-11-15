@@ -16,31 +16,37 @@ import java.util.regex.Matcher;
 public class NullEnhancement implements SqlProvider {
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+        if (mappedStatement.getSqlCommandType() == SqlCommandType.SELECT ||
+                mappedStatement.getSqlCommandType() == SqlCommandType.DELETE) {
             String sql = boundSql.getSql();
+
             Matcher matcher = SqlUtils.PATTERN_PLACEHOLDER.matcher(sql);
             Iterator<ParameterMapping> iterator = boundSql.getParameterMappings().iterator();
             MetaObject parameterMetaObject = SystemMetaObject.forObject(boundSql.getParameterObject());
-            StringBuilder sqlBuilder = new StringBuilder(sql);
+            boolean isUpperCase = Character.isUpperCase(sql.charAt(0));
+
             int offset = 0;
+            StringBuilder sqlBuilder = new StringBuilder();
             while (matcher.find() && iterator.hasNext()) {
                 try {
                     if (parameterMetaObject.getValue(iterator.next().getProperty()) != null) continue;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                     continue;
                 }
                 iterator.remove();
-                String substring = sql.substring(matcher.start() - 3, matcher.end());
-                substring = substring.replaceFirst("!= ?\\?$|<> ?\\$",
-                        sql.startsWith("SELECT") ? "IS NOT NULL" : "is not null");
-                if (substring.length() == 4) {
-                    substring = substring.replaceFirst("= ?\\?$",
-                            sql.startsWith("SELECT") ? "IS NULL" : "is null");
+
+                String substring = sql.substring(offset, matcher.end());
+                int before = substring.length();
+                substring = substring.replaceFirst("!= *\\?$|<> *\\?$",
+                        isUpperCase ? " IS NOT NULL" : " is not null");
+                if (substring.length() == before) {
+                    substring = substring.replaceFirst("= *\\?$", isUpperCase ? " IS NULL" : " is null");
                 }
-                sqlBuilder.replace(matcher.start() + offset - 3, matcher.end() + offset, substring);
-                offset += substring.length() - 4;
+                sqlBuilder.append(substring);
+                offset = matcher.end();
             }
+            sqlBuilder.append(sql, offset, sql.length());
             metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());
         }
     }

@@ -7,12 +7,9 @@ import org.apache.ibatis.session.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public abstract class MyBatisUtils {
-
-    private static ConcurrentMap<String, ParameterMapping> parameterMappingCache = new ConcurrentHashMap<>();
 
     public static MetaObject getRealMetaObject(Object target) {
         MetaObject metaObject;
@@ -23,11 +20,19 @@ public abstract class MyBatisUtils {
     }
 
     public static List<ParameterMapping> getParameterMappings(Configuration configuration, List<String> properties) {
-        List<ParameterMapping> parameterMappings = new ArrayList<>(properties.size());
-        for (String property : properties) {
-            ParameterMapping pm = parameterMappingCache.computeIfAbsent(property, k ->
-                    new ParameterMapping.Builder(configuration, property, Object.class).build());
-            parameterMappings.add(pm);
+        return properties.stream()
+                .map(property -> new ParameterMapping.Builder(configuration, property, Object.class).build())
+                .collect(Collectors.toCollection(() -> new ArrayList<>(properties.size())));
+    }
+
+    public static List<ParameterMapping> getListParameterMappings
+            (Configuration configuration, List<String> properties, int size) {
+        List<ParameterMapping> parameterMappings = new ArrayList<>(properties.size() * size);
+        for (int i = 0; i < size; i++) {
+            for (String property : properties) {
+                parameterMappings.add(new ParameterMapping.Builder
+                        (configuration, "list[" + i + "]." + property, Object.class).build());
+            }
         }
         return parameterMappings;
     }

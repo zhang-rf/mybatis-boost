@@ -46,7 +46,8 @@ public abstract class EntityUtils {
                 return type.getDeclaredField("id").getName();
             } catch (NoSuchFieldException e) {
                 return Arrays.stream(type.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Id.class))
-                        .findFirst().map(Field::getName).orElse(null);
+                        .findFirst().map(Field::getName)
+                        .orElseThrow(() -> new NoSuchFieldError("Id property not found in " + type.getName()));
             }
         });
     }

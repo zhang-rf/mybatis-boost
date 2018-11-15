@@ -14,17 +14,17 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class MapperProviderChain implements SqlProvider {
+public class MapperSqlProvider implements SqlProvider {
 
     private Configuration configuration;
     private ConcurrentMap<Class<?>, SqlProvider> providerMap = new ConcurrentHashMap<>();
 
-    public MapperProviderChain(Configuration configuration) {
+    public MapperSqlProvider(Configuration configuration) {
         this.configuration = configuration;
     }
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (Objects.equals(boundSql.getSql(), SqlProvider.MYBATIS_BOOST)) {
             Class<?> providerType = (Class<?>)
                     SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("providerType");
@@ -41,7 +41,7 @@ public class MapperProviderChain implements SqlProvider {
                 }
             }
             if (provider != null) {
-                provider.handle(connection, metaObject, mappedStatement, boundSql);
+                provider.replace(connection, metaObject, mappedStatement, boundSql);
             }
         }
     }

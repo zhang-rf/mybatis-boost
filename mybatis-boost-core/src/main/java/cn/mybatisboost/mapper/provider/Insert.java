@@ -21,7 +21,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
@@ -34,6 +34,8 @@ public class Insert implements SqlProvider, ConfigurationAware {
             entities = (List<?>) entity;
             if (entities.isEmpty()) {
                 metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
+                metaObject.setValue("delegate.boundSql.parameterObject", null);
+                metaObject.setValue("delegate.parameterHandler.parameterObject", null);
                 return;
             }
             entity = entities.iterator().next();
@@ -41,7 +43,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
             entities = Collections.singletonList(entity);
         }
 
-        boolean selective = mappedStatement.getId().endsWith("Selectively");
+        boolean selective = mappedStatement.getId().endsWith("Selective");
         String[] candidateProperties = (String[]) parameterMap.get("param2");
         List<String> properties;
         if (candidateProperties.length == 0) {

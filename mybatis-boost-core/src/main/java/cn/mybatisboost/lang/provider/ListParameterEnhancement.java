@@ -24,13 +24,12 @@ public class ListParameterEnhancement implements SqlProvider {
     private static ConcurrentMap<String, Boolean> filterCache = new ConcurrentHashMap<>();
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (filter(mappedStatement)) {
             org.apache.ibatis.session.Configuration configuration =
                     (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
 
-            Map<Integer, List<?>> listMap =
-                    getLists(boundSql.getParameterObject(), boundSql.getParameterMappings(), configuration);
+            Map<Integer, List<?>> listMap = getLists(boundSql.getParameterObject(), boundSql.getParameterMappings());
             if (!listMap.isEmpty()) {
                 boolean isEmpty = listMap.values().stream().anyMatch(List::isEmpty);
                 if (isEmpty) {
@@ -73,22 +72,11 @@ public class ListParameterEnhancement implements SqlProvider {
         return true;
     }
 
-    private Map<Integer, List<?>> getLists(Object parameterObject, List<ParameterMapping> parameterMappings,
-                                           org.apache.ibatis.session.Configuration configuration) {
-        Map<Integer, List<?>> listMap = new HashMap<>();
+    private Map<Integer, List<?>> getLists(Object parameterObject, List<ParameterMapping> parameterMappings) {
         if (parameterMappings.isEmpty()) {
-            if (parameterObject instanceof Map) {
-                Map<?, ?> map = (Map<?, ?>) parameterObject;
-                for (int i = 1; map.containsKey("param" + i); i++) {
-                    Object property = map.get("param" + i);
-                    if (property instanceof List) {
-                        listMap.put(i - 1, (List<?>) property);
-                        parameterMappings.add(new ParameterMapping.Builder
-                                (configuration, "param" + i, Object.class).build());
-                    }
-                }
-            }
+            return Collections.emptyMap();
         } else {
+            Map<Integer, List<?>> listMap = new HashMap<>();
             MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
             for (int i = 0; i < parameterMappings.size(); i++) {
                 try {
@@ -100,8 +88,8 @@ public class ListParameterEnhancement implements SqlProvider {
                     return Collections.emptyMap();
                 }
             }
+            return listMap;
         }
-        return listMap;
     }
 
     private void replacePlaceholders(Map<Integer, List<?>> listMap, StringBuilder sqlBuilder) {

@@ -34,24 +34,24 @@ public enum Predicate {
 
     private static List<String> keywords;
     private static Map<String, Predicate> aliasMap = new HashMap<>();
-    private String alias, sqlFragment;
+    private String abbr, sqlFragment;
     private boolean containsParameters;
 
     static {
         keywords = Stream.concat(Arrays.stream(values()).map(Predicate::name), Arrays.stream(values()).map(Predicate::alias))
                 .distinct().sorted(Comparator.comparingInt(it -> -it.length())).collect(Collectors.toList());
         keywords = Collections.unmodifiableList(keywords);
-        Arrays.stream(values()).forEach(it -> aliasMap.put(it.alias, it));
+        Arrays.stream(values()).forEach(it -> aliasMap.put(it.abbr, it));
     }
 
-    Predicate(String alias, String sqlFragment, boolean containsParameters) {
-        this.alias = alias;
+    Predicate(String abbr, String sqlFragment, boolean containsParameters) {
+        this.abbr = abbr;
         this.sqlFragment = sqlFragment;
         this.containsParameters = containsParameters;
     }
 
     public String alias() {
-        return alias;
+        return abbr;
     }
 
     public String sqlFragment() {

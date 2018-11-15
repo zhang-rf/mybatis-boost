@@ -15,13 +15,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LimiterProviderChain implements SqlProvider {
+public class LimiterSqlProvider implements SqlProvider {
 
     private Configuration configuration;
     private Map<String, SqlProvider> providerMap = new HashMap<>();
     private volatile SqlProvider provider;
 
-    public LimiterProviderChain(Configuration configuration) {
+    public LimiterSqlProvider(Configuration configuration) {
         this.configuration = configuration;
         initProviders();
     }
@@ -36,7 +36,7 @@ public class LimiterProviderChain implements SqlProvider {
     }
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         SqlProvider provider = this.provider;
         if (provider == null || configuration.isMultipleDatasource()) {
             try {
@@ -47,7 +47,7 @@ public class LimiterProviderChain implements SqlProvider {
             }
         }
         if (provider != null) {
-            provider.handle(connection, metaObject, mappedStatement, boundSql);
+            provider.replace(connection, metaObject, mappedStatement, boundSql);
         }
     }
 }

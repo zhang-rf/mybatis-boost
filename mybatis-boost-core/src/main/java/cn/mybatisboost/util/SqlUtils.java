@@ -1,12 +1,10 @@
 package cn.mybatisboost.util;
 
+import cn.mybatisboost.util.tuple.BinaryTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -70,5 +68,26 @@ public abstract class SqlUtils {
         } else {
             return StringUtils.capitalize(column);
         }
+    }
+
+    public static BinaryTuple<List<String>, List<String>> getPropertiesAndColumnsFromLiteralColumns
+            (String literalColumns, Class<?> entityType, boolean mapUnderscoreToCamelCase) {
+        List<String> properties, columns;
+        if (Objects.equals(literalColumns, "*") || literalColumns.toUpperCase().startsWith("NOT ")) {
+            properties = EntityUtils.getProperties(entityType);
+            if (literalColumns.toUpperCase().startsWith("NOT ")) {
+                properties.removeAll
+                        (Arrays.stream(literalColumns.substring(4).split(","))
+                                .map(String::trim).map(PropertyUtils::normalizeProperty)
+                                .collect(Collectors.toList()));
+            }
+            columns = properties.stream()
+                    .map(it -> SqlUtils.normalizeColumn(it, mapUnderscoreToCamelCase)).collect(Collectors.toList());
+        } else {
+            columns = Arrays.stream(literalColumns.split(",")).map(String::trim)
+                    .map(it -> SqlUtils.normalizeColumn(it, mapUnderscoreToCamelCase)).collect(Collectors.toList());
+            properties = columns.stream().map(PropertyUtils::normalizeProperty).collect(Collectors.toList());
+        }
+        return new BinaryTuple<>(properties, columns);
     }
 }

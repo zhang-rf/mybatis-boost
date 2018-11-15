@@ -3,10 +3,13 @@ package cn.mybatisboost.lang.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.util.*;
+import cn.mybatisboost.util.EntityUtils;
+import cn.mybatisboost.util.MapperUtils;
+import cn.mybatisboost.util.MyBatisUtils;
+import cn.mybatisboost.util.SqlUtils;
+import cn.mybatisboost.util.tuple.BinaryTuple;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -14,15 +17,14 @@ import java.sql.Connection;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class InsertEnhancement implements SqlProvider, ConfigurationAware {
 
-    private static final Pattern PATTERN_LITERAL_COLUMNS = Pattern.compile("(((NOT|not) )?(\\w+, ?)*\\w+|\\*)");
+    private static final Pattern PATTERN_LITERAL_COLUMNS = Pattern.compile("((NOT|not) )?(\\w+, ?)*\\w+|\\*");
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         String sqlUpperCase = sql.toUpperCase();
         if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT &&
@@ -33,49 +35,33 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
             }
 
             String literalColumns = matcher.group();
-            String additionalStatement = sql.substring(literalColumns.length());
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
-            List<String> properties, columns;
-            if (Objects.equals(literalColumns, "*") || literalColumns.toUpperCase().startsWith("NOT ")) {
-                properties = EntityUtils.getProperties(entityType);
-                if (literalColumns.toUpperCase().startsWith("NOT ")) {
-                    properties.removeAll
-                            (Arrays.stream(literalColumns.substring(4).split(","))
-                                    .map(String::trim).map(PropertyUtils::normalizeProperty)
-                                    .collect(Collectors.toList()));
-                }
-                columns = properties.stream()
-                        .map(it -> SqlUtils.normalizeColumn(it, mapUnderscoreToCamelCase)).collect(Collectors.toList());
-            } else {
-                columns = Arrays.stream(literalColumns.split(",")).map(String::trim).collect(Collectors.toList());
-                properties = columns.stream().map(PropertyUtils::normalizeProperty).collect(Collectors.toList());
-            }
+            BinaryTuple<List<String>, List<String>> propertiesAndColumns =
+                    SqlUtils.getPropertiesAndColumnsFromLiteralColumns(literalColumns, entityType, mapUnderscoreToCamelCase);
 
             List<?> entities = boundSql.getParameterObject() instanceof Map ?
                     (List<?>) ((Map) boundSql.getParameterObject()).get("param1") :
-                    Collections.singletonList(boundSql.getParameterObject());
+                    Collections.singletonList(Objects.requireNonNull(boundSql.getParameterObject(),
+                            "ParameterObject mustn't be null"));
             if (entities.isEmpty()) {
                 metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
-                return;
-            }
-
-            Object parameterObject = getParameterObject(entities);
-            List<ParameterMapping> parameterMappings;
-            if (entities.size() > 1) {
-                parameterMappings = buildParameterMappings(metaObject, properties, entities);
+                metaObject.setValue("delegate.boundSql.parameterObject", null);
+                metaObject.setValue("delegate.parameterHandler.parameterObject", null);
             } else {
-                parameterMappings = MyBatisUtils.getParameterMappings((org.apache.ibatis.session.Configuration)
-                        metaObject.getValue("delegate.configuration"), properties);
+                String additionalStatement = sql.substring(literalColumns.length());
+                org.apache.ibatis.session.Configuration configuration =
+                        (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
+                Object parameterObject = buildParameterObject(entities);
+                metaObject.setValue("delegate.boundSql.sql",
+                        buildSql(entityType, propertiesAndColumns.second(), entities.size(), additionalStatement));
+                metaObject.setValue("delegate.boundSql.parameterMappings",
+                        MyBatisUtils.getListParameterMappings(configuration, propertiesAndColumns.first(), entities.size()));
+                metaObject.setValue("delegate.boundSql.parameterObject", parameterObject);
+                metaObject.setValue("delegate.parameterHandler.parameterObject", parameterObject);
             }
-
-            metaObject.setValue("delegate.parameterHandler.parameterObject", parameterObject);
-            metaObject.setValue("delegate.boundSql.parameterObject", parameterObject);
-            metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
-            metaObject.setValue("delegate.boundSql.sql",
-                    buildSql(entityType, columns, entities.size(), additionalStatement));
         }
     }
 
@@ -84,26 +70,11 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
         this.configuration = configuration;
     }
 
-    private Object getParameterObject(List<?> entities) {
-        if (entities.size() > 1) {
-            return Collections.singletonMap("list", entities);
-        } else {
-            return entities.iterator().next();
-        }
-    }
-
-    private List<ParameterMapping> buildParameterMappings
-            (MetaObject metaObject, List<String> properties, List<?> entities) {
-        List<ParameterMapping> parameterMappings = new ArrayList<>(properties.size() * entities.size());
-        org.apache.ibatis.session.Configuration configuration =
-                (org.apache.ibatis.session.Configuration) metaObject.getValue("delegate.configuration");
-        for (int i = 0; i < entities.size(); i++) {
-            for (String property : properties) {
-                parameterMappings.add(new ParameterMapping.Builder
-                        (configuration, "list[" + i + "]." + property, Object.class).build());
-            }
-        }
-        return parameterMappings;
+    private Object buildParameterObject(List<?> entities) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", entities);
+        map.put("collection", entities);
+        return map;
     }
 
     private String buildSql(Class<?> entityType, List<String> columns, int batchSize, String additionalStatement) {

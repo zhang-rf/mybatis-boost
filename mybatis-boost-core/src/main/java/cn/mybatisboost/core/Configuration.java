@@ -9,6 +9,7 @@ public class Configuration {
 
     private NameAdaptor nameAdaptor = new NoopNameAdaptor();
     private boolean multipleDatasource;
+    private boolean iterateSelectiveInBatch;
     private boolean showQuery;
     private boolean showQueryWithParameters;
     private long slowQueryThresholdInMillis = Long.MAX_VALUE;
@@ -24,6 +25,10 @@ public class Configuration {
 
     public boolean isMultipleDatasource() {
         return multipleDatasource;
+    }
+
+    public boolean isIterateSelectiveInBatch() {
+        return iterateSelectiveInBatch;
     }
 
     public boolean isShowQuery() {
@@ -57,6 +62,11 @@ public class Configuration {
 
         public Builder setMultipleDatasource(boolean multipleDatasource) {
             configuration.multipleDatasource = multipleDatasource;
+            return this;
+        }
+
+        public Builder setIterateSelectiveInBatch(boolean iterateSelectiveInBatch) {
+            configuration.iterateSelectiveInBatch = iterateSelectiveInBatch;
             return this;
         }
 

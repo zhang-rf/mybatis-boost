@@ -3,10 +3,7 @@ package cn.mybatisboost.mapper.provider;
 import cn.mybatisboost.core.Configuration;
 import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
-import cn.mybatisboost.util.EntityUtils;
-import cn.mybatisboost.util.MapperUtils;
-import cn.mybatisboost.util.MyBatisUtils;
-import cn.mybatisboost.util.SqlUtils;
+import cn.mybatisboost.util.*;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -23,7 +20,7 @@ public class Delete implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
@@ -36,7 +33,7 @@ public class Delete implements SqlProvider, ConfigurationAware {
         if (conditionalProperties.length == 0) {
             properties = EntityUtils.getProperties(entity, true);
         } else {
-            properties = Arrays.asList(conditionalProperties);
+            properties = Arrays.stream(conditionalProperties).map(PropertyUtils::normalizeProperty).collect(Collectors.toList());
         }
 
         if (!properties.isEmpty()) {

@@ -16,12 +16,12 @@ public class TableEnhancement implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String sql = boundSql.getSql();
         if (sql.contains("#t")) {
             Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
-            metaObject.setValue("delegate.boundSql.sql", sql.replaceFirst("#t",
+            metaObject.setValue("delegate.boundSql.sql", sql.replace("#t",
                     EntityUtils.getTableName(entityType, configuration.getNameAdaptor())));
         }
     }

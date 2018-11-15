@@ -16,7 +16,7 @@ public class SelectOrCountAll implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         String tableName = EntityUtils.getTableName(MapperUtils.getEntityTypeFromMapper
                         (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.'))),
                 configuration.getNameAdaptor());

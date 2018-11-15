@@ -55,7 +55,7 @@ public class ThatTable {
 
 继承于CrudMapper&lt;T&gt;的Mybatis Mapper接口即自动拥有了CrudMapper的所有功能，继承时请指明范型“T”代表的POJO类型。
 
-默认情况下，MybatisBoost使用POJO的所有属性参与CRUD，以Selectively结尾的方法会过滤值为null的字段，即POJO中值为null的字段不参与CRUD。
+默认情况下，MybatisBoost使用POJO的所有属性参与CRUD，以Selective结尾的方法会过滤值为null的字段，即POJO中值为null的字段不参与CRUD。
 
 带有properties参数的方法，可使用properties参数指定参与插入、更新的属性。如果properties参数的第一个字符串为“!”，则代表排除后续指定的属性，如“new String[]{"!", "id"}”则代表除“id”以外，其他属性都参与CRUD。
 带有conditionProperties参数的方法，可使用conditionProperties参数指定用于WHERE条件的属性。
@@ -79,12 +79,12 @@ public interface CrudMapper<T> {
     List<T> selectByIds(Object... ids);
     int insert(T entity, String... properties);
     int batchInsert(List<T> entities, String... properties);
-    int insertSelectively(T entity, String... properties);
-    int batchInsertSelectively(List<T> entities, String... properties);
+    int insertSelective(T entity, String... properties);
+    int batchInsertSelective(List<T> entities, String... properties);
     int update(T entity, String... conditionProperties);
-    int updatePartially(T entity, String[] properties, String... conditionProperties);
-    int updateSelectively(T entity, String... conditionProperties);
-    int updatePartiallySelectively(T entity, String[] properties, String... conditionProperties);
+    int updatePartial(T entity, String[] properties, String... conditionProperties);
+    int updateSelective(T entity, String... conditionProperties);
+    int updatePartialSelective(T entity, String[] properties, String... conditionProperties);
     int delete(T entity, String... conditionProperties);
     int deleteByIds(Object... ids);
 }

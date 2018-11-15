@@ -14,5 +14,5 @@ public interface SqlProvider {
         return MYBATIS_BOOST;
     }
 
-    void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
+    void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql);
 }

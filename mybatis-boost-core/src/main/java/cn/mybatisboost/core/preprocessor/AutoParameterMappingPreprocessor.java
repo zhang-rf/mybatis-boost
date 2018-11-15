@@ -1,4 +1,4 @@
-package cn.mybatisboost.lang.provider;
+package cn.mybatisboost.core.preprocessor;
 
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.SqlUtils;
@@ -12,18 +12,16 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
-public class ParameterMappingEnhancement implements SqlProvider {
+public class AutoParameterMappingPreprocessor implements SqlProvider {
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
-        Object parameterObject = boundSql.getParameterObject();
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        if (parameterMappings.isEmpty() && parameterObject instanceof Map) {
+        if (parameterMappings.isEmpty() && boundSql.getParameterObject() instanceof Map) {
             int parameterCount = SqlUtils.countPlaceholders(boundSql.getSql());
             if (parameterCount > 0) {
-                Map<?, ?> parameterMap = (Map<?, ?>) parameterObject;
                 Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
-                for (int i = 1; parameterMap.containsKey("param" + i); i++) {
+                for (int i = 1; i < parameterCount; i++) {
                     parameterMappings.add(new ParameterMapping.Builder
                             (configuration, "param" + i, Object.class).build());
                 }

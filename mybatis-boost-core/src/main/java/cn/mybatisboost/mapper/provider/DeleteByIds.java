@@ -23,7 +23,7 @@ public class DeleteByIds implements SqlProvider, ConfigurationAware {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
@@ -33,14 +33,14 @@ public class DeleteByIds implements SqlProvider, ConfigurationAware {
         Object[] ids = (Object[]) parameterMap.get("param1");
         parameterMap.clear();
         if (ids.length > 0) {
-            String idColumn = SqlUtils.normalizeColumn(EntityUtils.getIdProperty(entityType), (boolean)
-                    metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
+            String idProperty = EntityUtils.getIdProperty(entityType);
+            String idColumn = SqlUtils.normalizeColumn(idProperty,
+                    (boolean) metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
             sqlBuilder.append(" WHERE ").append(idColumn).append(" IN (");
             Arrays.stream(ids).forEach(c -> sqlBuilder.append("?, "));
             sqlBuilder.setLength(sqlBuilder.length() - 2);
             sqlBuilder.append(')');
 
-            String idProperty = EntityUtils.getIdProperty(entityType);
             org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
                     metaObject.getValue("delegate.configuration");
             List<ParameterMapping> parameterMappings = new ArrayList<>(ids.length);

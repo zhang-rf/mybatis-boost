@@ -19,14 +19,15 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
     private Configuration configuration;
 
     @Override
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Class<?> entityType = MapperUtils.getEntityTypeFromMapper
                 (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT * FROM ").append(EntityUtils.getTableName(entityType, configuration.getNameAdaptor()));
 
-        String idColumn = SqlUtils.normalizeColumn(EntityUtils.getIdProperty(entityType), (boolean)
-                metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
+        String idProperty = EntityUtils.getIdProperty(entityType);
+        String idColumn = SqlUtils.normalizeColumn(idProperty,
+                (boolean) metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase"));
         boolean multipleIds = mappedStatement.getId().endsWith("Ids");
         List<ParameterMapping> parameterMappings = Collections.emptyList();
         if (!multipleIds) {
@@ -43,7 +44,6 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
                 sqlBuilder.setLength(sqlBuilder.length() - 2);
                 sqlBuilder.append(')');
 
-                String idProperty = EntityUtils.getIdProperty(entityType);
                 org.apache.ibatis.session.Configuration configuration = (org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration");
                 Map<String, Object> newParameterMap = new HashMap<>(ids.length);

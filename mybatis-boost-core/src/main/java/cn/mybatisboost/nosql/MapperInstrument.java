@@ -25,7 +25,7 @@ public class MapperInstrument {
                 boolean modified = false;
                 CtClass ctClass = ClassPool.getDefault().get(className);
                 for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-                    if (ctMethod.hasAnnotation(NosqlQuery.class)) {
+                    if (ctMethod.hasAnnotation(Nosql.class)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
                         addQueryAnnotation(ctMethod, parser.toSql());

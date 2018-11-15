@@ -1,8 +1,5 @@
-package cn.mybatisboost;
+package cn.mybatisboost.core;
 
-import cn.mybatisboost.core.Configuration;
-import cn.mybatisboost.core.ConfigurationAware;
-import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.MyBatisUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -11,29 +8,29 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Intercepts(@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}))
-public class MybatisBoostInterceptor implements Interceptor {
+public class DispatcherInterceptor implements Interceptor {
 
     private Configuration configuration;
-    private List<SqlProvider> preprocessors = new ArrayList<>();
-    private List<SqlProvider> providers = new ArrayList<>();
+    private List<SqlProvider> preprocessors = new CopyOnWriteArrayList<>();
+    private List<SqlProvider> providers = new CopyOnWriteArrayList<>();
 
-    public MybatisBoostInterceptor(Configuration configuration) {
+    public DispatcherInterceptor(Configuration configuration) {
         this.configuration = configuration;
     }
 
-    public synchronized void appendPreprocessor(SqlProvider provider) {
+    public void appendPreprocessor(SqlProvider provider) {
         preprocessors.add(provider);
         if (provider instanceof ConfigurationAware) {
             ((ConfigurationAware) provider).setConfiguration(configuration);
         }
     }
 
-    public synchronized void appendProvider(SqlProvider provider) {
+    public void appendProvider(SqlProvider provider) {
         providers.add(provider);
     }
 
@@ -43,8 +40,8 @@ public class MybatisBoostInterceptor implements Interceptor {
         MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
-        preprocessors.forEach(p -> p.handle(connection, metaObject, mappedStatement, boundSql));
-        providers.forEach(p -> p.handle(connection, metaObject, mappedStatement, boundSql));
+        preprocessors.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
+        providers.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));
         return invocation.proceed();
     }
 

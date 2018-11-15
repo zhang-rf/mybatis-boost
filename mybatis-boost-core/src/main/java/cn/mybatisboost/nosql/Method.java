@@ -2,12 +2,12 @@ package cn.mybatisboost.nosql;
 
 import java.util.Arrays;
 
-public enum Command {
+public enum Method {
     Select("SELECT * FROM"), Count("SELECT COUNT(*) FROM"), Delete("DELETE FROM");
 
     private String sqlFragment;
 
-    Command(String sqlFragment) {
+    Method(String sqlFragment) {
         this.sqlFragment = sqlFragment;
     }
 
@@ -15,8 +15,8 @@ public enum Command {
         return sqlFragment;
     }
 
-    public static Command of(String name) {
+    public static Method of(String name) {
         return Arrays.stream(values()).filter(it -> name.startsWith(it.name())).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Illegal command type"));
+                .orElseThrow(() -> new IllegalArgumentException("Illegal method type"));
     }
 }

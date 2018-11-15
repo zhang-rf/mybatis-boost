@@ -14,7 +14,7 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void handle(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
+    public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject != null) {
             Class<?> entityType;
@@ -29,7 +29,7 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
                     Map<String, Object> parameterMap = (Map<String, Object>) parameterObject;
                     if (parameterMap.size() == 2 &&
                             parameterMap.containsKey("collection") && parameterMap.containsKey("list")) {
-                        Object collection = parameterMap.get("collection");
+                        Object collection = parameterMap.get("list");
                         parameterMap.clear();
                         parameterMap.put("arg0", collection);
                         parameterMap.put("param1", collection);

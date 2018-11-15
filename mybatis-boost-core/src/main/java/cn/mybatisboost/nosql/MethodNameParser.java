@@ -23,10 +23,10 @@ public class MethodNameParser {
     public String toSql() {
         if (parsedSql != null) return parsedSql;
         StringBuilder sqlBuilder = new StringBuilder();
-        Command command = Command.of(StringUtils.capitalize(methodName));
-        sqlBuilder.append(command.sqlFragment()).append(' ').append(tableName).append(' ');
+        Method method = Method.of(StringUtils.capitalize(methodName));
+        sqlBuilder.append(method.sqlFragment()).append(' ').append(tableName).append(' ');
 
-        String expression = this.methodName.substring(command.name().length());
+        String expression = this.methodName.substring(method.name().length());
         expression = prepare(sqlBuilder, expression);
         if (expression.isEmpty()) {
             return parsedSql = sqlBuilder.toString().trim();

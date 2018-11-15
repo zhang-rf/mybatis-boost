@@ -46,22 +46,22 @@ public interface CrudMapper<T> extends GenericMapper<T> {
     int batchInsert(List<T> entities, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int insertSelectively(T entity, String... properties);
+    int insertSelective(T entity, String... properties);
 
     @InsertProvider(type = Insert.class, method = "reserved")
-    int batchInsertSelectively(List<T> entities, String... properties);
+    int batchInsertSelective(List<T> entities, String... properties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
     int update(T entity, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
-    int updatePartially(T entity, String[] properties, String... conditionProperties);
+    int updatePartial(T entity, String[] properties, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
-    int updateSelectively(T entity, String... conditionProperties);
+    int updateSelective(T entity, String... conditionProperties);
 
     @UpdateProvider(type = Update.class, method = "reserved")
-    int updatePartiallySelectively(T entity, String[] properties, String... conditionProperties);
+    int updatePartialSelective(T entity, String[] properties, String... conditionProperties);
 
     @DeleteProvider(type = Delete.class, method = "reserved")
     int delete(T entity, String... conditionProperties);

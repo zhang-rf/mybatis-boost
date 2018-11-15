@@ -1,12 +1,13 @@
 package cn.mybatisboost.spring.boot.autoconfigure;
 
-import cn.mybatisboost.MybatisBoostInterceptor;
+import cn.mybatisboost.core.DispatcherInterceptor;
 import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
-import cn.mybatisboost.core.preprocessor.ParameterMappingsPreprocessor;
+import cn.mybatisboost.core.preprocessor.AutoParameterMappingPreprocessor;
+import cn.mybatisboost.core.preprocessor.MybatisCacheRemovingPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
-import cn.mybatisboost.lang.LangProviderChain;
-import cn.mybatisboost.limiter.LimiterProviderChain;
-import cn.mybatisboost.mapper.MapperProviderChain;
+import cn.mybatisboost.lang.LanguageSqlProvider;
+import cn.mybatisboost.limiter.LimiterSqlProvider;
+import cn.mybatisboost.mapper.MapperSqlProvider;
 import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
@@ -34,7 +35,7 @@ public class MybatisBoostAutoConfiguration {
     private boolean isLangEnabled;
     @Value("${mybatisboost.limiter.enabled:true}")
     private boolean isLimiterEnabled;
-    @Value("${mybatisboost.metric.enabled:true}")
+    @Value("${mybatisboost.metric.enabled:false}")
     private boolean isMetricEnabled;
 
     public MybatisBoostAutoConfiguration(MybatisBoostProperties properties) {
@@ -70,19 +71,20 @@ public class MybatisBoostAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MybatisBoostInterceptor mybatisBoostInterceptor(cn.mybatisboost.core.Configuration configuration) {
-        MybatisBoostInterceptor mybatisBoostInterceptor = new MybatisBoostInterceptor(configuration);
-        mybatisBoostInterceptor.appendPreprocessor(new ParameterMappingsPreprocessor());
-        mybatisBoostInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
+    public DispatcherInterceptor mybatisBoostInterceptor(cn.mybatisboost.core.Configuration configuration) {
+        DispatcherInterceptor dispatcherInterceptor = new DispatcherInterceptor(configuration);
+        dispatcherInterceptor.appendPreprocessor(new MybatisCacheRemovingPreprocessor());
+        dispatcherInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
+        dispatcherInterceptor.appendPreprocessor(new AutoParameterMappingPreprocessor());
         if (isMapperEnabled) {
-            mybatisBoostInterceptor.appendProvider(new MapperProviderChain(configuration));
+            dispatcherInterceptor.appendProvider(new MapperSqlProvider(configuration));
         }
         if (isLangEnabled) {
-            mybatisBoostInterceptor.appendProvider(new LangProviderChain(configuration));
+            dispatcherInterceptor.appendProvider(new LanguageSqlProvider(configuration));
         }
         if (isLimiterEnabled) {
-            mybatisBoostInterceptor.appendProvider(new LimiterProviderChain(configuration));
+            dispatcherInterceptor.appendProvider(new LimiterSqlProvider(configuration));
         }
-        return mybatisBoostInterceptor;
+        return dispatcherInterceptor;
     }
 }
