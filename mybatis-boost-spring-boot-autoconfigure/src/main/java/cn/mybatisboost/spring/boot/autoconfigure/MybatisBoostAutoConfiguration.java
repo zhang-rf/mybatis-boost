@@ -35,7 +35,7 @@ public class MybatisBoostAutoConfiguration {
     private boolean isLangEnabled;
     @Value("${mybatisboost.limiter.enabled:true}")
     private boolean isLimiterEnabled;
-    @Value("${mybatisboost.metric.enabled:false}")
+    @Value("${mybatisboost.metric.enabled:true}")
     private boolean isMetricEnabled;
 
     public MybatisBoostAutoConfiguration(MybatisBoostProperties properties) {
