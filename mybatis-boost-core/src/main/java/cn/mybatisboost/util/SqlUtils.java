@@ -4,7 +4,9 @@ import cn.mybatisboost.util.tuple.BinaryTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -15,10 +17,7 @@ import java.util.stream.Stream;
 public abstract class SqlUtils {
 
     public static final Pattern PATTERN_PLACEHOLDER = Pattern.compile("(?<!')\\B\\?\\B(?!')");
-    public static final Pattern PATTERN_COLUMN = Pattern.compile("(\\w+).*?(?<!')\\B\\?\\B(?!')");
-
     private static ConcurrentMap<String, Integer> placeholderCountCache = new ConcurrentHashMap<>();
-    private static ConcurrentMap<String, List<String>> columnsCache = new ConcurrentHashMap<>();
 
     public static StringBuilder appendWhere(StringBuilder sqlBuilder, Stream<String> stream) {
         sqlBuilder.append(" WHERE ");
@@ -50,23 +49,13 @@ public abstract class SqlUtils {
         });
     }
 
-    public static List<String> findColumnsFromSQL(String sql) {
-        return columnsCache.computeIfAbsent(sql, k -> {
-            List<String> columns = new ArrayList<>();
-            Matcher matcher = PATTERN_COLUMN.matcher(sql);
-            while (matcher.find()) {
-                columns.add(matcher.group(1));
-            }
-            return Collections.unmodifiableList(columns);
-        });
-    }
-
     public static String normalizeColumn(String column, boolean mapUnderscoreToCamelCase) {
+        Stream<String> stream = Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(column))
+                .filter(it -> !Objects.equals(it, "_"));
         if (mapUnderscoreToCamelCase) {
-            return Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(column))
-                    .map(StringUtils::uncapitalize).collect(Collectors.joining("_"));
+            return stream.map(StringUtils::uncapitalize).collect(Collectors.joining("_"));
         } else {
-            return StringUtils.capitalize(column);
+            return stream.map(StringUtils::capitalize).collect(Collectors.joining());
         }
     }
 
