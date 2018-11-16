@@ -17,11 +17,12 @@ public class AutoParameterMappingPreprocessor implements SqlProvider {
     @Override
     public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        if (parameterMappings.isEmpty() && boundSql.getParameterObject() instanceof Map) {
+        Object parameterObject = boundSql.getParameterObject();
+        if (parameterMappings.isEmpty() && parameterObject instanceof Map) {
             int parameterCount = SqlUtils.countPlaceholders(boundSql.getSql());
             if (parameterCount > 0) {
                 Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
-                for (int i = 1; i <= parameterCount; i++) {
+                for (int size = ((Map<?, ?>) parameterObject).size() / 2, i = size - parameterCount; i <= size; i++) {
                     parameterMappings.add(new ParameterMapping.Builder
                             (configuration, "param" + i, Object.class).build());
                 }
