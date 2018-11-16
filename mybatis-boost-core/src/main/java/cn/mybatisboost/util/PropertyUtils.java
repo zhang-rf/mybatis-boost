@@ -9,6 +9,11 @@ import java.util.stream.Collectors;
 
 public abstract class PropertyUtils {
 
+    public static String normalizeProperty(String property) {
+        return StringUtils.uncapitalize
+                (Arrays.stream(property.split("_")).map(StringUtils::capitalize).collect(Collectors.joining()));
+    }
+
     public static List<String> buildPropertiesWithCandidates
             (String[] candidateProperties, Object entity, boolean isSelectiveUpdating) {
         if (candidateProperties.length > 0 && !Objects.equals(candidateProperties[0], "!")) {
@@ -33,10 +38,5 @@ public abstract class PropertyUtils {
                 .map(PropertyUtils::normalizeProperty).collect(Collectors.toList());
         properties.removeAll(conditionalPropertyList);
         properties.addAll(conditionalPropertyList);
-    }
-
-    public static String normalizeProperty(String property) {
-        return StringUtils.uncapitalize
-                (Arrays.stream(property.split("_")).map(StringUtils::capitalize).collect(Collectors.joining()));
     }
 }
