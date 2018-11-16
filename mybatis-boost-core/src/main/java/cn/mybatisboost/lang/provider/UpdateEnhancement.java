@@ -33,9 +33,14 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
                     (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
             boolean mapUnderscoreToCamelCase = (boolean)
                     metaObject.getValue("delegate.configuration.mapUnderscoreToCamelCase");
+
             BinaryTuple<List<String>, List<String>> propertiesAndColumns =
                     SqlUtils.getPropertiesAndColumnsFromLiteralColumns(split[0], entityType, mapUnderscoreToCamelCase);
-            propertiesAndColumns.first().removeAll(getConditionProperties(entityType, boundSql.getParameterMappings()));
+            List<String> conditionProperties = getConditionProperties(entityType, boundSql.getParameterMappings());
+            propertiesAndColumns.first().removeAll(conditionProperties);
+            propertiesAndColumns.second().removeAll(conditionProperties.stream()
+                    .map(it -> SqlUtils.normalizeColumn(it, mapUnderscoreToCamelCase)).collect(Collectors.toList()));
+
             metaObject.setValue("delegate.boundSql.sql",
                     buildSQL(sql, entityType, propertiesAndColumns.second(), split));
             metaObject.setValue("delegate.boundSql.parameterMappings",
@@ -62,9 +67,9 @@ public class UpdateEnhancement implements SqlProvider, ConfigurationAware {
         List<String> conditionProperties = parameterMappings.stream()
                 .map(ParameterMapping::getProperty).collect(Collectors.toList());
         try {
-            String oIdProperty = EntityUtils.getIdProperty(entityType);
-            if (!conditionProperties.contains(oIdProperty)) {
-                conditionProperties.add(oIdProperty);
+            String idProperty = EntityUtils.getIdProperty(entityType);
+            if (!conditionProperties.contains(idProperty)) {
+                conditionProperties.add(idProperty);
             }
         } catch (NoSuchFieldError ignored) {
         }
