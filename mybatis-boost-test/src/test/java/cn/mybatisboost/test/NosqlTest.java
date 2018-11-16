@@ -3,7 +3,6 @@ package cn.mybatisboost.test;
 import cn.mybatisboost.core.GenericMapper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,17 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-
 @RunWith(SpringRunner.class)
 @SpringBootApplication
 @SpringBootTest(classes = GenericMapper.class)
 public class NosqlTest {
 
-    @Autowired
-    private ProjectNosqlMapper mapper;
+    //    @Autowired
+//    private ProjectNosqlMapper mapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -36,60 +31,60 @@ public class NosqlTest {
     public void tearDown() {
         jdbcTemplate.execute("delete from project");
     }
-
-    @Test
-    public void deleteAll() {
-        assertEquals(3, mapper.deleteAll());
-        jdbcTemplate.query("select * from project", resultSet -> {
-            assertEquals(0, resultSet.getRow());
-        });
-    }
-
-    @Test
-    public void selectFirst() {
-        assertEquals(123, (int) mapper.selectFirst().getId());
-    }
-
-    @Test
-    public void selectTop2() {
-        List<Project> list = mapper.selectTop2();
-        assertEquals(2, list.size());
-        assertEquals(123, (int) list.get(0).getId());
-        assertEquals(456, (int) list.get(1).getId());
-    }
-
-    @Test
-    public void selectAllOffset1Limit1() {
-        assertEquals(456, (int) mapper.selectAllOffset1Limit1().getId());
-    }
-
-    @Test
-    public void selectByGroupIdAndArtifactId() {
-        assertEquals(123, (int) mapper.selectByGroupIdAndArtifactId("cn.mybatisboost1", "mybatis-boost1").get(0).getId());
-    }
-
-    @Test
-    public void selectByGroupIdOrArtifactId() {
-        List<Project> list = mapper.selectByGroupIdOrArtifactId("cn.mybatisboost1", "mybatis-boost2");
-        assertEquals(2, list.size());
-        assertEquals(123, (int) list.get(0).getId());
-        assertEquals(456, (int) list.get(1).getId());
-    }
-
-    @Test
-    public void selectByNotArtifactId() {
-        List<Project> list = mapper.selectByArtifactIdNot("mybatis-boost1");
-        assertEquals(2, list.size());
-        assertEquals(456, (int) list.get(0).getId());
-        assertEquals(789, (int) list.get(1).getId());
-    }
-
-    @Test
-    public void selectAllOrderByGroupIdDesc() {
-        List<Project> list = mapper.selectAllOrderByGroupIdDesc();
-        assertEquals(3, list.size());
-        assertEquals(789, (int) list.get(0).getId());
-        assertEquals(456, (int) list.get(1).getId());
-        assertEquals(123, (int) list.get(2).getId());
-    }
+//
+//    @Test
+//    public void deleteAll() {
+//        assertEquals(3, mapper.deleteAll());
+//        jdbcTemplate.query("select * from project", resultSet -> {
+//            assertEquals(0, resultSet.getRow());
+//        });
+//    }
+//
+//    @Test
+//    public void selectFirst() {
+//        assertEquals(123, (int) mapper.selectFirst().getId());
+//    }
+//
+//    @Test
+//    public void selectTop2() {
+//        List<Project> list = mapper.selectTop2();
+//        assertEquals(2, list.size());
+//        assertEquals(123, (int) list.get(0).getId());
+//        assertEquals(456, (int) list.get(1).getId());
+//    }
+//
+//    @Test
+//    public void selectAllOffset1Limit1() {
+//        assertEquals(456, (int) mapper.selectAllOffset1Limit1().getId());
+//    }
+//
+//    @Test
+//    public void selectByGroupIdAndArtifactId() {
+//        assertEquals(123, (int) mapper.selectByGroupIdAndArtifactId("cn.mybatisboost1", "mybatis-boost1").get(0).getId());
+//    }
+//
+//    @Test
+//    public void selectByGroupIdOrArtifactId() {
+//        List<Project> list = mapper.selectByGroupIdOrArtifactId("cn.mybatisboost1", "mybatis-boost2");
+//        assertEquals(2, list.size());
+//        assertEquals(123, (int) list.get(0).getId());
+//        assertEquals(456, (int) list.get(1).getId());
+//    }
+//
+//    @Test
+//    public void selectByNotArtifactId() {
+//        List<Project> list = mapper.selectByArtifactIdNot("mybatis-boost1");
+//        assertEquals(2, list.size());
+//        assertEquals(456, (int) list.get(0).getId());
+//        assertEquals(789, (int) list.get(1).getId());
+//    }
+//
+//    @Test
+//    public void selectAllOrderByGroupIdDesc() {
+//        List<Project> list = mapper.selectAllOrderByGroupIdDesc();
+//        assertEquals(3, list.size());
+//        assertEquals(789, (int) list.get(0).getId());
+//        assertEquals(456, (int) list.get(1).getId());
+//        assertEquals(123, (int) list.get(2).getId());
+//    }
 }
