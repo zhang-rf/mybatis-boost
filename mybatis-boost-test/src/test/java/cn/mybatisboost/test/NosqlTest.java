@@ -78,7 +78,7 @@ public class NosqlTest {
     @Test
     public void selectByGroupIdAndArtifactId() throws Exception {
         Method selectByGroupIdAndArtifactId = mapper.getClass().getDeclaredMethod("selectByGroupIdAndArtifactId", String.class, String.class);
-        assertEquals(123, (int) ((Project) selectByGroupIdAndArtifactId.invoke(mapper, "cn.mybatisboost1", "mybatis-boost1")).getId());
+        assertEquals(123, (int) ((List<Project>) selectByGroupIdAndArtifactId.invoke(mapper, "cn.mybatisboost1", "mybatis-boost1")).get(0).getId());
     }
 
     @Test
