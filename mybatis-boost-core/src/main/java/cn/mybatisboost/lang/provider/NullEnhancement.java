@@ -28,7 +28,7 @@ public class NullEnhancement implements SqlProvider {
 
             int offset = 0;
             StringBuilder sqlBuilder = new StringBuilder();
-            while (matcher.find() && iterator.hasNext()) {
+            while (matcher.find() & iterator.hasNext()) {
                 try {
                     if (parameterMetaObject.getValue(iterator.next().getProperty()) != null) continue;
                 } catch (Exception ignored) {

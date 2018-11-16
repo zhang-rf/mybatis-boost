@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +36,6 @@ public class MybatisBoostAutoConfiguration {
     private boolean isLangEnabled;
     @Value("${mybatisboost.limiter.enabled:true}")
     private boolean isLimiterEnabled;
-    @Value("${mybatisboost.metric.enabled:true}")
-    private boolean isMetricEnabled;
 
     public MybatisBoostAutoConfiguration(MybatisBoostProperties properties) {
         this.properties = properties;
@@ -65,8 +64,9 @@ public class MybatisBoostAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty("mybatisboost.metric.enabled")
     public MetricInterceptor metricInterceptor(cn.mybatisboost.core.Configuration configuration) {
-        return isMetricEnabled ? new MetricInterceptor(configuration) : null;
+        return new MetricInterceptor(configuration);
     }
 
     @Bean
