@@ -8,15 +8,12 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 
 public class NullEnhancement implements SqlProvider {
-    private static Logger logger = LoggerFactory.getLogger(NullEnhancement.class);
 
     @Override
     public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
@@ -40,13 +37,11 @@ public class NullEnhancement implements SqlProvider {
                 iterator.remove();
 
                 String substring = sql.substring(offset, matcher.end());
-                logger.info("666666:" + substring);
                 int before = substring.length();
                 substring = substring.replaceFirst(" ?!= *\\?$| ?<> *\\?$",
                         isUpperCase ? " IS NOT NULL" : " is not null");
                 if (substring.length() == before) {
                     substring = substring.replaceFirst(" ?= *\\?$", isUpperCase ? " IS NULL" : " is null");
-                    logger.info("777777:" + substring);
                 }
                 sqlBuilder.append(substring);
                 offset = matcher.end();

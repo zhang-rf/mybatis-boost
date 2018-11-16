@@ -21,7 +21,7 @@ public class AutoParameterMappingPreprocessor implements SqlProvider {
             int parameterCount = SqlUtils.countPlaceholders(boundSql.getSql());
             if (parameterCount > 0) {
                 Configuration configuration = (Configuration) metaObject.getValue("delegate.configuration");
-                for (int i = 1; i < parameterCount; i++) {
+                for (int i = 1; i <= parameterCount; i++) {
                     parameterMappings.add(new ParameterMapping.Builder
                             (configuration, "param" + i, Object.class).build());
                 }
