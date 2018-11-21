@@ -10,6 +10,7 @@ public class MybatisBoostProperties {
 
     private Class<? extends NameAdaptor> nameAdaptor;
     private boolean multipleDatasource;
+    private boolean iterateSelectiveInBatch;
     private boolean showQuery;
     private boolean showQueryWithParameters;
     private long slowQueryThresholdInMillis = Long.MAX_VALUE;
@@ -29,6 +30,15 @@ public class MybatisBoostProperties {
 
     public void setMultipleDatasource(boolean multipleDatasource) {
         this.multipleDatasource = multipleDatasource;
+    }
+
+    public boolean isIterateSelectiveInBatch() {
+        return iterateSelectiveInBatch;
+    }
+
+    public MybatisBoostProperties setIterateSelectiveInBatch(boolean iterateSelectiveInBatch) {
+        this.iterateSelectiveInBatch = iterateSelectiveInBatch;
+        return this;
     }
 
     public boolean isShowQuery() {

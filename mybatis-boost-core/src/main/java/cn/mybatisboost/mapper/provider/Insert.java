@@ -33,10 +33,7 @@ public class Insert implements SqlProvider, ConfigurationAware {
         if (entity instanceof List) {
             entities = (List<?>) entity;
             if (entities.isEmpty()) {
-                metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
-                metaObject.setValue("delegate.boundSql.parameterObject", null);
-                metaObject.setValue("delegate.parameterHandler.parameterObject", null);
-                return;
+                throw new IllegalArgumentException("Can't insert empty list");
             }
             entity = entities.iterator().next();
         } else {
@@ -47,11 +44,10 @@ public class Insert implements SqlProvider, ConfigurationAware {
         String[] candidateProperties = (String[]) parameterMap.get("param2");
         List<String> properties;
         if (candidateProperties.length == 0) {
-            if (entities.size() == 1) {
+            if (!selective || !configuration.isIterateSelectiveInBatch()) {
                 properties = EntityUtils.getProperties(entity, selective);
             } else {
-                properties = entities.stream().map(it -> EntityUtils.getProperties(it, selective))
-                        .flatMap(List::stream).distinct().collect(Collectors.toList());
+                properties = EntityUtils.getProperties(entities);
             }
         } else {
             properties = PropertyUtils.buildPropertiesWithCandidates(candidateProperties, entity, selective);

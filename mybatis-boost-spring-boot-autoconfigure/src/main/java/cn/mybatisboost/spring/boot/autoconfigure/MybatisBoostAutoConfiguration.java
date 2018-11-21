@@ -48,6 +48,7 @@ public class MybatisBoostAutoConfiguration {
         cn.mybatisboost.core.Configuration.Builder builder =
                 cn.mybatisboost.core.Configuration.builder()
                         .setMultipleDatasource(properties.isMultipleDatasource())
+                        .setIterateSelectiveInBatch(properties.isIterateSelectiveInBatch())
                         .setShowQuery(properties.isShowQuery())
                         .setShowQueryWithParameters(properties.isShowQueryWithParameters())
                         .setSlowQueryThresholdInMillis(properties.getSlowQueryThresholdInMillis());

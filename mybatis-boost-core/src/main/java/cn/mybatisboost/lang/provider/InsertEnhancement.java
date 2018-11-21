@@ -47,9 +47,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                     Collections.singletonList(Objects.requireNonNull(boundSql.getParameterObject(),
                             "ParameterObject mustn't be null"));
             if (entities.isEmpty()) {
-                metaObject.setValue("delegate.boundSql.sql", "SELECT 0");
-                metaObject.setValue("delegate.boundSql.parameterObject", null);
-                metaObject.setValue("delegate.parameterHandler.parameterObject", null);
+                throw new IllegalArgumentException("Can't insert empty list");
             } else {
                 String additionalStatement = sql.substring(literalColumns.length());
                 org.apache.ibatis.session.Configuration configuration =

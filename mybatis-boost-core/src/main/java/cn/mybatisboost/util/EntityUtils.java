@@ -73,4 +73,23 @@ public abstract class EntityUtils {
         }
         return properties;
     }
+
+    public static List<String> getProperties(List<?> entities) {
+        if (entities.isEmpty()) return Collections.emptyList();
+
+        Class<?> type = entities.get(0).getClass();
+        List<String> properties = getProperties(type);
+        Iterator<String> iterator = properties.iterator();
+        while (iterator.hasNext()) {
+            try {
+                Field field = type.getDeclaredField(iterator.next());
+                boolean nonNull = entities.stream()
+                        .anyMatch(UncheckedPredicate.of(it -> field.get(it) != null));
+                if (!nonNull) iterator.remove();
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return properties;
+    }
 }

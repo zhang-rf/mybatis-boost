@@ -15,12 +15,12 @@ public abstract class PropertyUtils {
     }
 
     public static List<String> buildPropertiesWithCandidates
-            (String[] candidateProperties, Object entity, boolean isSelectiveUpdating) {
+            (String[] candidateProperties, Object entity, boolean selective) {
         if (candidateProperties.length > 0 && !Objects.equals(candidateProperties[0], "!")) {
             return Arrays.stream(candidateProperties)
                     .map(PropertyUtils::normalizeProperty).collect(Collectors.toList());
         } else {
-            List<String> properties = EntityUtils.getProperties(entity, isSelectiveUpdating);
+            List<String> properties = EntityUtils.getProperties(entity, selective);
             if (candidateProperties.length > 0) {
                 properties.removeAll(Arrays.stream(candidateProperties)
                         .map(PropertyUtils::normalizeProperty).collect(Collectors.toList()));
