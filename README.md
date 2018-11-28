@@ -17,13 +17,13 @@ Maven:
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
 </dependency>
 ```
 
 Gradle:
 ```gradle
-compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.1'
+compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.2'
 ```
 
 如果你的数据库Table名与POJO类名一致，数据库列名与POJO属性名称命名方式也一致的话（大小写不敏感），那么恭喜你，你已经成功引入了MybatisBoost，可以跳过下一章《名称映射》的内容。

@@ -10,9 +10,7 @@ import cn.mybatisboost.limiter.LimiterSqlProvider;
 import cn.mybatisboost.mapper.MapperSqlProvider;
 import cn.mybatisboost.metric.MetricInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-@AutoConfigureAfter(MybatisAutoConfiguration.class)
 @ConditionalOnBean(SqlSessionFactory.class)
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
