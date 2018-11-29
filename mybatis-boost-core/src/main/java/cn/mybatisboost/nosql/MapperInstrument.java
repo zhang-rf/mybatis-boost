@@ -8,6 +8,7 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Set;
@@ -25,7 +26,8 @@ public class MapperInstrument {
                 boolean modified = false;
                 CtClass ctClass = ClassPool.getDefault().get(className);
                 for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-                    if (ctMethod.hasAnnotation(Nosql.class)) {
+                    if (ctMethod.hasAnnotation(Mapper.class) ||
+                            ctMethod.hasAnnotation(cn.mybatisboost.support.Mapper.class)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
                         addQueryAnnotation(ctMethod, parser.toSql());

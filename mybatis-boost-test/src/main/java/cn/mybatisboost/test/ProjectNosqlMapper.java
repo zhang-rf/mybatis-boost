@@ -1,7 +1,6 @@
 package cn.mybatisboost.test;
 
 import cn.mybatisboost.core.GenericMapper;
-import cn.mybatisboost.nosql.Nosql;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -9,27 +8,27 @@ import java.util.List;
 @Mapper
 public interface ProjectNosqlMapper extends GenericMapper<Project> {
 
-    @Nosql
+    @Mapper
     int deleteAll();
 
-    @Nosql
+    @Mapper
     Project selectFirst();
 
-    @Nosql
+    @Mapper
     List<Project> selectTop2();
 
-    @Nosql
+    @Mapper
     Project selectAllOffset1Limit1();
 
-    @Nosql
+    @Mapper
     List<Project> selectByGroupIdAndArtifactId(String groupId, String artifactId);
 
-    @Nosql
+    @Mapper
     List<Project> selectByGroupIdOrArtifactId(String groupId, String artifactId);
 
-    @Nosql
+    @Mapper
     List<Project> selectByArtifactIdNot(String artifactId);
 
-    @Nosql
+    @Mapper
     List<Project> selectAllOrderByGroupIdDesc();
 }
