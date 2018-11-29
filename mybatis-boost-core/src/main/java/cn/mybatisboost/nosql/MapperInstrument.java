@@ -8,7 +8,6 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Set;
@@ -18,6 +17,16 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class MapperInstrument {
 
     private static Set<String> modifiedClassNames = new ConcurrentSkipListSet<>();
+    private static Class<?> MAPPER_CLASS;
+
+    static {
+        try {
+            MAPPER_CLASS = MapperInstrument.class.getClassLoader()
+                    .loadClass("org.apache.ibatis.annotations.Mapper");
+        } catch (ClassNotFoundException ignored) {
+            MAPPER_CLASS = cn.mybatisboost.support.Mapper.class;
+        }
+    }
 
     public static boolean modify(String className, boolean mapUnderscoreToCamelCase) {
         synchronized (className.intern()) {
@@ -26,8 +35,7 @@ public class MapperInstrument {
                 boolean modified = false;
                 CtClass ctClass = ClassPool.getDefault().get(className);
                 for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-                    if (ctMethod.hasAnnotation(Mapper.class) ||
-                            ctMethod.hasAnnotation(cn.mybatisboost.support.Mapper.class)) {
+                    if (ctMethod.hasAnnotation(MAPPER_CLASS)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
                         addQueryAnnotation(ctMethod, parser.toSql());
@@ -36,7 +44,8 @@ public class MapperInstrument {
                     }
                 }
                 if (modified) {
-                    ctClass.toClass(MapperInstrument.class.getClassLoader(), MapperInstrument.class.getProtectionDomain());
+                    ctClass.toClass(MapperInstrument.class.getClassLoader(),
+                            MapperInstrument.class.getProtectionDomain());
                     modifiedClassNames.add(className);
                 }
 
