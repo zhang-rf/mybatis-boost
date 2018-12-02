@@ -1,19 +1,23 @@
 # MybatisBoost [![Maven central](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost) [![Build Status](https://www.travis-ci.org/zhang-rf/mybatis-boost.svg?branch=master)](https://www.travis-ci.org/zhang-rf/mybatis-boost) [![Coverage Status](https://coveralls.io/repos/github/zhang-rf/mybatis-boost/badge.svg)](https://coveralls.io/github/zhang-rf/mybatis-boost)
 
-Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、智能方法查询、SQL监控等功能，使用MybatisBoost来提升开发效率，内聚SQL代码！
+Mybatis SQL开发神器MybatisBoost，包含通用CrudMapper、Mybatis语法增强、无感知分页、智能方法查询、SQL监控等功能，使用MybatisBoost来提升开发效率，轻松编写SQL代码！
 
-在使用MybatisBoost前，请确保：
+使用MybatisBoost的最低要求：
 
-* 使用JDK1.8 及以上版本
-* 已引入MyBatis3.0.6 及以上版本
-* 已引入MyBatis integration with Spring Boot (mybatis-spring-boot-starter)
+* JDK 1.8+
+* MyBatis 3.0.6+
 
 ## 快速开始
 
-基于Spring Boot项目的快速开始。
+基于Spring Boot以及mybatis-spring-boot-starter项目的快速开始。
 
 Maven:
 ```xml
+<dependency>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>1.3.2</version>
+</dependency>
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
@@ -23,40 +27,41 @@ Maven:
 
 Gradle:
 ```gradle
+compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'
 compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.3'
 ```
 
-如果你的数据库Table名与POJO类名一致，数据库列名与POJO属性名称命名方式也一致的话（大小写不敏感），那么恭喜你，你已经成功引入了MybatisBoost，可以跳过下一章《名称映射》的内容。
+如果你的数据库Table名称与POJO类名一致，数据库列名与POJO属性名称命名方式也一致的话（大小写不敏感），那么恭喜你，你已经成功引入了MybatisBoost。可以跳过下一章《名称映射》的内容。
 
 ## 名称映射
 
-MybatisBoost内置有TPrefixedNameAdaptor、SnakeCaseNameAdaptor和NoopNameAdaptor三个常用的表名转换器，如果内置的表名转换器无法满足你的需求，你也可以基于NameAdaptor接口实现自己的表名转换器。
+关于数据库Table名称与POJO类名之间的映射，MybatisBoost内置有TPrefixedNameAdaptor、SnakeCaseNameAdaptor两个常用的表名转换器，如果内置的表名转换器无法满足你的需求，你也可以基于NameAdaptor接口实现自己的表名转换器。
 
-MybatisBoost默认不使用表名转换器，现在假设你的表名为“my_table”，你的POJO类名为“MyTable”，则可以使用如下的配置做表名映射。
+MybatisBoost默认使用NoopNameAdaptor表名转换器。现在假设你有一张表，表名为“my_table”，对应的POJO类名为“MyTable”，则可以使用SnakeCaseNameAdaptor表名转换器做表名映射。
 
 ```
 mybatisboost.name-adaptor=cn.mybatisboost.core.adaptor.SnakeCaseNameAdaptor
 ```
 
-MybatisBoost采用约定大于配置的思想，支持CamelCase和snake_case两种数据库列名命名方式，默认使用CamelCase命名方式。
-
-如果你的数据库列名命名方式为snake_case命名方式，请使用Mybatis内置的配置做名称映射。
+关于数据库列名与POJO属性名之间的映射，MybatisBoost支持CamelCase和snake_case两种数据库列名命名方式，默认使用CamelCase命名方式。如果你的数据库列名命名方式为snake_case命名方式，请使用Mybatis内置的配置做列名映射。
 
 ```
 mybatis.configuration.map-underscore-to-camel-case=true
 ```
 
-除了自动映射方案，MybatisBoost同样提供部分的手动映射方案。
+除了自动映射方案，MybatisBoost同样提供手动标注的方案。
 
-现在假设你的表名为“DEMO_ThisTable”，你的POJO类名为“ThatTable”，表名和POJO类名直接并无任何关联，则可以使用JPA提供的标准注解进行手动映射。
+现在假设你的表名为“DEMO_ThisTable”，你的POJO类名为“ThatTable”，表名和POJO类名之间并无任何关联，则可以使用JPA提供的标准注解进行手动标注。
 
-同样，主键也可以使用JPA提供的标准注解进行手动映射。
+同样地，主键也可以使用JPA提供的标准注解进行手动标注。
+
+关于数据库列名与POJO属性名之间的关系，MybatisBoost采用约定大于配置的思想，不提供手动标注的功能。
 
 ```java
 @Table(name="DEMO_ThisTable")
 public class ThatTable {
 
-    @Id // 默认以名称为“id”的字段作为主键，如果不是需要使用“@Id”注解显式标注
+    @Id // 默认以名称为“id”的字段作为主键，否则需要使用@Id注解手动标注
     private Long myId;
     private String myField;
 
@@ -64,7 +69,7 @@ public class ThatTable {
 }
 ```
 
-到此，已经可以开始使用MybatisBoost了，下面将逐一介绍MybatisBoost的各种功能特性。
+到此，你已经可以开始使用MybatisBoost了。下面将逐一介绍MybatisBoost的各种功能特性。
 
 ## 通用CrudMapper
 
