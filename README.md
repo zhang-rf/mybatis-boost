@@ -51,7 +51,7 @@ MybatisBoost默认使用NoopNameAdaptor表名映射器，对应的application配
 mybatisboost.name-adaptor=cn.mybatisboost.core.adaptor.NoopNameAdaptor
 ```
 
-关于Table列名与POJO属性名之间的映射，MybatisBoost采用了Mybatis内置的MapUnderscoreToCamelCase功能，可以使用CamelCase和snake_case两种Table列名命名方式，默认使用CamelCase命名方式。如果你的数据库列名命名方式为snake_case命名方式，请使用Mybatis内置的配置做列名映射。
+关于Table列名与POJO属性名之间的映射，MybatisBoost采用了Mybatis内置的MapUnderscoreToCamelCase功能，可以使用CamelCase和snake_case两种Table列名命名方式，默认使用CamelCase命名方式。如果你的数据库列名命名方式为snake_case命名方式，请使用Mybatis内置的配置做列名映射。
 
 ```
 mybatis.configuration.map-underscore-to-camel-case=true
@@ -59,11 +59,11 @@ mybatis.configuration.map-underscore-to-camel-case=true
 
 除了自动映射方案，MybatisBoost同样提供手动标注的方案。
 
-现在假设你的表名为“DEMO_ThisTable”，你的POJO类名为“ThatTable”，表名和POJO类名之间并无任何联系，则可以使用JPA提供的标准注解进行手动标注。
+现在假设你的表名为“DEMO_ThisTable”，你的POJO类名为“ThatTable”，表名和POJO类名之间并无任何联系，则可以使用JPA提供的标准注解进行手动标注。
 
 同样地，主键也可以使用JPA提供的标准注解进行手动标注。
 
-关于数据库列名与POJO属性名之间的关系，MybatisBoost采用约定大于配置的思想，不提供手动标注的功能。
+关于数据库列名与POJO属性名之间的关系，MybatisBoost采用约定大于配置的思想，不提供手动标注的功能。
 
 ```java
 @Table(name="DEMO_ThisTable")
@@ -77,7 +77,7 @@ public class ThatTable {
 }
 ```
 
-到此，你已经可以开始使用MybatisBoost了，下面将逐一介绍MybatisBoost的各种功能特性。
+到此，你已经可以开始使用MybatisBoost了，下面将逐一介绍MybatisBoost的各种功能特性。
 
 ## 基础知识
 
