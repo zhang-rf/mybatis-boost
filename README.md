@@ -37,7 +37,7 @@ compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.3'
 
 ## 名称映射
 
-配置名称映射是为了使Mybatis能自动地找到POJO类对应的表，以及POJO中的属性对应的列，名称映射方案分为自动映射和手动映射。
+配置名称映射是为了使Mybatis能自动地找到POJO类对应的表，以及POJO中的属性对应的列，名称映射方案分为自动映射和手动标注两种方案。
 
 关于数据库Table名称与POJO类名之间的自动映射，MybatisBoost内置有几个常用的表名映射器，如果内置的表名映射器无法满足你的需求，你也可以基于NameAdaptor接口实现自己的表名映射器。
 
