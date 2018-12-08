@@ -41,7 +41,7 @@ compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.3'
 
 配置名称映射是为了使Mybatis能自动地找到POJO类对应的表，以及POJO中的属性对应的列，名称映射方案分为自动映射和手动标注两种方案。
 
-关于表名与POJO类名之间的自动映射，MybatisBoost内置有几个常用的表名映射器，如果内置的表名映射器无法满足你的需求，你也可以基于NameAdaptor接口实现自己的表名映射器。
+对于表名与POJO类名之间的自动映射，MybatisBoost内置有几个常用的表名映射器，如果内置的表名映射器无法满足你的需求，你也可以基于NameAdaptor接口实现自己的表名映射器。
 
 表名映射器|POJO类名|映射到的表名
 -|-|-
@@ -55,7 +55,7 @@ MybatisBoost默认使用NoopNameAdaptor表名映射器，对应的`application.p
 mybatisboost.name-adaptor=cn.mybatisboost.core.adaptor.NoopNameAdaptor
 ```
 
-关于列名与属性名之间的自动映射，MybatisBoost采用了Mybatis内置的MapUnderscoreToCamelCase功能，默认使用CamelCase命名方式。如果你的数据库列名命名方式为snake_case命名方式，请使用如下的`application.properties`配置：
+对于列名与属性名之间的自动映射，MybatisBoost采用了Mybatis内置的MapUnderscoreToCamelCase功能，默认使用CamelCase命名方式。如果你的数据库列名命名方式为snake_case命名方式，请使用如下的`application.properties`配置：
 
 ```
 mybatis.configuration.map-underscore-to-camel-case=true
@@ -67,7 +67,7 @@ mybatis.configuration.map-underscore-to-camel-case=true
 
 同样地，主键也可以使用JPA提供的标准注解进行手动标注。
 
-关于列名与POJO属性名之间的关系，MybatisBoost采用约定大于配置的思想，不提供手动标注的功能。
+对于列名与POJO属性名之间的关系，MybatisBoost采用约定大于配置的思想，不提供手动标注的功能。
 
 ```java
 @Table(name="DEMO_ThisTable")
@@ -124,11 +124,11 @@ public interface CrudMapper<T> {
 }
 ```
 
-如果你不需要CrudMapper接口里的所有方法，可以把CrudMapper接口中所需要的方法复制到你的Mybatis Mapper里即可。（需要把方法上的注解也一并复制。）
+如果你不需要CrudMapper接口里的所有方法，可以把CrudMapper接口中所需要的方法复制到你的Mybatis Mapper里即可。（需要把方法上的注解也一并复制。）
 
 ## MySQL CrudMapper
 
-除了通用的CrudMapper，MybatisBoost还提供专用于MySQL的MysqlCrudMapper&lt;T&gt;接口，在CrudMapper的基础上，增加了几个支持MySQL特性的方法。
+除了通用的CrudMapper，MybatisBoost还提供专用于MySQL的MysqlCrudMapper&lt;T&gt;接口，在CrudMapper的基础上，增加了几个支持MySQL特性的方法。
 
 ```java
 public interface MysqlCrudMapper<T> extends CrudMapper<T> {
@@ -249,10 +249,10 @@ SELECT * FROM Post WHERE id IN #{list}
 
 ## 智能方法查询
 
-简单的SQL语句千篇一律，能否不再编写那些显而易见的SQL语句呢？答案是肯定的。
+简单的SQL语句千篇一律，能否不再编写那些显而易见的SQL语句呢？答案是肯定的。
 
 ```java
-public interface PostMapper extends GenericMapper<Post> {
+public interface PostMapper extends GenericMapper<Post> {
 
     @org.apache.ibatis.annotations.Mapper
     List<Post> selectByPostIdAndPostDateBw(int a, Date b, Date c);
@@ -269,9 +269,9 @@ SELECT * FROM #t WHERE PostId = ? AND PostDate BETWEEN ? AND ?
 
 > 低版本的Mybatis没有@Mapper注解，可以使用MybatisBoost提供的@cn.mybatisboost.support.Mapper注解代替。
 
-下面我们就以“selectByPostIdAndPostDateBw”来分析下如何编写智能方法查询，分解后的单词如下：select By PostId And PostDate Bw。其中“select”称为“方法词”，“By”称为“辅助词”，“PostId”和“PostDatae”为POJO中的属性，“And”和“Bw”（BETWEEN的缩写）为SQL关键字，其中，方法词和辅助词都是必须的，其他的都为可选项。
+下面我们就以“selectByPostIdAndPostDateBw”为例来分析下如何编写智能方法查询，分解后的单词如下：select By PostId And PostDate Bw。其中“select”称为“方法词”，“By”称为“辅助词”，“PostId”和“PostDate”为POJO中的属性，“And”和“Bw”（BETWEEN的缩写）为SQL关键字，其中，方法词和辅助词都是必须的，其他的都为可选项。
 
-目前支持的方法词：select、count、delete。
+目前支持的方法词：select、count、delete。
 
 目前支持的关键字：
 
@@ -307,7 +307,7 @@ Desc|Desc|DESC
 同时，智能查询方法还支持分页功能：
 
 ```java
-public interface PostMapper extends GenericMapper<Post> {
+public interface PostMapper extends GenericMapper<Post> {
 
     @Mapper
     List<Post> selectAllOffset10Limit100();
@@ -322,7 +322,7 @@ public interface PostMapper extends GenericMapper<Post> {
 
 ## 无感知分页
 
-Mybatis本身其实已经提供了分页的功能，可惜它的实现并不优雅。为此，MybatisBoost在使用方法不变的前提下，透明的修改了实现，做到了真正的`物理分页`。
+Mybatis本身其实已经提供了分页的功能，可惜它的实现并不优雅。为此，MybatisBoost在使用方法不变的前提下，透明的修改了实现，做到了真正的`物理分页`。
 
 ```java
 List<T> selectAll(RowBounds rowBounds); // RowBounds内含offset和limit字段
