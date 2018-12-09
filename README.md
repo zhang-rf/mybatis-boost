@@ -11,8 +11,6 @@ Mybatis SQL开发神器MybatisBoost，为Mybatis带来诸多官方没有的新�
 
 基于Spring Boot以及mybatis-spring-boot-starter项目的快速开始。
 
-本章节假设你没有手动创建SqlSessionFactory Bean，否则需要增加一些额外的配置，这部分的内容安排在文档的末尾章节。
-
 Maven:
 ```xml
 <dependency>
@@ -31,6 +29,17 @@ Gradle:
 ```gradle
 compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'
 compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.1.3'
+```
+
+在手动创建SqlSessionFactory Bean的情况下，请确保MybatisBoost的Mybatis Plugin有被加载。
+
+```java
+@Bean
+public SqlSessionFactory sqlSessionFactory(ObjectProvider<Interceptor[]> interceptorsProvider) {
+    SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+    sessionFactory.setPlugins(interceptorsProvider.getIfAvailable()); // 确保加载了所有的Mybatis Plugin
+    ...
+}
 ```
 
 如果你的数据库Table名称与项目中的POJO类名一致，Table的列名称与POJO属性的名称命名方式也一致的话（大小写忽略），那么恭喜你，你已经成功引入了MybatisBoost，可以跳过下一章《名称映射》的内容。
