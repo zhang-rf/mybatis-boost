@@ -44,7 +44,7 @@ public SqlSessionFactory sqlSessionFactory(ObjectProvider<Interceptor[]> interce
 
 如果你的数据库Table名称与项目中的POJO类名一致，Table的列名称与POJO属性的名称命名方式也一致的话（大小写忽略），那么恭喜你，你已经成功引入了MybatisBoost，可以跳过下一章《名称映射》的内容。
 
-> 本文后续内容将使用术语“表”来代表数据库中的表，“列”来代表数据库表中的列，“POJO”来代表表对应的实体类，“属性”和“字段”来代表POJO中的成员变量。
+> 后续内容将使用术语“表”来代表数据库中的表，“列”来代表数据库表中的列，“POJO”来代表表对应的实体类，“属性”和“字段”来代表POJO中的成员变量。
 
 ## 名称映射
 
