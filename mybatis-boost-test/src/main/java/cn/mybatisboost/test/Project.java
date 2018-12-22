@@ -1,5 +1,7 @@
 package cn.mybatisboost.test;
 
+import cn.mybatisboost.support.Property;
+
 public class Project {
 
     private Integer id;
@@ -8,16 +10,18 @@ public class Project {
     private String license;
     private String scm;
     private String developer;
+    private Property<Website> website = Property.empty();
 
     public Project() {
     }
 
-    public Project(String groupId, String artifactId, String license, String scm, String developer) {
+    public Project(String groupId, String artifactId, String license, String scm, String developer, Property<Website> website) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.license = license;
         this.scm = scm;
         this.developer = developer;
+        this.website = website;
     }
 
     public Integer getId() {
@@ -74,6 +78,15 @@ public class Project {
         return this;
     }
 
+
+    public Property<Website> getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(Property<Website> website) {
+        this.website = website;
+    }
+
     @Override
     public String toString() {
         return "Project{" +
@@ -83,6 +96,7 @@ public class Project {
                 ", license='" + license + '\'' +
                 ", scm='" + scm + '\'' +
                 ", developer='" + developer + '\'' +
+                ", website=" + website +
                 '}';
     }
 }

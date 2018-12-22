@@ -1,5 +1,6 @@
 package cn.mybatisboost.test;
 
+import cn.mybatisboost.support.Property;
 import cn.mybatisboost.util.SafeProperty;
 import org.apache.ibatis.session.RowBounds;
 import org.junit.After;
@@ -125,7 +126,7 @@ public class CrudMapperTest {
     public void insert() {
         try {
             assertEquals(1, mapper.insert(new Project(null, "mybatis-boost",
-                    "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
+                    "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
             fail();
         } catch (Exception ignored) {
             // normally, exception would happen because "group_id" column is declared NOT NULL
@@ -137,7 +138,7 @@ public class CrudMapperTest {
         try {
             assertEquals(1, mapper.batchInsert(Collections.singletonList(
                     new Project(null, "mybatis-boost",
-                            "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan"))));
+                            "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty()))));
             fail();
         } catch (Exception ignored) {
             // normally, exception would happen because "group_id" column is declared NOT NULL
@@ -147,7 +148,7 @@ public class CrudMapperTest {
     @Test
     public void insertSelective() {
         assertEquals(1, mapper.insertSelective(new Project("cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan")));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
         });
@@ -157,7 +158,7 @@ public class CrudMapperTest {
     public void batchInsertSelective() {
         assertEquals(1, mapper.batchInsertSelective(Collections.singletonList(
                 new Project("cn.mybatisboost", "mybatis-boost",
-                        "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan"))));
+                        "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty()))));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
         });

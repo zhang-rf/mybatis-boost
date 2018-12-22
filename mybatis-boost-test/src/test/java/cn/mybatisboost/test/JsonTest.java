@@ -1,0 +1,60 @@
+package cn.mybatisboost.test;
+
+import cn.mybatisboost.support.Property;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.junit.Assert.*;
+
+@RunWith(SpringRunner.class)
+@SpringBootApplication
+@SpringBootTest(classes = ProjectMapper.class)
+public class JsonTest {
+
+    @Autowired
+    private ProjectMapper mapper;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
+    @After
+    public void tearDown() {
+        jdbcTemplate.execute("delete from project");
+    }
+
+    @Test
+    public void testSave() {
+        Project project = new Project("cn.mybatisboost", "mybatis-boost",
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan",
+                Property.of(new Website("HTTPS", "mybatisboost.cn", (short) 80)));
+        mapper.insert(project);
+        jdbcTemplate.query("select * from project", resultSet -> {
+            try {
+                assertEquals(objectMapper.writeValueAsString(project.getWebsite().orElseThrow(Error::new)), resultSet.getString("website"));
+            } catch (JsonProcessingException e) {
+                fail();
+            }
+        });
+    }
+
+    @Test
+    public void testQuery() throws Exception {
+        Project project = new Project("cn.mybatisboost", "mybatis-boost",
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan",
+                Property.of(new Website("HTTPS", "mybatisboost.cn", (short) 80)));
+        jdbcTemplate.execute("insert into project (id, website) values (999, '" + objectMapper.writeValueAsString(project.getWebsite().get()) + "')");
+        project = mapper.selectById(999);
+        assertNotNull(project);
+        assertEquals("HTTPS", project.getWebsite().get().getProtocol());
+        assertEquals("mybatisboost.cn", project.getWebsite().get().getHost());
+        assertEquals(80, project.getWebsite().get().getPort());
+    }
+}
