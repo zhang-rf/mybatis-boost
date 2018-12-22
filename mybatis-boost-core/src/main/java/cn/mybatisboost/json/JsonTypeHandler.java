@@ -29,16 +29,16 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
 
     @Override
     public Property<?> getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return Property.ofNullable(rs.getString(columnName));
+        return Property.of(rs.getString(columnName));
     }
 
     @Override
     public Property<?> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return Property.ofNullable(rs.getString(columnIndex));
+        return Property.of(rs.getString(columnIndex));
     }
 
     @Override
     public Property<?> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return Property.ofNullable(cs.getString(columnIndex));
+        return Property.of(cs.getString(columnIndex));
     }
 }
