@@ -38,7 +38,7 @@ public class JsonTest {
         mapper.insert(project);
         jdbcTemplate.query("select * from project", resultSet -> {
             try {
-                assertEquals(objectMapper.writeValueAsString(project.getWebsite().orElseThrow(Error::new)), resultSet.getString("website"));
+                assertEquals(objectMapper.writeValueAsString(project.getWebsite().get()), resultSet.getString("website"));
             } catch (JsonProcessingException e) {
                 fail();
             }
