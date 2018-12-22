@@ -50,7 +50,7 @@ public class JsonTest {
         Project project = new Project("cn.mybatisboost", "mybatis-boost",
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan",
                 Property.of(new Website("HTTPS", "mybatisboost.cn", (short) 80)));
-        jdbcTemplate.execute("insert into project (id, website) values (999, '" + objectMapper.writeValueAsString(project.getWebsite().get()) + "')");
+        jdbcTemplate.execute("insert into project (id, group_id, website) values (999, 'cn.mybatisboost', '" + objectMapper.writeValueAsString(project.getWebsite().get()) + "')");
         project = mapper.selectById(999);
         assertNotNull(project);
         assertEquals("HTTPS", project.getWebsite().get().getProtocol());
