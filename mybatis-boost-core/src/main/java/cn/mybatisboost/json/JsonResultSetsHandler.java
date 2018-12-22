@@ -23,7 +23,6 @@ public class JsonResultSetsHandler implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         List<?> proceed = (List<?>) invocation.proceed();
-        System.out.println("4790174127041207412701401:" + proceed);
         if (proceed.isEmpty()) return proceed;
 
         Class<?> type = proceed.get(0).getClass();

@@ -21,11 +21,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
     public void setNonNullParameter(PreparedStatement ps, int i, Property<?> parameter, JdbcType jdbcType)
             throws SQLException {
         try {
-            if (parameter.isPresent()) {
-                ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
-            } else {
-                ps.setObject(i, null);
-            }
+            ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
