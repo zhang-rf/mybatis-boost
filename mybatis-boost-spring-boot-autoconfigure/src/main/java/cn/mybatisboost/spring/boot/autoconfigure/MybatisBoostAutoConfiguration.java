@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnClass(SqlSessionFactory.class)
 @Configuration
 @EnableConfigurationProperties(MybatisBoostProperties.class)
-@Import({NosqlConfiguration.class, JsonConfiguration.class})
+@Import(NosqlConfiguration.class)
 public class MybatisBoostAutoConfiguration {
 
     private final MybatisBoostProperties properties;
