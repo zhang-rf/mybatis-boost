@@ -37,8 +37,8 @@ public class JsonResultSetsHandler implements Interceptor {
             for (Field field : fields) {
                 Object value = ((Property<?>) field.get(object)).orElse(null);
                 if (value instanceof String) {
-                    field.set(object, JsonTypeHandler.objectMapper.readValue((String) value,
-                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+                    field.set(object, Property.of(JsonTypeHandler.objectMapper.readValue((String) value,
+                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])));
                 }
             }
         }
