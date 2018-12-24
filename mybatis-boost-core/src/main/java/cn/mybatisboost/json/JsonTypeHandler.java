@@ -13,16 +13,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @MappedTypes(Property.class)
-public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
+public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     static ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Property<?> parameter, JdbcType jdbcType)
+    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
             throws SQLException {
         try {
-            if (parameter.isPresent()) {
-                ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
+            Property<?> property = (Property<?>) parameter;
+            if (property.isPresent()) {
+                ps.setString(i, objectMapper.writeValueAsString(property.get()));
             } else {
                 ps.setObject(i, null);
             }
@@ -32,17 +33,17 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
     }
 
     @Override
-    public Property<?> getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return Property.ofNullable(rs.getString(columnName));
+    public Object getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return rs.getString(columnName);
     }
 
     @Override
-    public Property<?> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return Property.ofNullable(rs.getString(columnIndex));
+    public Object getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        return rs.getString(columnIndex);
     }
 
     @Override
-    public Property<?> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return Property.ofNullable(cs.getString(columnIndex));
+    public Object getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        return cs.getString(columnIndex);
     }
 }

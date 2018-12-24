@@ -1,6 +1,6 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.support.Property;
+import java.util.Optional;
 
 public class Project {
 
@@ -10,7 +10,7 @@ public class Project {
     private String license;
     private String scm;
     private String developer;
-    private Property<Website> website = Property.empty();
+    private Website website;
 
     public Project() {
     }
@@ -21,7 +21,7 @@ public class Project {
         this.license = license;
         this.scm = scm;
         this.developer = developer;
-        this.website = Property.ofNullable(website);
+        this.website = website;
     }
 
     public Integer getId() {
@@ -79,12 +79,12 @@ public class Project {
     }
 
 
-    public Property<Website> getWebsite() {
-        return website;
+    public Optional<Website> getWebsite() {
+        return Optional.ofNullable(website);
     }
 
     public void setWebsite(Website website) {
-        this.website = Property.ofNullable(website);
+        this.website = website;
     }
 
     @Override
