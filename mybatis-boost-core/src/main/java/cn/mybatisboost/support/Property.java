@@ -13,7 +13,7 @@ public class Property<T> {
     }
 
     private Property(T value) {
-        this.value = Objects.requireNonNull(value);
+        this.value = value;
     }
 
     public static <T> Property<T> of(T value) {
