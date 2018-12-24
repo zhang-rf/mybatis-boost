@@ -1,11 +1,13 @@
 package cn.mybatisboost.support;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Property<T> {
 
+    private static final Property<?> EMPTY = new Property<>();
     private final T value;
 
     private Property() {
@@ -13,14 +15,26 @@ public class Property<T> {
     }
 
     private Property(T value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Property<T> empty() {
+        return (Property<T>) EMPTY;
     }
 
     public static <T> Property<T> of(T value) {
         return new Property<>(value);
     }
 
+    public static <T> Property<T> ofNullable(T value) {
+        return value == null ? empty() : of(value);
+    }
+
     public T get() {
+        if (value == null) {
+            throw new NoSuchElementException("No value present");
+        }
         return value;
     }
 

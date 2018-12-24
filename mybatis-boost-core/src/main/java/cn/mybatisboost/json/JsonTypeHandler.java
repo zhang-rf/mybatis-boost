@@ -21,7 +21,11 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
     public void setNonNullParameter(PreparedStatement ps, int i, Property<?> parameter, JdbcType jdbcType)
             throws SQLException {
         try {
-            ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
+            if (parameter.isPresent()) {
+                ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
+            } else {
+                ps.setNull(i, ps.getParameterMetaData().getParameterType(i));
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -29,16 +33,16 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
 
     @Override
     public Property<?> getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return Property.of(rs.getString(columnName));
+        return Property.ofNullable(rs.getString(columnName));
     }
 
     @Override
     public Property<?> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return Property.of(rs.getString(columnIndex));
+        return Property.ofNullable(rs.getString(columnIndex));
     }
 
     @Override
     public Property<?> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return Property.of(cs.getString(columnIndex));
+        return Property.ofNullable(cs.getString(columnIndex));
     }
 }
