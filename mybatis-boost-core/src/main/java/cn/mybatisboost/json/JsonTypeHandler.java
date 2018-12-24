@@ -24,7 +24,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Property<?>> {
             if (parameter.isPresent()) {
                 ps.setString(i, objectMapper.writeValueAsString(parameter.get()));
             } else {
-                ps.setNull(i, ps.getParameterMetaData().getParameterType(i));
+                ps.setObject(i, null);
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
