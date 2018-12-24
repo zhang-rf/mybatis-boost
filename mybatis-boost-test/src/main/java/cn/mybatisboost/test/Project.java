@@ -10,7 +10,7 @@ public class Project {
     private String license;
     private String scm;
     private String developer;
-    private Property<Website> website;
+    private Property<Website> website = Property.empty();
 
     public Project() {
     }
