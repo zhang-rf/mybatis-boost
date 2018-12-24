@@ -5,6 +5,7 @@ import cn.mybatisboost.core.ConfigurationAware;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.MapperUtils;
+import cn.mybatisboost.util.MyBatisUtils;
 import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -57,7 +58,8 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
             } else {
                 parameterMap = Collections.emptyMap();
             }
-            metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
+            MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
+                    .setValue("delegate.parameterObject", parameterMap);
             metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
         }
         metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);

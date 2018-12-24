@@ -52,7 +52,8 @@ public class SelectOrCount implements SqlProvider, ConfigurationAware {
         List<ParameterMapping> parameterMappings = MyBatisUtils.getParameterMappings
                 ((org.apache.ibatis.session.Configuration)
                         metaObject.getValue("delegate.configuration"), properties);
-        metaObject.setValue("delegate.parameterHandler.parameterObject", entity);
+        MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
+                .setValue("delegate.parameterObject", entity);
         metaObject.setValue("delegate.boundSql.parameterObject", entity);
         metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);
         metaObject.setValue("delegate.boundSql.sql", sqlBuilder.toString());

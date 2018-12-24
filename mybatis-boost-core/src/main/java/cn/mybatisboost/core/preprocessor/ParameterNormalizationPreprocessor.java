@@ -2,6 +2,7 @@ package cn.mybatisboost.core.preprocessor;
 
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.MapperUtils;
+import cn.mybatisboost.util.MyBatisUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.reflection.MetaObject;
@@ -43,7 +44,8 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
                     Map<String, Object> parameterMap = new HashMap<>();
                     parameterMap.put("arg0", parameterObject);
                     parameterMap.put("param1", parameterObject);
-                    metaObject.setValue("delegate.parameterHandler.parameterObject", parameterMap);
+                    MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
+                            .setValue("delegate.parameterObject", parameterMap);
                     metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
                 }
             }
