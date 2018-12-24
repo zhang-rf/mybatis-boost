@@ -1,6 +1,5 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.support.Property;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +60,7 @@ public class EnhancementTest {
     public void insertSome() {
         assertEquals(1, mapper.insertSome(Collections.singletonList(new Project(
                 "cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty()))));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null))));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
@@ -72,7 +71,7 @@ public class EnhancementTest {
     @Test
     public void insertOne1() {
         assertEquals(1, mapper.insertOne1(new Project("cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null)));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
@@ -83,7 +82,7 @@ public class EnhancementTest {
     @Test
     public void insertOne2() {
         assertEquals(1, mapper.insertOne2(new Project("cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null)));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
@@ -106,7 +105,7 @@ public class EnhancementTest {
     public void updateNotGroupId() {
         jdbcTemplate.execute("insert into project (group_id) values ('cn.mybatisboost1')");
         assertEquals(1, mapper.updateNotGroupId(new Project("cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null)));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost1", resultSet.getString("group_id"));
@@ -121,7 +120,7 @@ public class EnhancementTest {
     public void updateAll() {
         jdbcTemplate.execute("insert into project (group_id) values ('cn.mybatisboost1')");
         assertEquals(1, mapper.updateAll(new Project("cn.mybatisboost", "mybatis-boost",
-                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", Property.empty())));
+                "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null)));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));

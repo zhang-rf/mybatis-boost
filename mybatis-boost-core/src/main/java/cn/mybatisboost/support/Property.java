@@ -1,6 +1,5 @@
 package cn.mybatisboost.support;
 
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -32,9 +31,6 @@ public class Property<T> {
     }
 
     public T get() {
-        if (value == null) {
-            throw new NoSuchElementException("No value present");
-        }
         return value;
     }
 

@@ -15,13 +15,13 @@ public class Project {
     public Project() {
     }
 
-    public Project(String groupId, String artifactId, String license, String scm, String developer, Property<Website> website) {
+    public Project(String groupId, String artifactId, String license, String scm, String developer, Website website) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.license = license;
         this.scm = scm;
         this.developer = developer;
-        this.website = website;
+        this.website = Property.ofNullable(website);
     }
 
     public Integer getId() {
@@ -79,12 +79,12 @@ public class Project {
     }
 
 
-    public Property<Website> getWebsite() {
-        return website;
+    public Website getWebsite() {
+        return website.get();
     }
 
-    public void setWebsite(Property<Website> website) {
-        this.website = website;
+    public void setWebsite(Website website) {
+        this.website = Property.ofNullable(website);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Project {
                 ", license='" + license + '\'' +
                 ", scm='" + scm + '\'' +
                 ", developer='" + developer + '\'' +
-                ", website=" + website +
+                ", website=" + website.get() +
                 '}';
     }
 }
