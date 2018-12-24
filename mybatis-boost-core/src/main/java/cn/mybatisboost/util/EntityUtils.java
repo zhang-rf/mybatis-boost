@@ -1,7 +1,6 @@
 package cn.mybatisboost.util;
 
 import cn.mybatisboost.core.adaptor.NameAdaptor;
-import cn.mybatisboost.support.Property;
 import cn.mybatisboost.util.function.UncheckedFunction;
 import cn.mybatisboost.util.function.UncheckedPredicate;
 import org.apache.commons.lang3.StringUtils;
@@ -68,10 +67,7 @@ public abstract class EntityUtils {
             properties = properties.stream()
                     .map(UncheckedFunction.of(type::getDeclaredField))
                     .peek(f -> f.setAccessible(true))
-                    .filter(UncheckedPredicate.of(f -> {
-                        Object value = f.get(entity);
-                        return value != null && (!(value instanceof Property) || ((Property<?>) value).isPresent());
-                    }))
+                    .filter(UncheckedPredicate.of(f -> f.get(entity) != null))
                     .map(UncheckedFunction.of(Field::getName))
                     .collect(Collectors.toList());
         }
@@ -88,10 +84,7 @@ public abstract class EntityUtils {
             try {
                 Field field = type.getDeclaredField(iterator.next());
                 boolean nonNull = entities.stream()
-                        .anyMatch(UncheckedPredicate.of(it -> {
-                            Object value = field.get(it);
-                            return value != null && (!(value instanceof Property) || ((Property<?>) value).isPresent());
-                        }));
+                        .anyMatch(UncheckedPredicate.of(it -> field.get(it) != null));
                 if (!nonNull) iterator.remove();
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);

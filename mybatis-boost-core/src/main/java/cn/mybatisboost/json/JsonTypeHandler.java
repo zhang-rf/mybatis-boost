@@ -1,6 +1,5 @@
 package cn.mybatisboost.json;
 
-import cn.mybatisboost.support.Property;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.type.BaseTypeHandler;
@@ -11,8 +10,9 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
-@MappedTypes(Property.class)
+@MappedTypes(Optional.class)
 public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     static ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
@@ -21,9 +21,9 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
     public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
             throws SQLException {
         try {
-            Property<?> property = (Property<?>) parameter;
-            if (property.isPresent()) {
-                ps.setString(i, objectMapper.writeValueAsString(property.get()));
+            Optional<?> optional = (Optional<?>) parameter;
+            if (optional.isPresent()) {
+                ps.setString(i, objectMapper.writeValueAsString(optional.get()));
             } else {
                 ps.setObject(i, null);
             }
