@@ -96,7 +96,7 @@ public class Project {
                 ", license='" + license + '\'' +
                 ", scm='" + scm + '\'' +
                 ", developer='" + developer + '\'' +
-                ", website=" + website.get() +
+                ", website=" + website +
                 '}';
     }
 }
