@@ -22,7 +22,7 @@ public class JsonTest {
     private ProjectMapper mapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().enableDefaultTyping();
 
     @After
     public void tearDown() {
@@ -37,7 +37,7 @@ public class JsonTest {
         mapper.insert(project);
         jdbcTemplate.query("select * from project", resultSet -> {
             try {
-                assertEquals(objectMapper.writeValueAsString(project.getWebsite().get()), resultSet.getString("website"));
+                assertEquals(objectMapper.writeValueAsString(project.getWebsite()), resultSet.getString("website"));
             } catch (JsonProcessingException e) {
                 fail();
             }
@@ -52,8 +52,8 @@ public class JsonTest {
         jdbcTemplate.execute("insert into project (id, group_id, website) values (999, 'cn.mybatisboost', '" + objectMapper.writeValueAsString(project.getWebsite()) + "')");
         project = mapper.selectById(999);
         assertNotNull(project);
-        assertEquals("HTTPS", project.getWebsite().get().getProtocol());
-        assertEquals("mybatisboost.cn", project.getWebsite().get().getHost());
-        assertEquals(80, project.getWebsite().get().getPort());
+        assertEquals("HTTPS", project.getWebsite().getProtocol());
+        assertEquals("mybatisboost.cn", project.getWebsite().getHost());
+        assertEquals(80, project.getWebsite().getPort());
     }
 }

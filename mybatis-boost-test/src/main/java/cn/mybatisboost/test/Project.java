@@ -1,7 +1,5 @@
 package cn.mybatisboost.test;
 
-import java.util.Optional;
-
 public class Project {
 
     private Integer id;
@@ -78,9 +76,8 @@ public class Project {
         return this;
     }
 
-
-    public Optional<Website> getWebsite() {
-        return Optional.ofNullable(website);
+    public Website getWebsite() {
+        return website;
     }
 
     public void setWebsite(Website website) {

@@ -1,6 +1,8 @@
 package cn.mybatisboost.test;
 
-public class Website {
+import cn.mybatisboost.support.Bean;
+
+public class Website extends Bean {
 
     private String protocol;
     private String host;

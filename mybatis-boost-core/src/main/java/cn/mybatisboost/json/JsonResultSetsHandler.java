@@ -1,43 +1,45 @@
 package cn.mybatisboost.json;
 
+import cn.mybatisboost.util.ReflectionUtils;
+import cn.mybatisboost.util.function.UncheckedFunction;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.sql.Statement;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 @Intercepts(@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = Statement.class))
 public class JsonResultSetsHandler implements Interceptor {
 
-    private ConcurrentMap<Class<?>, List<Field>> fieldCache = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, Field> fieldCache = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        List<?> proceed = (List<?>) invocation.proceed();
-        if (proceed.isEmpty()) return proceed;
+        try {
+            List<?> proceed = (List<?>) invocation.proceed();
+            List<String> properties = JsonTypeHandler.tlProperties.get();
+            if (proceed.isEmpty() || properties.isEmpty()) return proceed;
 
-        Class<?> type = proceed.get(0).getClass();
-        List<Field> fields = fieldCache.computeIfAbsent(type,
-                key -> Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields())
-                        .filter(it -> it.getType() == Optional.class)
-                        .peek(it -> it.setAccessible(true)).collect(Collectors.toList())));
-        if (fields.isEmpty()) return proceed;
-
-        for (Object object : proceed) {
-            for (Field field : fields) {
-                Object value = ((Optional<?>) field.get(object)).orElse(null);
-                if (value instanceof String) {
-                    field.set(object, Optional.of(JsonTypeHandler.objectMapper.readValue((String) value,
-                            (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])));
+            Class<?> type = proceed.get(0).getClass();
+            List<String> results = JsonTypeHandler.tlResults.get();
+            for (int i = 0; i < results.size(); i++) {
+                String content = results.get(i);
+                if (content != null) {
+                    Field field = fieldCache.computeIfAbsent(properties.get(i % properties.size()),
+                            UncheckedFunction.of(key -> ReflectionUtils.makeAccessible(type.getDeclaredField(key))));
+                    field.set(proceed.get(i / properties.size()),
+                            JsonTypeHandler.objectMapper.readValue(content, field.getType()));
                 }
             }
+            return proceed;
+        } finally {
+            JsonTypeHandler.tlProperties.remove();
+            JsonTypeHandler.tlResults.remove();
         }
-        return proceed;
     }
 
     @Override
