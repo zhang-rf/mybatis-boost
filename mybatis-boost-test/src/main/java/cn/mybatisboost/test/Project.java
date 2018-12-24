@@ -79,8 +79,8 @@ public class Project {
     }
 
 
-    public Website getWebsite() {
-        return website.get();
+    public Property<Website> getWebsite() {
+        return website;
     }
 
     public void setWebsite(Website website) {

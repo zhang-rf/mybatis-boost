@@ -52,8 +52,8 @@ public class JsonTest {
         jdbcTemplate.execute("insert into project (id, group_id, website) values (999, 'cn.mybatisboost', '" + objectMapper.writeValueAsString(project.getWebsite()) + "')");
         project = mapper.selectById(999);
         assertNotNull(project);
-        assertEquals("HTTPS", project.getWebsite().getProtocol());
-        assertEquals("mybatisboost.cn", project.getWebsite().getHost());
-        assertEquals(80, project.getWebsite().getPort());
+        assertEquals("HTTPS", project.getWebsite().get().getProtocol());
+        assertEquals("mybatisboost.cn", project.getWebsite().get().getHost());
+        assertEquals(80, project.getWebsite().get().getPort());
     }
 }
