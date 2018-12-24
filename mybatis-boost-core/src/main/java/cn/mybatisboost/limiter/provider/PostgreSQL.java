@@ -18,7 +18,7 @@ public class PostgreSQL implements SqlProvider {
                 SqlUtils.appendLimitOffset(boundSql.getSql(), (RowBounds) metaObject.getValue("delegate.rowBounds")));
         metaObject.setValue("delegate.rowBounds", RowBounds.DEFAULT);
         MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.resultSetHandler"))
-                .setValue("delegate.rowBounds", RowBounds.DEFAULT);
+                .setValue("rowBounds", RowBounds.DEFAULT);
     }
 
     @Override

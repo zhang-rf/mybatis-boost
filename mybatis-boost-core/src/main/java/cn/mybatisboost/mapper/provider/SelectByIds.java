@@ -59,7 +59,7 @@ public class SelectByIds implements SqlProvider, ConfigurationAware {
                 parameterMap = Collections.emptyMap();
             }
             MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
-                    .setValue("delegate.parameterObject", parameterMap);
+                    .setValue("parameterObject", parameterMap);
             metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
         }
         metaObject.setValue("delegate.boundSql.parameterMappings", parameterMappings);

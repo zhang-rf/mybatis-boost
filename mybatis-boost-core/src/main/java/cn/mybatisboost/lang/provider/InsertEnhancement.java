@@ -59,7 +59,7 @@ public class InsertEnhancement implements SqlProvider, ConfigurationAware {
                         MyBatisUtils.getListParameterMappings(configuration, propertiesAndColumns.first(), entities.size()));
                 metaObject.setValue("delegate.boundSql.parameterObject", parameterObject);
                 MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
-                        .setValue("delegate.parameterObject", parameterObject);
+                        .setValue("parameterObject", parameterObject);
             }
         }
     }

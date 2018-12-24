@@ -45,7 +45,7 @@ public class ParameterNormalizationPreprocessor implements SqlProvider {
                     parameterMap.put("arg0", parameterObject);
                     parameterMap.put("param1", parameterObject);
                     MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
-                            .setValue("delegate.parameterObject", parameterMap);
+                            .setValue("parameterObject", parameterMap);
                     metaObject.setValue("delegate.boundSql.parameterObject", parameterMap);
                 }
             }
