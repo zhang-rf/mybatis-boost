@@ -12,7 +12,9 @@ import org.apache.ibatis.reflection.MetaObject;
 import javax.persistence.GeneratedValue;
 import java.lang.reflect.Field;
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,20 +33,31 @@ public class GeneratingSqlProvider implements SqlProvider {
                 return;
             }
             Object parameterObject = boundSql.getParameterObject();
-            if (parameterObject.getClass() == type) {
-                List<Field> generatedFields = EntityUtils.getGeneratedFields(type);
-                if (!generatedFields.isEmpty()) {
-                    try {
+            List parameterList = null;
+            if (parameterObject instanceof Map) {
+                parameterObject = ((Map) parameterObject).get("param1");
+                if (parameterObject instanceof List) {
+                    parameterList = (List) parameterObject;
+                }
+            }
+            if (parameterList == null) {
+                parameterList = Collections.singletonList(parameterObject);
+            } else if (parameterList.isEmpty() || parameterList.get(0).getClass() != type) return;
+
+            List<Field> generatedFields = EntityUtils.getGeneratedFields(type);
+            if (!generatedFields.isEmpty()) {
+                try {
+                    for (Object parameter : parameterList) {
                         for (Field field : generatedFields) {
                             String generatorType = field.getAnnotation(GeneratedValue.class).generator();
-                            ValueGenerator<?> idGenerator = generatorCache.computeIfAbsent(generatorType,
+                            ValueGenerator<?> generator = generatorCache.computeIfAbsent(generatorType,
                                     UncheckedFunction.of(key -> (ValueGenerator<?>)
                                             GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
-                            field.set(parameterObject, idGenerator.generateValue(type, field.getType()));
+                            field.set(parameter, generator.generateValue(type, field.getType()));
                         }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
                     }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }

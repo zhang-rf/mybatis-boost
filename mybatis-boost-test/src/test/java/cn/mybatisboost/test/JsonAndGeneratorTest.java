@@ -22,7 +22,7 @@ public class JsonAndGeneratorTest {
     private ProjectMapper mapper;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().enableDefaultTyping();
+    private ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @After
     public void tearDown() {
