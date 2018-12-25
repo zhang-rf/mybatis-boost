@@ -5,7 +5,7 @@ import javax.persistence.GeneratedValue;
 public class Project {
 
     private Integer id;
-    @GeneratedValue(generator = "cn.mybatisboost.id.UuidGenerator")
+    @GeneratedValue(generator = "cn.mybatisboost.generator.UuidGenerator")
     private String uuid;
     private String groupId;
     private String artifactId;
