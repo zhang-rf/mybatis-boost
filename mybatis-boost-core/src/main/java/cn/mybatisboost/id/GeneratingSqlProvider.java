@@ -41,13 +41,10 @@ public class GeneratingSqlProvider implements SqlProvider {
                             IdGenerator<?> idGenerator = generatorCache.computeIfAbsent(generatorType,
                                     UncheckedFunction.of(key -> (IdGenerator<?>)
                                             GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
-
-                            Object generateValue = idGenerator.generateValue(type, field.getType());
-                            field.set(parameterObject, generateValue);
-                            parameterObject = MyBatisUtils.getRealMetaObject
-                                    (metaObject.getValue("delegate.parameterHandler"))
-                                    .getValue("parameterObject");
-                            field.set(parameterObject, generateValue);
+                            field.set(parameterObject, idGenerator.generateValue(type, field.getType()));
+                            MyBatisUtils.getRealMetaObject(metaObject.getValue("delegate.parameterHandler"))
+                                    .setValue("parameterObject", parameterObject);
+                            metaObject.setValue("delegate.boundSql.parameterObject", parameterObject);
                         }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);

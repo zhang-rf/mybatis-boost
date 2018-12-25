@@ -100,6 +100,7 @@ public class Project {
     public String toString() {
         return "Project{" +
                 "id=" + id +
+                ", uuid='" + uuid + '\'' +
                 ", groupId='" + groupId + '\'' +
                 ", artifactId='" + artifactId + '\'' +
                 ", license='" + license + '\'' +
