@@ -78,6 +78,7 @@ public class MybatisBoostAutoConfiguration {
         dispatcherInterceptor.appendPreprocessor(new MybatisCacheRemovingPreprocessor());
         dispatcherInterceptor.appendPreprocessor(new ParameterNormalizationPreprocessor());
         dispatcherInterceptor.appendPreprocessor(new AutoParameterMappingPreprocessor());
+        dispatcherInterceptor.appendProvider(new GeneratingSqlProvider());
         if (isMapperEnabled) {
             dispatcherInterceptor.appendProvider(new MapperSqlProvider(configuration));
         }
@@ -87,7 +88,6 @@ public class MybatisBoostAutoConfiguration {
         if (isLimiterEnabled) {
             dispatcherInterceptor.appendProvider(new LimiterSqlProvider(configuration));
         }
-        dispatcherInterceptor.appendProvider(new GeneratingSqlProvider());
         return dispatcherInterceptor;
     }
 
