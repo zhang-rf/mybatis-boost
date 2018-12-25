@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS test;
 CREATE TABLE `test`.`project`
 (
   id                int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  uuid              char(32)        NOT NULL,
+  uuid              char(32),
   group_id          varchar(100)    NOT NULL,
   artifact_id       varchar(100),
   license           varchar(100),
