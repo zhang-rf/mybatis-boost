@@ -53,7 +53,7 @@ public class GeneratingSqlProvider implements SqlProvider {
                             String generatorType = field.getAnnotation(GeneratedValue.class).generator();
                             ValueGenerator<?> generator = generatorCache.computeIfAbsent(generatorType,
                                     UncheckedFunction.of(key -> (ValueGenerator<?>)
-                                            GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
+                                            this.getClass().getClassLoader().loadClass(key).newInstance()));
                             field.set(parameter, generator.generateValue(entityType, field.getType()));
                         }
                     }

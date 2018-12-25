@@ -65,6 +65,7 @@ public class EnhancementTest {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
             assertEquals("mybatis-boost", resultSet.getString("artifact_id"));
+            assertNotNull(resultSet.getString("uuid"));
         });
     }
 
@@ -87,6 +88,7 @@ public class EnhancementTest {
             assertEquals(1, resultSet.getRow());
             assertEquals("cn.mybatisboost", resultSet.getString("group_id"));
             assertNull(resultSet.getString("artifact_id"));
+            assertNotNull(resultSet.getString("uuid"));
         });
     }
 
