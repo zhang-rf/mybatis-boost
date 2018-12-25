@@ -3,6 +3,7 @@ package cn.mybatisboost.id;
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.MapperUtils;
+import cn.mybatisboost.util.MyBatisUtils;
 import cn.mybatisboost.util.function.UncheckedFunction;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -41,7 +42,12 @@ public class GeneratingSqlProvider implements SqlProvider {
                                     UncheckedFunction.of(key -> (IdGenerator<?>)
                                             GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
 
-                            field.set(parameterObject, idGenerator.generateValue(type, field.getType()));
+                            Object generateValue = idGenerator.generateValue(type, field.getType());
+                            field.set(parameterObject, generateValue);
+                            parameterObject = MyBatisUtils.getRealMetaObject
+                                    (metaObject.getValue("delegate.parameterHandler"))
+                                    .getValue("parameterObject");
+                            field.set(parameterObject, generateValue);
                         }
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
