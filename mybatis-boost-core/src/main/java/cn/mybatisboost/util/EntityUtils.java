@@ -5,6 +5,7 @@ import cn.mybatisboost.util.function.UncheckedFunction;
 import cn.mybatisboost.util.function.UncheckedPredicate;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.beans.Introspector;
@@ -20,6 +21,7 @@ public abstract class EntityUtils {
     private static ConcurrentMap<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, String> idPropertyCache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, List<String>> propertiesCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<Class<?>, List<Field>> generatedFieldCache = new ConcurrentHashMap<>();
 
     public static String getTableName(Class<?> type, NameAdaptor converter) {
         return tableNameCache.computeIfAbsent(type, k -> {
@@ -91,5 +93,12 @@ public abstract class EntityUtils {
             }
         }
         return properties;
+    }
+
+    public static List<Field> getGeneratedFields(Class<?> type) {
+        return generatedFieldCache.computeIfAbsent(type, k ->
+                Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields())
+                        .filter(it -> it.isAnnotationPresent(GeneratedValue.class))
+                        .map(ReflectionUtils::makeAccessible).collect(Collectors.toList())));
     }
 }

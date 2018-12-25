@@ -1,8 +1,12 @@
 package cn.mybatisboost.test;
 
+import javax.persistence.GeneratedValue;
+
 public class Project {
 
     private Integer id;
+    @GeneratedValue(generator = "cn.mybatisboost.id.UuidGenerator")
+    private String uuid;
     private String groupId;
     private String artifactId;
     private String license;
@@ -29,6 +33,14 @@ public class Project {
     public Project setId(Integer id) {
         this.id = id;
         return this;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getGroupId() {

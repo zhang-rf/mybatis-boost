@@ -5,6 +5,7 @@ import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.preprocessor.AutoParameterMappingPreprocessor;
 import cn.mybatisboost.core.preprocessor.MybatisCacheRemovingPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
+import cn.mybatisboost.id.GeneratingSqlProvider;
 import cn.mybatisboost.json.JsonResultSetsHandler;
 import cn.mybatisboost.json.JsonTypeHandler;
 import cn.mybatisboost.lang.LanguageSqlProvider;
@@ -86,6 +87,7 @@ public class MybatisBoostAutoConfiguration {
         if (isLimiterEnabled) {
             dispatcherInterceptor.appendProvider(new LimiterSqlProvider(configuration));
         }
+        dispatcherInterceptor.appendProvider(new GeneratingSqlProvider());
         return dispatcherInterceptor;
     }
 
