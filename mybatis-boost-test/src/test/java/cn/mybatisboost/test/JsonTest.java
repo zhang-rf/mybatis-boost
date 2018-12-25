@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootApplication
 @SpringBootTest(classes = ProjectMapper.class)
-public class JsonAndGeneratorTest {
+public class JsonTest {
 
     @Autowired
     private ProjectMapper mapper;
@@ -37,7 +37,6 @@ public class JsonAndGeneratorTest {
         mapper.insert(project);
         jdbcTemplate.query("select * from project", resultSet -> {
             try {
-                assertNotNull(resultSet.getString("uuid"));
                 assertEquals(objectMapper.writeValueAsString(project.getWebsite()), resultSet.getString("website"));
             } catch (JsonProcessingException e) {
                 fail();

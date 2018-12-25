@@ -25,9 +25,9 @@ public class GeneratingSqlProvider implements SqlProvider {
     @Override
     public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
         if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT) {
-            Class<?> type;
+            Class<?> entityType;
             try {
-                type = MapperUtils.getEntityTypeFromMapper
+                entityType = MapperUtils.getEntityTypeFromMapper
                         (mappedStatement.getId().substring(0, mappedStatement.getId().lastIndexOf('.')));
             } catch (Exception ignored) {
                 return;
@@ -41,10 +41,11 @@ public class GeneratingSqlProvider implements SqlProvider {
                 }
             }
             if (parameterList == null) {
+                if (parameterObject == null) return;
                 parameterList = Collections.singletonList(parameterObject);
-            } else if (parameterList.isEmpty() || parameterList.get(0).getClass() != type) return;
+            } else if (parameterList.isEmpty() || parameterList.get(0).getClass() != entityType) return;
 
-            List<Field> generatedFields = EntityUtils.getGeneratedFields(type);
+            List<Field> generatedFields = EntityUtils.getGeneratedFields(entityType);
             if (!generatedFields.isEmpty()) {
                 try {
                     for (Object parameter : parameterList) {
@@ -53,7 +54,7 @@ public class GeneratingSqlProvider implements SqlProvider {
                             ValueGenerator<?> generator = generatorCache.computeIfAbsent(generatorType,
                                     UncheckedFunction.of(key -> (ValueGenerator<?>)
                                             GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
-                            field.set(parameter, generator.generateValue(type, field.getType()));
+                            field.set(parameter, generator.generateValue(entityType, field.getType()));
                         }
                     }
                 } catch (IllegalAccessException e) {

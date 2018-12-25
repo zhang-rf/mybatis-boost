@@ -150,6 +150,7 @@ public class CrudMapperTest {
                 "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null)));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
+            assertNotNull(resultSet.getString("uuid"));
         });
     }
 
@@ -160,6 +161,7 @@ public class CrudMapperTest {
                         "MIT", "https://github.com/zhang-rf/mybatis-boost", "zhangrongfan", null))));
         jdbcTemplate.query("select * from project", resultSet -> {
             assertEquals(1, resultSet.getRow());
+            assertNotNull(resultSet.getString("uuid"));
         });
     }
 
