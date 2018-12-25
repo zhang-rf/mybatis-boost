@@ -1,8 +1,8 @@
-package cn.mybatisboost.id;
+package cn.mybatisboost.generator;
 
 import java.util.UUID;
 
-public class UuidGenerator implements IdGenerator<String> {
+public class UuidGenerator implements ValueGenerator<String> {
 
     @Override
     public String generateValue(Class<?> type, Class<?> fieldType) {

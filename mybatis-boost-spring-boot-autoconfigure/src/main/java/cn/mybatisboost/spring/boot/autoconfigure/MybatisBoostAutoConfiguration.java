@@ -5,7 +5,7 @@ import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.core.preprocessor.AutoParameterMappingPreprocessor;
 import cn.mybatisboost.core.preprocessor.MybatisCacheRemovingPreprocessor;
 import cn.mybatisboost.core.preprocessor.ParameterNormalizationPreprocessor;
-import cn.mybatisboost.id.GeneratingSqlProvider;
+import cn.mybatisboost.generator.GeneratingSqlProvider;
 import cn.mybatisboost.json.JsonResultSetsHandler;
 import cn.mybatisboost.json.JsonTypeHandler;
 import cn.mybatisboost.lang.LanguageSqlProvider;

@@ -1,4 +1,4 @@
-package cn.mybatisboost.id;
+package cn.mybatisboost.generator;
 
 import cn.mybatisboost.core.SqlProvider;
 import cn.mybatisboost.util.EntityUtils;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class GeneratingSqlProvider implements SqlProvider {
 
-    private static ConcurrentMap<String, IdGenerator<?>> generatorCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<String, ValueGenerator<?>> generatorCache = new ConcurrentHashMap<>();
 
     @Override
     public void replace(Connection connection, MetaObject metaObject, MappedStatement mappedStatement, BoundSql boundSql) {
@@ -37,8 +37,8 @@ public class GeneratingSqlProvider implements SqlProvider {
                     try {
                         for (Field field : generatedFields) {
                             String generatorType = field.getAnnotation(GeneratedValue.class).generator();
-                            IdGenerator<?> idGenerator = generatorCache.computeIfAbsent(generatorType,
-                                    UncheckedFunction.of(key -> (IdGenerator<?>)
+                            ValueGenerator<?> idGenerator = generatorCache.computeIfAbsent(generatorType,
+                                    UncheckedFunction.of(key -> (ValueGenerator<?>)
                                             GeneratingSqlProvider.class.getClassLoader().loadClass(key).newInstance()));
                             field.set(parameterObject, idGenerator.generateValue(type, field.getType()));
                         }
