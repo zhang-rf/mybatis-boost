@@ -1,6 +1,7 @@
 package cn.mybatisboost.generator;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class Snowflake {
@@ -12,7 +13,7 @@ public class Snowflake {
     private long maxSequence;
 
     private long lastTimestamp;
-    private ArrayBlockingQueue<Long> idQueue;
+    private BlockingQueue<Long> idQueue;
 
     public Snowflake(long epoch, int identity) {
         this(epoch, identity, 10, 12);
