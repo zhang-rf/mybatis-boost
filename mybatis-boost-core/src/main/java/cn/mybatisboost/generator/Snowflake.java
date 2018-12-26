@@ -15,11 +15,11 @@ public class Snowflake {
     private long lastTimestamp;
     private BlockingQueue<Long> idQueue;
 
-    public Snowflake(long epoch, int identity) {
+    public Snowflake(long epoch, long identity) {
         this(epoch, identity, 10, 12);
     }
 
-    public Snowflake(long epoch, int identity, int identityBits, int sequenceBits) {
+    public Snowflake(long epoch, long identity, int identityBits, int sequenceBits) {
         this.epoch = epoch;
         this.identity = identity;
         timestampShifting = sequenceBits + identityBits;
