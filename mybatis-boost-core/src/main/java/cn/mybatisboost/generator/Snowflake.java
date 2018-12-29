@@ -3,23 +3,27 @@ package cn.mybatisboost.generator;
 public class Snowflake {
 
     private final long epoch;
-    private final long identity;
+    private final long workerId;
     private final int timestampShifting;
-    private final int identityShifting;
+    private final int workerIdShifting;
     private final long maxSequence;
 
     private long lastTimestamp;
     private long sequence;
 
-    public Snowflake(long epoch, long identity) {
-        this(epoch, identity, 10, 12);
+    public Snowflake(long workerId) {
+        this(1545825894992L, workerId);
     }
 
-    public Snowflake(long epoch, long identity, int identityBits, int sequenceBits) {
+    public Snowflake(long epoch, long workerId) {
+        this(epoch, workerId, 10, 12);
+    }
+
+    public Snowflake(long epoch, long workerId, int workerIdBits, int sequenceBits) {
         this.epoch = epoch;
-        this.identity = identity;
-        timestampShifting = sequenceBits + identityBits;
-        identityShifting = sequenceBits;
+        this.workerId = workerId;
+        timestampShifting = sequenceBits + workerIdBits;
+        workerIdShifting = sequenceBits;
         maxSequence = ~(-1L << sequenceBits);
     }
 
@@ -32,7 +36,7 @@ public class Snowflake {
             sequence = 0;
         }
         long id = timestamp << timestampShifting;
-        id |= identity << identityShifting;
+        id |= workerId << workerIdShifting;
         if (sequence > maxSequence) {
             Thread.yield();
             return next();
