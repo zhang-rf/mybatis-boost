@@ -31,8 +31,7 @@ public class JsonResultSetsHandler implements Interceptor {
                 if (content != null) {
                     Field field = fieldCache.computeIfAbsent(properties.get(i % properties.size()),
                             UncheckedFunction.of(key -> ReflectionUtils.makeAccessible(type.getDeclaredField(key))));
-                    field.set(proceed.get(i / properties.size()),
-                            JsonTypeHandler.objectMapper.readValue(content,
+                    field.set(proceed.get(i / properties.size()), JsonTypeHandler.objectMapper.readValue(content,
                                     JsonTypeHandler.objectMapper.constructType(field.getGenericType())));
                 }
             }
