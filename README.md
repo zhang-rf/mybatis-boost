@@ -1,6 +1,6 @@
 # MybatisBoost [![Maven central](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.mybatisboost/mybatis-boost) [![Build Status](https://www.travis-ci.org/zhang-rf/mybatis-boost.svg?branch=master)](https://www.travis-ci.org/zhang-rf/mybatis-boost) [![Coverage Status](https://coveralls.io/repos/github/zhang-rf/mybatis-boost/badge.svg)](https://coveralls.io/github/zhang-rf/mybatis-boost)
 
-Mybatis SQL开发神器MybatisBoost，为Mybatis带来诸多官方没有的高级特性，包含[通用CrudMapper](#通用CrudMapper)、Mybatis语法增强、字段生成、JSON映射、智能方法查询、无感知分页、SQL监控等功能，使用MybatisBoost来提升开发效率，轻松编写SQL代码！
+Mybatis SQL开发神器MybatisBoost，为Mybatis带来诸多官方没有的高级特性，包含[通用CrudMapper](#通用CrudMapper)、[Mybatis语法增强](#Mybatis语法增强)、[字段生成](#字段生成)、[JSON映射](#JSON映射)、[智能方法查询](#智能方法查询)、[无感知分页](#无感知分页)、[SQL监控](#SQL监控)、流式查询（开发中...）等功能，使用MybatisBoost来提升开发效率，轻松编写SQL代码！
 
 使用MybatisBoost的最低要求：
 
