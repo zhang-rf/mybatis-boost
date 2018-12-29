@@ -23,7 +23,7 @@ public class Snowflake {
         maxSequence = ~(-1L << sequenceBits);
     }
 
-    public synchronized long next() throws InterruptedException {
+    public synchronized long next() {
         long timestamp = System.currentTimeMillis() - epoch;
         if (timestamp != lastTimestamp) {
             if (timestamp < lastTimestamp)
@@ -34,7 +34,7 @@ public class Snowflake {
         long id = timestamp << timestampShifting;
         id |= identity << identityShifting;
         if (sequence > maxSequence) {
-            Thread.sleep(1);
+            Thread.yield();
             return next();
         }
         id |= sequence++;
