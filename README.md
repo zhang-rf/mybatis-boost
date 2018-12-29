@@ -94,13 +94,13 @@ public class ThatTable {
 
 ## 基础知识
 
-为了使MybatisBoost生效，你的Mybatis Mapper接口必须直接或间接地继承`GenericMapper&lt;T&gt;`接口，范型&lt;T&gt;代表此Mapper对应的POJO类。
+为了使MybatisBoost生效，你的Mybatis Mapper接口必须直接或间接地继承`GenericMapper<T>`接口，范型&lt;T&gt;代表此Mapper对应的POJO类。
 
 > MybatisBoost提供的所有通用Mapper都继承于`GenericMapper<T>`接口
 
 ## 通用CrudMapper
 
-继承于`CrudMapper&lt;T&gt;`接口的Mybatis Mapper接口即自动拥有了CrudMapper接口的所有功能。
+继承于`CrudMapper<T>`接口的Mybatis Mapper接口即自动拥有了CrudMapper接口的所有功能。
 
 CrudMapper接口中的方法使用POJO中所有的属性参与CRUD，但不包括以Selective结尾的方法，这些方法会过滤值为null的属性，即POJO中值为null的属性不参与CRUD。
 
@@ -139,7 +139,7 @@ public interface CrudMapper<T> {
 
 ## MySQL CrudMapper
 
-除了通用的CrudMapper，MybatisBoost还提供专用于MySQL的`MysqlCrudMapper&lt;T&gt;`接口，在CrudMapper的基础上，增加了几个支持MySQL特性的方法。
+除了通用的CrudMapper，MybatisBoost还提供专用于MySQL的`MysqlCrudMapper<T>`接口，在CrudMapper的基础上，增加了几个支持MySQL特性的方法。
 
 ```java
 public interface MysqlCrudMapper<T> extends CrudMapper<T> {
