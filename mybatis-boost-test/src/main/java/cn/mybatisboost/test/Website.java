@@ -1,8 +1,8 @@
 package cn.mybatisboost.test;
 
-import cn.mybatisboost.support.Bean;
+import cn.mybatisboost.support.JsonType;
 
-public class Website extends Bean {
+public class Website extends JsonType {
 
     private String protocol;
     private String host;

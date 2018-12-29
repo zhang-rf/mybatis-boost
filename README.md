@@ -21,14 +21,14 @@ Maven:
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.1-SNAPSHOT</version>
 </dependency>
 ```
 
 Gradle:
 ```gradle
 compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'
-compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.3.0'
+compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.3.1-SNAPSHOT'
 ```
 
 在手动创建SqlSessionFactory Bean的情况下，请确保MybatisBoost的Mybatis Plugin有被加载。

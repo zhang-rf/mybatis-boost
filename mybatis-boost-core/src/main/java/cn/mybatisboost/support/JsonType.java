@@ -1,4 +1,4 @@
 package cn.mybatisboost.support;
 
-public abstract class Bean {
+public abstract class JsonType {
 }

@@ -1,6 +1,6 @@
 package cn.mybatisboost.json;
 
-import cn.mybatisboost.support.Bean;
+import cn.mybatisboost.support.JsonType;
 import cn.mybatisboost.util.PropertyUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +16,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-@MappedTypes(Bean.class)
-public class JsonTypeHandler extends BaseTypeHandler<Bean> {
+@MappedTypes({JsonType.class, List.class, Map.class})
+public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     private static Logger logger = LoggerFactory.getLogger(JsonTypeHandler.class);
     static ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
@@ -26,7 +27,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Bean> {
     static ThreadLocal<List<String>> tlResults = ThreadLocal.withInitial(ArrayList::new);
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Bean parameter, JdbcType jdbcType)
+    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
             throws SQLException {
         try {
             ps.setString(i, objectMapper.writeValueAsString(parameter));
@@ -36,7 +37,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Bean> {
     }
 
     @Override
-    public Bean getNullableResult(ResultSet rs, String columnName) throws SQLException {
+    public Object getNullableResult(ResultSet rs, String columnName) throws SQLException {
         List<String> resultNames = tlProperties.get();
         String property = PropertyUtils.normalizeProperty(columnName);
         if (!resultNames.contains(property)) {
@@ -47,13 +48,13 @@ public class JsonTypeHandler extends BaseTypeHandler<Bean> {
     }
 
     @Override
-    public Bean getNullableResult(ResultSet rs, int columnIndex) {
+    public Object getNullableResult(ResultSet rs, int columnIndex) {
         logger.warn("Json type is not supported when using CallableStatement");
         return null;
     }
 
     @Override
-    public Bean getNullableResult(CallableStatement cs, int columnIndex) {
+    public Object getNullableResult(CallableStatement cs, int columnIndex) {
         logger.warn("Json type is not supported when using CallableStatement");
         return null;
     }
