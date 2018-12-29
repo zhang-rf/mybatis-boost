@@ -104,7 +104,7 @@ public class ThatTable {
 
 CrudMapper接口中的方法使用POJO中所有的属性参与CRUD，但不包括以Selective结尾的方法，这些方法会过滤值为null的属性，即POJO中值为null的属性不参与CRUD。
 
-带有`properties`参数的方法，可使用`properties`参数指定参与插入、更新的属性。如果`properties`参数的第一个字符串为“!”，则代表排除后续指定的属性，如`new String[]{"!", "id"}`则代表除“id”以外，其他属性都参与CRUD。
+带有`properties`参数的方法，可使用`properties`参数指定参与插入、更新的属性。如果`properties`参数的第一个字符串为`!`，则代表排除后续指定的属性，如`new String[]{"!", "id"}`则代表除“id”以外，其他属性都参与CRUD。
 
 同样地，带有`conditionProperties`参数的方法，可使用`conditionProperties`参数指定用于WHERE条件的属性。
 
@@ -163,7 +163,7 @@ public interface MysqlCrudMapper<T> extends CrudMapper<T> {
 
 ### 自动参数映射
 
-Mybatis设计之中的一个不合理之处，在于舍弃了JDBC原生的参数占位符（即“?”）。显而易见的是，简单的SQL语句根本没有必要使用Mybatis的`#{variable}`语法去做多余的映射，这种麻烦在编写INSERT和UPDATE语句的时候尤为明显。
+Mybatis设计之中的一个不合理之处，在于舍弃了JDBC原生的参数占位符（即`?`）。显而易见的是，简单的SQL语句根本没有必要使用Mybatis的`#{variable}`语法去做多余的映射，这种麻烦在编写INSERT和UPDATE语句的时候尤为明显。
 
 为此，MybatisBoost恢复了JDBC原生的参数占位符功能，MybatisBoost会自动按照参数的声明顺序做出正确的映射。
 
