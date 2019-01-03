@@ -8,6 +8,7 @@ import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Set;
@@ -17,16 +18,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class MapperInstrument {
 
     private static Set<String> modifiedClassNames = new ConcurrentSkipListSet<>();
-    private static Class<?> MAPPER_CLASS;
-
-    static {
-        try {
-            MAPPER_CLASS = MapperInstrument.class.getClassLoader()
-                    .loadClass("org.apache.ibatis.annotations.Mapper");
-        } catch (ClassNotFoundException ignored) {
-            MAPPER_CLASS = cn.mybatisboost.support.Mapper.class;
-        }
-    }
 
     public static boolean modify(String className, boolean mapUnderscoreToCamelCase) {
         synchronized (className.intern()) {
@@ -35,7 +26,7 @@ public class MapperInstrument {
                 boolean modified = false;
                 CtClass ctClass = ClassPool.getDefault().get(className);
                 for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-                    if (ctMethod.hasAnnotation(MAPPER_CLASS)) {
+                    if (ctMethod.hasAnnotation(Mapper.class)) {
                         MethodNameParser parser =
                                 new MethodNameParser(ctMethod.getName(), "#t", mapUnderscoreToCamelCase);
                         addQueryAnnotation(ctMethod, parser.toSql());
