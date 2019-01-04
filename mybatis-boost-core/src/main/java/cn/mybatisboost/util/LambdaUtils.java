@@ -6,36 +6,38 @@ import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class LambdaUtils implements MethodInterceptor {
+public class LambdaUtils implements MethodInterceptor {
 
     private static Pattern CLASS_CAST_PATTERN = Pattern.compile("cannot be cast to (.+)$");
     private LambdaInfo lambdaInfo;
 
+    private LambdaUtils() {
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T, R> LambdaInfo getLambdaInfo(Function<T, R> function) {
+    public static <T, R> Optional<LambdaInfo> getLambdaInfo(Function<T, R> function) {
         Enhancer enhancer = new Enhancer();
-        LambdaUtils that = new LambdaUtils() {
-        };
-        enhancer.setCallback(that);
+        LambdaUtils holder = new LambdaUtils();
+        enhancer.setCallback(holder);
         try {
             function.apply((T) enhancer.create());
         } catch (ClassCastException e) {
             Matcher matcher = CLASS_CAST_PATTERN.matcher(e.getMessage());
             if (matcher.find()) {
                 try {
-                    Class<?> type = function.getClass().getClassLoader().loadClass(matcher.group(1));
-                    enhancer.setSuperclass(type);
+                    enhancer.setSuperclass(holder.getClass().getClassLoader().loadClass(matcher.group(1)));
                     function.apply((T) enhancer.create());
                 } catch (ClassNotFoundException e1) {
                     throw new RuntimeException(e1);
                 }
             }
         }
-        return that.lambdaInfo;
+        return Optional.ofNullable(holder.lambdaInfo);
     }
 
     @Override
