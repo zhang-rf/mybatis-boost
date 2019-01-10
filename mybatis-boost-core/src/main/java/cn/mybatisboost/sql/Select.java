@@ -4,7 +4,7 @@ public interface Select {
 
     Select from(Class<?>... tables);
 
-    Select where();
+    Select where(Condition condition);
 
     Select groupBy();
 

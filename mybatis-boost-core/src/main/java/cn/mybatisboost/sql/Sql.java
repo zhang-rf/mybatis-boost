@@ -13,4 +13,8 @@ public class Sql {
         return new SimpleSelect(Arrays.stream(columns)
                 .map(LambdaUtils::getLambdaInfo).map(Optional::get).collect(Collectors.toList()));
     }
+
+    public static Condition newCondition() {
+        return new ConditionImpl();
+    }
 }

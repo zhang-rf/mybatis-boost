@@ -4,6 +4,7 @@ import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.LambdaUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class SimpleSelect implements Select {
 
     private List<LambdaUtils.LambdaInfo> columns;
     private List<Class<?>> tables;
+    private List<Condition> conditions = new ArrayList<>();
 
     public SimpleSelect(List<LambdaUtils.LambdaInfo> columns) {
         this.columns = columns;
@@ -23,8 +25,9 @@ public class SimpleSelect implements Select {
     }
 
     @Override
-    public Select where() {
-        return null;
+    public Select where(Condition condition) {
+        conditions.add(condition);
+        return this;
     }
 
     @Override
@@ -61,6 +64,17 @@ public class SimpleSelect implements Select {
             builder.append(EntityUtils.getTableName(table, new NoopNameAdaptor())).append(", ");
         }
         builder.setLength(builder.length() - 2);
+        if (!conditions.isEmpty()) {
+            builder.append(" WHERE ");
+            if (conditions.size() == 1) {
+                builder.append(conditions.get(0));
+            } else {
+                for (Condition condition : conditions) {
+                    builder.append('(').append(condition).append(") ");
+                }
+                builder.setLength(builder.length() - 1);
+            }
+        }
         return builder.toString();
     }
 }
