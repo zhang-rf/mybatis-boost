@@ -4,17 +4,16 @@ import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.LambdaUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class SimpleSelect implements Select {
+public class SelectImpl implements Select {
 
     private List<LambdaUtils.LambdaInfo> columns;
     private List<Class<?>> tables;
     private List<Condition> conditions = new ArrayList<>();
+    private Queue<String> linkSymbols = new ArrayDeque<>();
 
-    public SimpleSelect(List<LambdaUtils.LambdaInfo> columns) {
+    public SelectImpl(List<LambdaUtils.LambdaInfo> columns) {
         this.columns = columns;
     }
 
@@ -46,6 +45,18 @@ public class SimpleSelect implements Select {
     }
 
     @Override
+    public Select and() {
+        linkSymbols.add("AND");
+        return this;
+    }
+
+    @Override
+    public Select or() {
+        linkSymbols.add("OR");
+        return this;
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("SELECT ");
@@ -67,10 +78,16 @@ public class SimpleSelect implements Select {
         if (!conditions.isEmpty()) {
             builder.append(" WHERE ");
             if (conditions.size() == 1) {
-                builder.append(conditions.get(0));
+                ((Clause) conditions.get(0)).writeClause(builder);
             } else {
                 for (Condition condition : conditions) {
-                    builder.append('(').append(condition).append(") ");
+                    builder.append('(');
+                    ((Clause) condition).writeClause(builder);
+                    builder.setLength(builder.length() - 1);
+                    builder.append(") ");
+                    if (!linkSymbols.isEmpty()) {
+                        builder.append(linkSymbols.poll()).append(' ');
+                    }
                 }
                 builder.setLength(builder.length() - 1);
             }

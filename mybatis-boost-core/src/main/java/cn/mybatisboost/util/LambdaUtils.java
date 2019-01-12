@@ -6,7 +6,6 @@ import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +19,7 @@ public class LambdaUtils implements MethodInterceptor {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, R> Optional<LambdaInfo> getLambdaInfo(Function<T, R> function) {
+    public static <T, R> LambdaInfo getLambdaInfo(Function<T, R> function) {
         Enhancer enhancer = new Enhancer();
         LambdaUtils holder = new LambdaUtils();
         enhancer.setCallback(holder);
@@ -37,7 +36,7 @@ public class LambdaUtils implements MethodInterceptor {
                 }
             }
         }
-        return Optional.ofNullable(holder.lambdaInfo);
+        return holder.lambdaInfo;
     }
 
     @Override

@@ -1,106 +1,289 @@
 package cn.mybatisboost.sql;
 
-import cn.mybatisboost.core.adaptor.NoopNameAdaptor;
+import cn.mybatisboost.core.adaptor.NameAdaptor;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.LambdaUtils;
+import cn.mybatisboost.util.SqlUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public class ConditionImpl implements Condition {
+public class ConditionImpl implements Condition, Clause {
 
+    private boolean mapUnderscoreToCamelCase;
+    private NameAdaptor nameAdaptor;
     private List<ConditionClause> conditions = new ArrayList<>();
+    private List<Object> parameters = new ArrayList<>();
 
-    @Override
-    public <T1, T2, R> Condition eq(Function<T1, R> column1, Function<T2, R> column2) {
-        conditions.add(new ConditionClause("=", LambdaUtils.getLambdaInfo(column1).get(), LambdaUtils.getLambdaInfo(column2).get()));
-        return this;
-    }
-
-    @Override
-    public <T, R> Condition eq(Function<T, R> column, Object value) {
-        conditions.add(new ConditionClause("=", LambdaUtils.getLambdaInfo(column).get(), value));
-        return this;
+    public ConditionImpl(boolean mapUnderscoreToCamelCase, NameAdaptor nameAdaptor) {
+        this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
+        this.nameAdaptor = nameAdaptor;
     }
 
     @Override
     public Condition and() {
-        conditions.add(new ConditionClause("AND"));
+        conditions.add(new SymbolConditionClause("AND"));
         return this;
     }
 
     @Override
     public Condition or() {
-        conditions.add(new ConditionClause("OR"));
+        conditions.add(new SymbolConditionClause("OR"));
         return this;
     }
 
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (ConditionClause condition : conditions) {
-            if (condition.getSymbol().equals("AND")) {
-                builder.append("AND ");
-            } else if (condition.getSymbol().equals("OR")) {
-                builder.append("OR ");
-            } else {
-                LambdaUtils.LambdaInfo column = condition.getColumn1();
-                builder.append(String.format("'%s'.'%s' ",
-                        EntityUtils.getTableName(column.getType(), new NoopNameAdaptor()),
-                        column.getMethodName().replace("get", "")));
-                builder.append(condition.getSymbol()).append(' ');
-                if (condition.getValue() != null) {
-                    builder.append("? ");
-                } else {
-                    column = condition.getColumn2();
-                    builder.append(String.format("'%s'.'%s' ",
-                            EntityUtils.getTableName(column.getType(), new NoopNameAdaptor()),
-                            column.getMethodName().replace("get", "")));
-                }
-            }
-        }
-        builder.setLength(builder.length() - 1);
-        return builder.toString();
+    public <A, B> Condition eq(Function<A, ?> column, B value) {
+        LambdaUtils.LambdaInfo lambdaInfo = LambdaUtils.getLambdaInfo(column);
+        conditions.add(new ParameterizedConditionClause("=",
+                EntityUtils.getTableName(lambdaInfo.getType(), nameAdaptor) + "." + SqlUtils.normalizeColumn
+                        (lambdaInfo.getMethodName().replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
     }
 
-    private static class ConditionClause {
+    @Override
+    public <A, B> Condition eq(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
 
-        private String symbol;
-        private LambdaUtils.LambdaInfo column1;
-        private LambdaUtils.LambdaInfo column2;
-        private Object value;
+    @Override
+    public <A, B> Condition ne(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause("!=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
 
-        public ConditionClause(String symbol) {
-            this.symbol = symbol;
-        }
+    @Override
+    public <A, B> Condition ne(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("!=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
 
-        public ConditionClause(String symbol, LambdaUtils.LambdaInfo column1, LambdaUtils.LambdaInfo column2) {
-            this.symbol = symbol;
-            this.column1 = column1;
-            this.column2 = column2;
-        }
+    @Override
+    public <A, B> Condition lt(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause("<", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
 
-        public ConditionClause(String symbol, LambdaUtils.LambdaInfo column, Object value) {
-            this.symbol = symbol;
-            this.column1 = column;
-            this.value = value;
-        }
+    @Override
+    public <A, B> Condition lt(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("<", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
 
-        public String getSymbol() {
-            return symbol;
-        }
+    @Override
+    public <A, B> Condition lte(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause("<=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
 
-        public LambdaUtils.LambdaInfo getColumn1() {
-            return column1;
-        }
+    @Override
+    public <A, B> Condition lte(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("<=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
 
-        public LambdaUtils.LambdaInfo getColumn2() {
-            return column2;
-        }
+    @Override
+    public <A, B> Condition gt(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause(">", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
 
-        public Object getValue() {
-            return value;
+    @Override
+    public <A, B> Condition gt(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause(">", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition gte(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause(">=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition gte(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause(">=", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition between(Function<A, ?> column, B minValue, B maxValue) {
+        conditions.add(new ParameterizedConditionClause("BETWEEN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), minValue, maxValue));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition notBetween(Function<A, ?> column, B minValue, B maxValue) {
+        conditions.add(new ParameterizedConditionClause("NOT BETWEEN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), minValue, maxValue));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isNull(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("IS NULL", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isNotNull(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("IS NOT NULL", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isEmpty(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("= ''", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isNotEmpty(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("!= ''", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition like(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause("LIKE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition like(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("LIKE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition notLike(Function<A, ?> column, B value) {
+        conditions.add(new ParameterizedConditionClause("NOT LIKE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition notLike(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("NOT LIKE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition in(Function<A, ?> column, List<B> value) {
+        conditions.add(new ParameterizedConditionClause("IN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition in(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("IN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition notIn(Function<A, ?> column, List<B> value) {
+        conditions.add(new ParameterizedConditionClause("NOT IN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase), value));
+        return this;
+    }
+
+    @Override
+    public <A, B> Condition notIn(Function<A, ?> column, Function<B, ?> value) {
+        conditions.add(new ColumnConditionClause("NOT IN", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase),
+                SqlUtils.normalizeColumn(LambdaUtils.getLambdaInfo(value).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isTrue(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("= TRUE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public <A> Condition isFalse(Function<A, ?> column) {
+        conditions.add(new ParameterizedConditionClause("= FALSE", SqlUtils.normalizeColumn
+                (LambdaUtils.getLambdaInfo(column).getMethodName()
+                        .replaceFirst("^get", ""), mapUnderscoreToCamelCase)));
+        return this;
+    }
+
+    @Override
+    public void writeClause(StringBuilder sqlBuilder) {
+        for (ConditionClause condition : conditions) {
+            condition.writeClause(sqlBuilder);
+            parameters.addAll(Arrays.asList(condition.getParameters()));
         }
     }
 }

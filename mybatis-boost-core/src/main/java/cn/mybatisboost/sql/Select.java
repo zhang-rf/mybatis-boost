@@ -11,4 +11,8 @@ public interface Select {
     Select having();
 
     Select orderBy();
+
+    Select and();
+
+    Select or();
 }
