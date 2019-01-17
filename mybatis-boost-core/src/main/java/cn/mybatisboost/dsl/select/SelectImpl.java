@@ -53,25 +53,6 @@ public class SelectImpl implements Select {
     }
 
     @Override
-    public Object[] parameters() {
-        List<Object> parameters = new ArrayList<>();
-        for (Condition condition : conditions) {
-            aggregateParameters(parameters, condition);
-        }
-        return parameters.toArray();
-    }
-
-    private void aggregateParameters(List<Object> parameters, Condition condition) {
-        if (condition instanceof ColumnCondition) {
-            parameters.addAll(Arrays.asList(((ColumnCondition) condition).getParameters()));
-        } else if (condition instanceof ConditionGroup) {
-            for (Condition subCondition : ((ConditionGroup) condition).getConditions()) {
-                aggregateParameters(parameters, subCondition);
-            }
-        }
-    }
-
-    @Override
     public String sql() {
         StringBuilder sqlBuilder = new StringBuilder();
         writeSelect(sqlBuilder);
@@ -151,6 +132,25 @@ public class SelectImpl implements Select {
             }
             sqlBuilder.setLength(sqlBuilder.length() - 1);
             sqlBuilder.append(") ");
+        }
+    }
+
+    @Override
+    public Object[] parameters() {
+        List<Object> parameters = new ArrayList<>();
+        for (Condition condition : conditions) {
+            aggregateParameters(parameters, condition);
+        }
+        return parameters.toArray();
+    }
+
+    private void aggregateParameters(List<Object> parameters, Condition condition) {
+        if (condition instanceof ColumnCondition) {
+            parameters.addAll(Arrays.asList(((ColumnCondition) condition).getParameters()));
+        } else if (condition instanceof ConditionGroup) {
+            for (Condition subCondition : ((ConditionGroup) condition).getConditions()) {
+                aggregateParameters(parameters, subCondition);
+            }
         }
     }
 }
