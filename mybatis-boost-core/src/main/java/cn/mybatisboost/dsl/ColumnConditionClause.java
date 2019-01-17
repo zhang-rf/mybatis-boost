@@ -1,4 +1,4 @@
-package cn.mybatisboost.sql;
+package cn.mybatisboost.dsl;
 
 public class ColumnConditionClause implements ConditionClause {
 
