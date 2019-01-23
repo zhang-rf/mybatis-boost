@@ -1,8 +1,6 @@
 package cn.mybatisboost.dsl.select;
 
 import cn.mybatisboost.core.adaptor.NameAdaptor;
-import cn.mybatisboost.dsl.MappingUnderscoreToCamelCaseAware;
-import cn.mybatisboost.dsl.NameAdaptorAware;
 import cn.mybatisboost.dsl.condition.*;
 import cn.mybatisboost.util.EntityUtils;
 import cn.mybatisboost.util.LambdaUtils;
@@ -18,9 +16,9 @@ public class SelectImpl implements Select {
 
     private boolean mapUnderscoreToCamelCase;
     private NameAdaptor nameAdaptor;
-    private List<String> columns;
+    private String[] columns = new String[0];
     private Class<?>[] tables;
-    private Condition[] conditions;
+    private Condition[] conditions = new Condition[0];
 
     public SelectImpl(boolean mapUnderscoreToCamelCase, NameAdaptor nameAdaptor) {
         this.mapUnderscoreToCamelCase = mapUnderscoreToCamelCase;
@@ -29,13 +27,17 @@ public class SelectImpl implements Select {
 
     @Override
     public <T> Select select(Function<T, ?>... columns) {
-        this.columns = new ArrayList<>();
-        for (Function<T, ?> mr : columns) {
-            LambdaUtils.LambdaInfo lambdaInfo = LambdaUtils.getLambdaInfo(mr);
-            String table = EntityUtils.getTableName(lambdaInfo.getType(), nameAdaptor);
-            String column = SqlUtils.normalizeColumn
-                    (lambdaInfo.getMethodName().replaceFirst("^get", ""), mapUnderscoreToCamelCase);
-            this.columns.add(table + "." + column);
+        if (columns.length > 0) {
+            List<String> columnList = new ArrayList<>();
+            for (Function<T, ?> mr : columns) {
+                LambdaUtils.LambdaInfo lambdaInfo = LambdaUtils.getLambdaInfo(mr);
+                String table = EntityUtils.getTableName(lambdaInfo.getType(), nameAdaptor);
+                String column = SqlUtils.normalizeColumn
+                        (lambdaInfo.getMethodName().replaceFirst("^get", ""),
+                                mapUnderscoreToCamelCase);
+                columnList.add(table + "." + column);
+            }
+            this.columns = columnList.toArray(new String[0]);
         }
         return this;
     }
@@ -55,15 +57,15 @@ public class SelectImpl implements Select {
     @Override
     public String sql() {
         StringBuilder sqlBuilder = new StringBuilder();
-        writeSelect(sqlBuilder);
-        writeFrom(sqlBuilder);
-        writeWhere(sqlBuilder);
+        appendSelect(sqlBuilder);
+        appendFrom(sqlBuilder);
+        appendWhere(sqlBuilder);
         return sqlBuilder.toString();
     }
 
-    private void writeSelect(StringBuilder sqlBuilder) {
+    private void appendSelect(StringBuilder sqlBuilder) {
         sqlBuilder.append("SELECT ");
-        if (columns.isEmpty()) {
+        if (columns.length == 0) {
             sqlBuilder.append("*");
         } else {
             for (String column : columns) {
@@ -78,7 +80,7 @@ public class SelectImpl implements Select {
         }
     }
 
-    private void writeFrom(StringBuilder sqlBuilder) {
+    private void appendFrom(StringBuilder sqlBuilder) {
         sqlBuilder.append(" FROM ");
         for (Class<?> table : tables) {
             sqlBuilder.append(EntityUtils.getTableName(table, nameAdaptor)).append(", ");
@@ -86,14 +88,14 @@ public class SelectImpl implements Select {
         sqlBuilder.setLength(sqlBuilder.length() - 2);
     }
 
-    private void writeWhere(StringBuilder sqlBuilder) {
+    private void appendWhere(StringBuilder sqlBuilder) {
         if (conditions.length > 0) {
             sqlBuilder.append(" WHERE ");
             for (int i = 0; i < conditions.length; i++) {
                 Condition condition = conditions[i];
                 writeCondition(sqlBuilder, condition, tables.length > 1);
                 if (i < conditions.length - 1) {
-                    if (condition instanceof ColumnCondition || condition instanceof ConditionGroup) {
+                    if (condition instanceof ParameterizedColumnCondition || condition instanceof ConditionGroup) {
                         if (!(conditions[i + 1] instanceof Or)) sqlBuilder.append("AND ");
                     }
                 }
@@ -105,15 +107,10 @@ public class SelectImpl implements Select {
     private void writeCondition(StringBuilder sqlBuilder, Condition condition, boolean withTableName) {
         if (condition instanceof Not) sqlBuilder.append("NOT ");
         else if (condition instanceof Or) sqlBuilder.append("OR ");
-        else if (condition instanceof ColumnCondition) {
-            ColumnCondition columnCondition = (ColumnCondition) condition;
-            if (columnCondition instanceof MappingUnderscoreToCamelCaseAware) {
-                ((MappingUnderscoreToCamelCaseAware) columnCondition)
-                        .setMappingUnderscoreToCamelCase(mapUnderscoreToCamelCase);
-            }
-            if (columnCondition instanceof NameAdaptorAware) {
-                ((NameAdaptorAware) columnCondition).setNameAdaptor(nameAdaptor);
-            }
+        else if (condition instanceof ParameterizedColumnCondition) {
+            ParameterizedColumnCondition columnCondition = (ParameterizedColumnCondition) condition;
+            columnCondition.setMappingUnderscoreToCamelCase(mapUnderscoreToCamelCase);
+            columnCondition.setNameAdaptor(nameAdaptor);
 
             sqlBuilder.append(columnCondition.getColumn(withTableName)).append(" ").append(columnCondition.getSymbol());
             if (columnCondition.getParameters().length == 1) {
@@ -124,6 +121,12 @@ public class SelectImpl implements Select {
                 }
                 sqlBuilder.setLength(sqlBuilder.length() - 3);
             }
+        } else if (condition instanceof ReferencedColumnCondition) {
+            ReferencedColumnCondition columnCondition = (ReferencedColumnCondition) condition;
+            columnCondition.setMappingUnderscoreToCamelCase(mapUnderscoreToCamelCase);
+            columnCondition.setNameAdaptor(nameAdaptor);
+            sqlBuilder.append(columnCondition.getColumn()).append(" ").append(columnCondition.getSymbol()).append(" ")
+                    .append(columnCondition.getReferencedColumn()).append(" ");
         } else if (condition instanceof ConditionGroup) {
             ConditionGroup conditionGroup = (ConditionGroup) condition;
             sqlBuilder.append("(");
@@ -145,8 +148,8 @@ public class SelectImpl implements Select {
     }
 
     private void aggregateParameters(List<Object> parameters, Condition condition) {
-        if (condition instanceof ColumnCondition) {
-            parameters.addAll(Arrays.asList(((ColumnCondition) condition).getParameters()));
+        if (condition instanceof ParameterizedColumnCondition) {
+            parameters.addAll(Arrays.asList(((ParameterizedColumnCondition) condition).getParameters()));
         } else if (condition instanceof ConditionGroup) {
             for (Condition subCondition : ((ConditionGroup) condition).getConditions()) {
                 aggregateParameters(parameters, subCondition);

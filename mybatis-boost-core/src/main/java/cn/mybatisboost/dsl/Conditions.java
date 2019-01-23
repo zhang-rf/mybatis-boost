@@ -19,10 +19,18 @@ public abstract class Conditions {
     }
 
     public static <T, V> Condition eq(Function<T, ?> column, V value) {
-        return new SimpleColumnCondition(column, "=", value);
+        return new ParameterizedColumnCondition(column, "=", value);
+    }
+
+    public static <T1, T2> Condition eq(Function<T1, ?> column, Function<T2, ?> referencedColumn) {
+        return new ReferencedColumnCondition(column, "=", referencedColumn);
     }
 
     public static <T, V> Condition ne(Function<T, ?> column, V value) {
-        return new SimpleColumnCondition(column, "!=", value);
+        return new ParameterizedColumnCondition(column, "!=", value);
+    }
+
+    public static <T1, T2> Condition ne(Function<T1, ?> column, Function<T2, ?> referencedColumn) {
+        return new ReferencedColumnCondition(column, "!=", referencedColumn);
     }
 }

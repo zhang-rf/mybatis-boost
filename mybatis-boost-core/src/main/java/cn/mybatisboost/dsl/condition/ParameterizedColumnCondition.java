@@ -9,7 +9,8 @@ import cn.mybatisboost.util.SqlUtils;
 
 import java.util.function.Function;
 
-public class SimpleColumnCondition implements ColumnCondition, MappingUnderscoreToCamelCaseAware, NameAdaptorAware {
+public class ParameterizedColumnCondition
+        implements ColumnCondition, MappingUnderscoreToCamelCaseAware, NameAdaptorAware {
 
     private LambdaUtils.LambdaInfo columnInfo;
     private String symbol;
@@ -17,13 +18,12 @@ public class SimpleColumnCondition implements ColumnCondition, MappingUnderscore
     private boolean mapUnderscoreToCamelCase;
     private NameAdaptor nameAdaptor;
 
-    public <E> SimpleColumnCondition(Function<E, ?> column, String symbol, Object... parameters) {
+    public <T> ParameterizedColumnCondition(Function<T, ?> column, String symbol, Object... parameters) {
         this.columnInfo = LambdaUtils.getLambdaInfo(column);
         this.symbol = symbol;
         this.parameters = parameters;
     }
 
-    @Override
     public String getColumn(boolean withTableName) {
         String column = SqlUtils.normalizeColumn
                 (columnInfo.getMethodName().replaceFirst("^get", ""), mapUnderscoreToCamelCase);
@@ -35,12 +35,10 @@ public class SimpleColumnCondition implements ColumnCondition, MappingUnderscore
         }
     }
 
-    @Override
     public String getSymbol() {
         return symbol;
     }
 
-    @Override
     public Object[] getParameters() {
         return parameters;
     }
