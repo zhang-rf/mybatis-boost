@@ -12,5 +12,17 @@ public interface Select extends Statement {
 
     Select from(Class<?>... tables);
 
-    Select where(Condition... condition);
+    Select where(Condition... conditions);
+
+    Select join(Class<?>... tables);
+
+    Select on(Condition... conditions);
+
+    <T> Select orderBy(Function<T, ?>... columns);
+
+    Select desc();
+
+    Select offset(int offset);
+
+    Select limit(int limit);
 }
