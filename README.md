@@ -21,14 +21,14 @@ Maven:
 <dependency>
     <groupId>cn.mybatisboost</groupId>
     <artifactId>mybatis-boost-spring-boot-starter</artifactId>
-    <version>2.3.1</version>
+    <version>2.3.2</version>
 </dependency>
 ```
 
 Gradle:
 ```gradle
 compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'
-compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.3.1'
+compile 'cn.mybatisboost:mybatis-boost-spring-boot-starter:2.3.2'
 ```
 
 在手动创建SqlSessionFactory Bean的情况下，请确保MybatisBoost的Mybatis Plugin有被加载。
@@ -316,8 +316,6 @@ SELECT * FROM #t WHERE PostId = ? AND PostDate BETWEEN ? AND ?
 ```
 
 只要以Mybatis的`@Mapper`注解标记的方法，MybatisBoost都会智能的生成相应SQL语句，让你的双手解放于编写千篇一律的简单SQL语句。
-
-> 低版本的Mybatis没有`@Mapper`注解，可以使用MybatisBoost提供的`@cn.mybatisboost.support.Mapper`注解代替。
 
 下面我们就以“selectByPostIdAndPostDateBw”为例来分析下如何编写智能方法查询，分解后的单词如下：select By PostId And PostDate Bw。其中“select”称为“方法词”，“By”称为“辅助词”，“PostId”和“PostDate”为POJO中的属性，“And”和“Bw”（BETWEEN的缩写）为SQL关键字，其中，方法词和辅助词都是必须的，其他的为可选项。
 

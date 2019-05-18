@@ -8,9 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -55,11 +54,11 @@ public abstract class EntityUtils {
     }
 
     public static List<String> getProperties(Class<?> type) {
-        return new ArrayList<>(propertiesCache.computeIfAbsent(type, UncheckedFunction.of(k ->
-                Collections.unmodifiableList(Arrays.stream(Introspector.getBeanInfo(type).getPropertyDescriptors())
-                        .map(PropertyDescriptor::getName)
-                        .filter(p -> !Objects.equals(p, "class"))
-                        .collect(Collectors.toList())))));
+        return new ArrayList<>(propertiesCache.computeIfAbsent(type, k ->
+                Collections.unmodifiableList(Arrays.stream(type.getDeclaredFields())
+                        .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                        .filter(f -> !Modifier.isTransient(f.getModifiers()))
+                        .map(Field::getName).collect(Collectors.toList()))));
     }
 
     public static List<String> getProperties(Object entity, boolean selective) {

@@ -6,8 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class MethodNameParser {
+
+    private static final Pattern PATTERN_ORDER_BY_SEPARATOR = Pattern.compile(" (?!ASC|DESC)");
 
     private final String methodName, tableName;
     private final boolean mapUnderscoreToCamelCase;
@@ -48,9 +51,10 @@ public class MethodNameParser {
 
         int offset = 0, predicateIndex;
         Iterator<String> iterator = keywordMap.values().iterator();
-        Predicate predicate = null;
+        boolean containsOrderBy = false;
+        int orderByIndex = 0;
         while ((predicateIndex = expression.indexOf("?", offset)) >= 0) {
-            predicate = Predicate.of(iterator.next());
+            Predicate predicate = Predicate.of(iterator.next());
 
             if (predicateIndex > offset) {
                 sqlBuilder.append(SqlUtils.normalizeColumn
@@ -61,13 +65,23 @@ public class MethodNameParser {
             }
             sqlBuilder.append(predicate.sqlFragment()).append(' ');
             offset = predicateIndex + 1;
+
+            if (predicate == Predicate.OrderBy) {
+                containsOrderBy = true;
+                orderByIndex = sqlBuilder.length();
+            }
         }
         if (offset < expression.length() - 1) {
             sqlBuilder.append(SqlUtils.normalizeColumn
                     (expression.substring(offset), mapUnderscoreToCamelCase));
-            if (predicate == null || predicate != Predicate.OrderBy) {
+            if (!containsOrderBy) {
                 sqlBuilder.append(" = ?");
             }
+        }
+        if (containsOrderBy) {
+            String correctedOrderByExpression = PATTERN_ORDER_BY_SEPARATOR.matcher
+                    (sqlBuilder.substring(orderByIndex).trim()).replaceAll(", ");
+            sqlBuilder.replace(orderByIndex, sqlBuilder.length(), correctedOrderByExpression);
         }
         return parsedSql = sqlBuilder.toString().trim();
     }
@@ -80,25 +94,6 @@ public class MethodNameParser {
     private String prepare(StringBuilder sqlBuilder, String expression) {
         if (expression.startsWith("All")) {
             expression = expression.substring(3);
-            if (expression.startsWith("By")) {
-                sqlBuilder.append("WHERE ");
-                expression = expression.substring(2);
-            }
-
-            Optional<BinaryTuple<String, Integer>> optional =
-                    extractKeyNumber(expression, "Limit", true);
-            if (optional.isPresent()) {
-                BinaryTuple<String, Integer> tuple = optional.get();
-                limit = tuple.second();
-                expression = tuple.first();
-
-                optional = extractKeyNumber(expression, "Offset", true);
-                if (optional.isPresent()) {
-                    tuple = optional.get();
-                    offset = tuple.second();
-                    expression = tuple.first();
-                }
-            }
         } else {
             if (expression.startsWith("First")) {
                 limit = 1;
@@ -112,9 +107,24 @@ public class MethodNameParser {
                     expression = tuple.first();
                 }
             }
-            if (expression.startsWith("By")) {
-                sqlBuilder.append("WHERE ");
-                expression = expression.substring(2);
+        }
+        if (expression.startsWith("By")) {
+            sqlBuilder.append("WHERE ");
+            expression = expression.substring(2);
+        }
+
+        Optional<BinaryTuple<String, Integer>> optional =
+                extractKeyNumber(expression, "Limit", true);
+        if (optional.isPresent()) {
+            BinaryTuple<String, Integer> tuple = optional.get();
+            limit = tuple.second();
+            expression = tuple.first();
+
+            optional = extractKeyNumber(expression, "Offset", true);
+            if (optional.isPresent()) {
+                tuple = optional.get();
+                offset = tuple.second();
+                expression = tuple.first();
             }
         }
         return expression;
