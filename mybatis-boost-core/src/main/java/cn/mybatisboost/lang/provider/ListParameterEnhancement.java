@@ -1,12 +1,12 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
+import cn.mybatisboost.util.MyBatisUtils;
 import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
@@ -48,7 +48,7 @@ public class ListParameterEnhancement implements SqlProvider {
     private boolean filter(MappedStatement mappedStatement) {
         return !(mappedStatement.getSqlSource() instanceof DynamicSqlSource) ||
                 filterCache.computeIfAbsent(mappedStatement.getId(), k -> filter(Collections.singletonList((SqlNode)
-                        SystemMetaObject.forObject(mappedStatement.getSqlSource()).getValue("rootSqlNode"))));
+                        MyBatisUtils.getMetaObject(mappedStatement.getSqlSource()).getValue("rootSqlNode"))));
     }
 
     @SuppressWarnings("unchecked")
@@ -77,7 +77,7 @@ public class ListParameterEnhancement implements SqlProvider {
             return Collections.emptyMap();
         } else {
             Map<Integer, List<?>> listMap = new HashMap<>();
-            MetaObject parameterMetaObject = SystemMetaObject.forObject(parameterObject);
+            MetaObject parameterMetaObject = MyBatisUtils.getMetaObject(parameterObject);
             for (int i = 0; i < parameterMappings.size(); i++) {
                 try {
                     Object property = parameterMetaObject.getValue(parameterMappings.get(i).getProperty());

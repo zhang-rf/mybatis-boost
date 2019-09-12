@@ -1,7 +1,7 @@
 package cn.mybatisboost.spring.boot.autoconfigure;
 
-import javassist.ClassPool;
-import javassist.CtClass;
+import org.apache.ibatis.javassist.ClassPool;
+import org.apache.ibatis.javassist.CtClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;

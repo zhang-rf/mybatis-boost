@@ -1,13 +1,13 @@
 package cn.mybatisboost.metric;
 
 import cn.mybatisboost.core.Configuration;
+import cn.mybatisboost.util.MyBatisUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class MetricInterceptor implements Interceptor {
         if (configuration.isShowQueryWithParameters()) {
             List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
             Object parameterObject = boundSql.getParameterObject();
-            MetaObject metaObject = SystemMetaObject.forObject(parameterObject);
+            MetaObject metaObject = MyBatisUtils.getMetaObject(parameterObject);
             if (parameterMappings.size() == 1 && !(parameterObject instanceof Map) &&
                     !metaObject.hasGetter(parameterMappings.get(0).getProperty())) {
                 parameters.add(parameterObject);

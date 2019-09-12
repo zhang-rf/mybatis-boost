@@ -12,11 +12,13 @@ public interface UncheckedConsumer<T> {
             try {
                 consumer.accept(t);
             } catch (Throwable e) {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                }
-                throw new RuntimeException(e);
+                throw sneakyThrow(e);
             }
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    static <E extends Throwable> E sneakyThrow(Throwable e) throws E {
+        return (E) e;
     }
 }

@@ -1,13 +1,13 @@
 package cn.mybatisboost.nosql;
 
-import javassist.*;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.MethodInfo;
-import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.ArrayMemberValue;
-import javassist.bytecode.annotation.MemberValue;
-import javassist.bytecode.annotation.StringMemberValue;
+import org.apache.ibatis.javassist.*;
+import org.apache.ibatis.javassist.bytecode.AnnotationsAttribute;
+import org.apache.ibatis.javassist.bytecode.ConstPool;
+import org.apache.ibatis.javassist.bytecode.MethodInfo;
+import org.apache.ibatis.javassist.bytecode.annotation.Annotation;
+import org.apache.ibatis.javassist.bytecode.annotation.ArrayMemberValue;
+import org.apache.ibatis.javassist.bytecode.annotation.MemberValue;
+import org.apache.ibatis.javassist.bytecode.annotation.StringMemberValue;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 

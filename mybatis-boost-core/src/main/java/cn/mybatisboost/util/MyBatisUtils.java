@@ -1,6 +1,7 @@
 package cn.mybatisboost.util;
 
 import org.apache.ibatis.mapping.ParameterMapping;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
@@ -11,12 +12,19 @@ import java.util.stream.Collectors;
 
 public abstract class MyBatisUtils {
 
-    public static MetaObject getRealMetaObject(Object target) {
+    private static final DefaultReflectorFactory DEFAULT_REFLECTOR_FACTORY = new DefaultReflectorFactory();
+
+    public static MetaObject getMetaObject(Object target) {
         MetaObject metaObject;
-        while ((metaObject = SystemMetaObject.forObject(target)).hasGetter("h")) {
+        while ((metaObject = forObject(target)).hasGetter("h")) {
             target = metaObject.getValue("h.target");
         }
         return metaObject;
+    }
+
+    private static MetaObject forObject(Object object) {
+        return MetaObject.forObject(object, SystemMetaObject.DEFAULT_OBJECT_FACTORY,
+                SystemMetaObject.DEFAULT_OBJECT_WRAPPER_FACTORY, DEFAULT_REFLECTOR_FACTORY);
     }
 
     public static List<ParameterMapping> getParameterMappings(Configuration configuration, List<String> properties) {

@@ -37,7 +37,7 @@ public class DispatcherInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Connection connection = (Connection) invocation.getArgs()[0];
-        MetaObject metaObject = MyBatisUtils.getRealMetaObject(invocation.getTarget());
+        MetaObject metaObject = MyBatisUtils.getMetaObject(invocation.getTarget());
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
         preprocessors.forEach(p -> p.replace(connection, metaObject, mappedStatement, boundSql));

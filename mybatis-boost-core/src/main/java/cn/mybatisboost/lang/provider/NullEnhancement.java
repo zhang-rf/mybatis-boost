@@ -1,13 +1,13 @@
 package cn.mybatisboost.lang.provider;
 
 import cn.mybatisboost.core.SqlProvider;
+import cn.mybatisboost.util.MyBatisUtils;
 import cn.mybatisboost.util.SqlUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.sql.Connection;
 import java.util.Iterator;
@@ -23,7 +23,7 @@ public class NullEnhancement implements SqlProvider {
 
             Matcher matcher = SqlUtils.PATTERN_PLACEHOLDER.matcher(sql);
             Iterator<ParameterMapping> iterator = boundSql.getParameterMappings().iterator();
-            MetaObject parameterMetaObject = SystemMetaObject.forObject(boundSql.getParameterObject());
+            MetaObject parameterMetaObject = MyBatisUtils.getMetaObject(boundSql.getParameterObject());
             boolean isUpperCase = Character.isUpperCase(sql.charAt(0));
 
             int offset = 0;
